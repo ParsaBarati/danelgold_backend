@@ -12,6 +12,8 @@ import { Token } from '@/auth/token/entity/token.entity';
 import { SmsService } from '@/services/sms.service';
 import { ConfigService } from '@nestjs/config';
 import { editDateUser } from '@/user/dto/edit-user-date.dto';
+import { CreateUserByAdminDTO } from './dto/create-user.dto';
+import { PaginationResult } from '@/common/paginate/pagitnate.service';
 
 @Injectable()
 export class UserService {
@@ -41,6 +43,38 @@ export class UserService {
 
     const result = await this.userRepository.save(NewUser);
     return result;
+  }
+
+  async createUser(createUserDTO: CreateUserByAdminDTO) {
+    const existingUser = await this.userRepository.findOne({
+      where: { phone: createUserDTO.phone },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException(
+        'کاربری با این شماره همراه قبلاً حساب کاربری ساخته است',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDTO.password, 10);
+
+    const NewUser = this.userRepository.create({
+      ...createUserDTO,
+      password: hashedPassword,
+      createdAt: new Date(),
+    });
+
+    const result = await this.userRepository.save(NewUser);
+
+    if (createUserDTO.isSms) {
+      await this.smsService.sendSignUpSMS(
+        createUserDTO.phone,
+        createUserDTO.phone,
+        createUserDTO.password,
+      );
+    }
+
+    return createResponse(201, result, 'کاربر با موفقیت ایجاد گردید');
   }
 
   async updateUser(
@@ -107,6 +141,110 @@ export class UserService {
     const result = userInformation;
     return createResponse(200, result, null);
   }
+
+  async getUsers(
+    page: number = 1,
+    limit: number = 10,
+    searchInput?: string,
+    role?: string,
+    all?: string,
+    sort: string = 'id',
+    sortOrder: 'ASC' | 'DESC' = 'DESC',
+  ): Promise<ApiResponses<PaginationResult<any>>> {
+    const allowedSortFields = [
+      'id',
+      'firstName',
+      'lastName',
+      'phone',
+      'roles',
+      'grade',
+      'lastLogin',
+      'skuTest',
+    ];
+
+    const validatedSortBy = allowedSortFields.includes(sort) ? sort : 'id';
+
+    let queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userDetail', 'userDetail')
+      .select([
+        'user.id as id',
+        'user.firstName as firstName',
+        'user.lastName as lastName',
+        'user.phone as phone',
+        'user.role as role',
+        'user.grade as grade',
+        'user.lastLogin as lastLogin',
+        'user.skuTest as skuTest',
+        'MAX(userDetail.ip) as ip',
+        'MAX(userDetail.platform) as platform',
+        'MAX(userDetail.browser) as browser',
+        'MAX(userDetail.versionBrowser) as versionBrowser',
+        'MAX(userDetail.versionPlatform) as versionPlatform',
+        'MAX(userDetail.loginDate) as lastLoginDate',
+      ])
+      .groupBy(
+        'user.id, user.firstName, user.lastName, user.phone, user.roles, user.grade, user.lastLogin, user.skuTest',
+      )
+      .orderBy(`user.${validatedSortBy}`, sortOrder);
+
+    if (searchInput) {
+      queryBuilder = queryBuilder.andWhere(
+        `(CONCAT(user.firstName, ' ', user.lastName) ILIKE :searchInput OR user.phone ILIKE :searchInput OR CAST(user.skuTest AS TEXT) ILIKE :searchInput)`,
+        { searchInput: `%${searchInput}%` },
+      );
+    }
+
+    if (role !== undefined && role !== '') {
+      queryBuilder = queryBuilder.andWhere('user.roles = :roles', { role });
+    }
+
+    if (all === 'true') {
+      const users = await queryBuilder.getRawMany();
+      const adminCount = await this.userRepository.count({
+        where: { role: UserRole.ADMIN},
+      });
+      const userCount = await this.userRepository.count({
+        where: { role: UserRole.USER },
+      });
+      const response = {
+        data: users,
+        total: users.length,
+        adminCount,
+        userCount,
+        totalPages: 1,
+        page: 1,
+        limit: users.length,
+      };
+
+      return createResponse(200, response);
+    }
+
+    const offset = (page - 1) * limit;
+    queryBuilder = queryBuilder.skip(offset).take(limit);
+    const users = await queryBuilder.getRawMany();
+
+    const total = await this.userRepository.count();
+    const totalPages = Math.ceil(total / limit);
+    const response = {
+      data: users,
+      total,
+      totalPages,
+      page,
+      limit,
+    };
+
+    return createResponse(200, response);
+  }
+
+  async getAdminCount(): Promise<number> {
+    return this.userRepository.count({ where: { role: UserRole.ADMIN } });
+  }
+
+  async getUserCount(): Promise<number> {
+    return this.userRepository.count({ where: { role: UserRole.ADMIN } });
+  }
+
 
   async getUserDataWithToken(userPhone: string) {
     const existingUser = await this.userRepository

@@ -174,7 +174,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       title: currentAuction.title,
       body: `${currentAuction.nft.name} در حال برگزاری است`,
       icon: currentAuction.nft.imageURL,
-      badge: `https://api.baclassonline.ir/app/uploads/2024/02/192.png`,
+      badge: ``,
     };
 
     for (const subscription of subscriptions) {
@@ -217,9 +217,9 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     const payload = {
       title: title,
       body: content,
-      icon: 'https://api.baclassonline.ir/public/images/2024/07/05.jpg',
+      icon: '',
       badge:
-        'https://api.baclassonline.ir/public/images/2024/08/gholami_offline.jpg',
+        '',
     };
 
     console.log(`payload >>> ${JSON.stringify(payload)}\n\n`);
@@ -256,6 +256,6 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       }
     }
 
-    return { statusCode: 200 }; // برگرداندن وضعیت موفقیت‌آمیز
+    return { statusCode: 200 };
   }
 }

@@ -26,7 +26,7 @@ export class UserAgentMiddleware implements NestMiddleware {
         platform: agent.os,
         browser: agent.browser,
         versionBrowser: agent.version,
-        versionPlatform: agent.os,
+        versionPlatform: agent.osVersion,
         ip: req.ip,
       };
     } catch (error) {

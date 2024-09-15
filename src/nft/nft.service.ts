@@ -6,7 +6,6 @@ import { ApiResponses, createResponse } from '@/utils/response.util';
 import { MintNFTDto } from '@/nft/dto/MintNFT.dto';
 import { User, UserRole } from '@/user/entity/user.entity';
 import { UpdateNFTDto } from '@/nft/dto/UpdateNFT.dto';
-import { PaginationResult } from '@/common/paginate/pagitnate.service';
 
 @Injectable()
 export class NFTsService {

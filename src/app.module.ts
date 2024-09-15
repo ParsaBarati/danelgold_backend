@@ -1,35 +1,109 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import typeormDataSource from './config/data-source';
+import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import { User } from '@/user/entity/user.entity';
-import { CollectionEntity } from '@/collection/entity/collection.entity';
-import { NFT } from '@/nft/entity/nft.entity';
-import { Auction } from '@/auction/entity/auction.entity';
-import { UserModule } from '@/user/user.module';
+import { OtpModule } from './auth/otp/otp.module';
+import { JwtAuthGuard } from './auth/guards/jwt.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { JwtStrategy } from './auth/strategy/jwt.strategy';
+import { TokenModule } from './auth/token/token.module';
+import { UserModule } from './user/user.module';
+import { SessionModule } from './session/session.module';
+import { SubscribeModule } from './subscribe/subscribe.module';
+import { UserDetailModule } from './user-detail/userDetail.module';
+import { PaymentModule } from './payment/payment.module';
+import { UploadModule } from './upload/upload.module';
+import { TransactionModule } from './transaction/module.transaction';
+import { WalletModule } from './wallet/wallet.module';
+import { walletTransaction } from './wallet/entity/walletTransaction.entity';
+import { LoggingInterceptor } from './common/utils/logger.interseptor';
+import { AllExceptionsFilter } from './common/exeptionFilters/global.error';
+import { UserAgentMiddleware } from './common/middleware/user-agent.middleware';
 import { AuctionModule } from './auction/auction.module';
-import { NFTModule } from './nft/nft.module';
 import { CollectionEntityModule } from './collection/collection.module';
+import { NFTModule } from './nft/nft.module';
+import { ForumModule } from './forum/forum.module';
+import { SupportTicketModule } from './support-ticket/support-ticket.module';
+
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 50,
+      },
+    ]),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
+    }),
     ConfigModule.forRoot({
-      isGlobal: true,
+      envFilePath: '.develop.env',
     }),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'nft-marketplace.sqlite',
-      entities: [User, CollectionEntity, NFT, Auction],
-      synchronize: true, 
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => {
+        const synchronize = configService.get('NODE_ENV') === 'development';
+
+        console.log('synchronize ' + synchronize);
+        return {
+          ...typeormDataSource.options,
+          autoLoadEntities: true,
+        };
+      },
     }),
-    TypeOrmModule.forFeature([User, CollectionEntity, NFT, Auction]),
-    UserModule,
-    AuthModule,
+    AuctionModule,
     CollectionEntityModule,
     NFTModule,
-    AuctionModule,
+    ForumModule,
+    SupportTicketModule,
+    WalletModule,
+    walletTransaction,
+    TransactionModule,
+    AuthModule,
+    UserModule,
+    UserDetailModule,
+    OtpModule,
+    SessionModule,
+    UploadModule,
+    SubscribeModule,
+    PaymentModule,
+    TokenModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserAgentMiddleware).forRoutes('*');
+  }
+}

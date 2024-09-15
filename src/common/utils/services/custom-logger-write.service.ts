@@ -6,7 +6,7 @@ import * as path from 'path';
 
 @Injectable()
 export class MyLogger implements LoggerService {
-  private logFilePath = path.join(__dirname, '@logs/app.log');
+  private logFilePath = path.join(__dirname, '../logs/app.log');
 
   log(message: any, ...optionalParams: any[]) {
     this.writeLog('LOG', message, ...optionalParams);
