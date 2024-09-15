@@ -35,7 +35,7 @@ export class UpdateAuctionDto{
     @IsBoolean()
     isSms?:boolean
 
-    @ApiProperty()
+    @ApiProperty({ enum: AuctionStatus})
     @IsEnum(AuctionStatus, {})
     @IsOptional()
     auctionStatus?: AuctionStatus;

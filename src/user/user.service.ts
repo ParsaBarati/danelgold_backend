@@ -23,7 +23,6 @@ export class UserService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly smsService: SmsService,
-    private readonly configService: ConfigService,
   ) {}
 
   async singupUser(createUserDTO: SignupDto) {

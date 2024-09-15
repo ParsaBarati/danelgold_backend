@@ -9,11 +9,14 @@ import { TokenService } from './token.service';
 import { JwtStrategy } from '@/auth/strategy/jwt.strategy';
 import { UserModule } from '@/user/user.module';
 import { TokenController } from './controller.token';
+import { User } from '@/user/entity/user.entity';
+import { UserService } from '@/user/user.service';
+import { SmsService } from '@/services/sms.service';
 
 @Module({
   imports: [
     UserModule,
-    TypeOrmModule.forFeature([Token]),
+    TypeOrmModule.forFeature([Token,User]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -25,7 +28,7 @@ import { TokenController } from './controller.token';
     }),
   ],
   controllers: [TokenController],
-  providers: [TokenService, JwtStrategy],
+  providers: [TokenService, UserService,SmsService,JwtStrategy],
   exports: [TokenService],
 })
 export class TokenModule {}

@@ -10,6 +10,7 @@ import { ParticipateAuctionDto } from '@/auction/dto/ParticipateAuction.dto';
 import { User } from '@/user/entity/user.entity';
 import { Bid } from './entity/auctionBid.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SmsService } from '@/services/sms.service';
 
 @Injectable()
 export class AuctionsService {
@@ -22,7 +23,8 @@ export class AuctionsService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
-    private readonly paginationService: PaginationService
+    private readonly paginationService: PaginationService,
+    private readonly smsService: SmsService
   ) {}
 
   async createAuction(

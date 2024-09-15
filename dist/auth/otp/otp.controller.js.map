@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/auth/otp/otp.controller.ts"],"sourcesContent":["import { Controller } from \"@nestjs/common\";\r\n\r\n\r\n@Controller('otp')\r\nexport class OtpController{}"],"names":["OtpController"],"mappings":";;;;+BAIaA;;;eAAAA;;;wBAJc;;;;;;;AAIpB,IAAA,AAAMA,gBAAN,MAAMA;AAAc"}

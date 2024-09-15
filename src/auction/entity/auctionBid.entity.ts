@@ -9,11 +9,9 @@ export class Bid {
   id: number;
 
   @Column('decimal', { precision: 18, scale: 8 })
-  @ApiProperty({ description: 'The amount of the bid' })
   amount: number;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  @ApiProperty({ description: 'The timestamp when the bid was placed' })
   createdAt: Date;
 
   @ManyToOne(() => Auction, (auction) => auction.bids)

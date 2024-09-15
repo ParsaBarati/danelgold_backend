@@ -20,7 +20,6 @@ import { SubscribeModule } from './subscribe/subscribe.module';
 import { UserDetailModule } from './user-detail/userDetail.module';
 import { PaymentModule } from './payment/payment.module';
 import { UploadModule } from './upload/upload.module';
-import { TransactionModule } from './transaction/module.transaction';
 import { WalletModule } from './wallet/wallet.module';
 import { walletTransaction } from './wallet/entity/walletTransaction.entity';
 import { LoggingInterceptor } from './common/utils/logger.interseptor';
@@ -31,6 +30,11 @@ import { CollectionEntityModule } from './collection/collection.module';
 import { NFTModule } from './nft/nft.module';
 import { ForumModule } from './forum/forum.module';
 import { SupportTicketModule } from './support-ticket/support-ticket.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { UserService } from './user/user.service';
+import { User } from './user/entity/user.entity';
+import { Token } from './auth/token/entity/token.entity';
+import { SmsService } from './services/sms.service';
 
 
 @Module({
@@ -62,6 +66,10 @@ import { SupportTicketModule } from './support-ticket/support-ticket.module';
         };
       },
     }),
+    TypeOrmModule.forFeature([
+      User,
+      Token
+    ]),
     AuctionModule,
     CollectionEntityModule,
     NFTModule,
@@ -83,6 +91,8 @@ import { SupportTicketModule } from './support-ticket/support-ticket.module';
   controllers: [AppController],
   providers: [
     AppService,
+    UserService,
+    SmsService,
     JwtStrategy,
     {
       provide: APP_GUARD,

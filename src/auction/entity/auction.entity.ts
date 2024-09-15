@@ -15,31 +15,25 @@ export class Auction {
   id: number;
 
   @Column({ type: 'varchar' })
-  @ApiProperty({ description: 'The title of the auction' })
   title: string;
 
   @Column({ type: 'timestamptz' })
-  @ApiProperty({ description: 'The start time of the auction' })
   startTime: Date;
 
   @Column({ type: 'timestamptz' })
-  @ApiProperty({ description: 'The end time of the auction' })
   endTime: Date;
 
   @Column('decimal', { precision: 18, scale: 8 })
-  @ApiProperty({ description: 'The starting bid amount' })
   startingBid: number;
 
   @Column('decimal', { precision: 18, scale: 8 })
-  @ApiProperty({ description: 'The current highest bid amount' })
   currentBid: number;
 
-  @Column({
-    type: 'enum',
+  @ApiProperty({ enum: AuctionStatus })
+  @Column('enum', {
     enum: AuctionStatus,
     default: AuctionStatus.Active
   })
-  @ApiProperty({ description: 'The status of the auction' })
   auctionStatus: AuctionStatus;
 
   @Column({ type: 'boolean', default: false, nullable: true })

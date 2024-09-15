@@ -3,42 +3,43 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '@/user/user.service';
-import { JalaliService } from '@/utils/jalali.util';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { OtpService } from './otp/otp.service';
 import { UserModule } from '@/user/user.module';
 import { OtpModule } from './otp/otp.module';
-import { CaptchaMiddleware } from '@/common/middleware/captcha.middleware';
 import { UserDetailService } from '@/user-detail/userDetail.service';
-import { TokenService } from './token/token.service';
 import { TokenModule } from './token/token.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@/user/entity/user.entity';
 import { UserDetail } from '@/user-detail/entity/userDetail.entity';
+import { Token } from './token/entity/token.entity';
+import { SmsService } from '@/services/sms.service';
+import { PaginationService } from '@/common/paginate/pagitnate.service';
+import { ConfigModule } from '@nestjs/config';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserDetail]),
+    TypeOrmModule.forFeature([User,UserDetail,Token]),
     PassportModule,
     UserModule,
     OtpModule,
     TokenModule,
+    ConfigModule
   ],
   controllers: [AuthController],
   providers: [
+    JwtStrategy,
+    JwtAuthGuard,
     AuthService,
     UserService,
-    JalaliService,
-
     OtpService,
-    OtpService,
+    RolesGuard,
     UserDetailService,
+    SmsService,
+    PaginationService
   ],
+  exports: [JwtStrategy, PassportModule],
 })
-export class AuthModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(CaptchaMiddleware)
-  //     .forRoutes({ path: 'auth/login/password', method: RequestMethod.POST });
-  // }
-}
+export class AuthModule {}
