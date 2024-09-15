@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "strict": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "sourceMap": true,
+    "incremental": true,
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node", "express", "multer"]
+  },
+  "include": ["src/**/*", "src/common/types/custom-session.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
