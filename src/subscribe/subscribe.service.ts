@@ -152,7 +152,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
 
     const currentAuction = await this.auctionRepository
       .createQueryBuilder('auctions')
-      .leftJoinAndSelect('auctions.nfts', 'nft')
+      .leftJoinAndSelect('auctions.nft', 'nft')
       .addSelect(['nft.name', 'nft.imageUrl'])
       .where('auctions.start >= :windowStart', { windowStart })
       .andWhere('auctions.start <= :windowEnd', { windowEnd })
