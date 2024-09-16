@@ -208,9 +208,9 @@ let SubscribeService = class SubscribeService {
             const currentAuction = yield _this.auctionRepository.createQueryBuilder('auctions').leftJoinAndSelect('auctions.nft', 'nft').addSelect([
                 'nft.name',
                 'nft.imageURL'
-            ]).where('auctions.start >= :windowStart', {
+            ]).where('auctions.startTime >= :windowStart', {
                 windowStart
-            }).andWhere('auctions.start <= :windowEnd', {
+            }).andWhere('auctions.startTime <= :windowEnd', {
                 windowEnd
             }).getOne();
             if (!currentAuction) {
