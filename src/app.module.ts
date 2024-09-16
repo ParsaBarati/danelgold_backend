@@ -35,6 +35,7 @@ import { UserService } from './user/user.service';
 import { User } from './user/entity/user.entity';
 import { Token } from './auth/token/entity/token.entity';
 import { SmsService } from './services/sms.service';
+import { IPFSService } from './services/IPFS.service';
 
 
 @Module({
@@ -92,6 +93,7 @@ import { SmsService } from './services/sms.service';
   providers: [
     AppService,
     UserService,
+    IPFSService,
     SmsService,
     JwtStrategy,
     {

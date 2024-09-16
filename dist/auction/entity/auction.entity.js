@@ -74,9 +74,6 @@ _ts_decorate([
     _ts_metadata("design:type", Number)
 ], Auction.prototype, "currentBid", void 0);
 _ts_decorate([
-    (0, _swagger.ApiProperty)({
-        enum: AuctionStatus
-    }),
     (0, _typeorm.Column)('enum', {
         enum: AuctionStatus,
         default: "active"
@@ -95,9 +92,6 @@ _ts_decorate([
     (0, _typeorm.CreateDateColumn)({
         type: 'timestamptz'
     }),
-    (0, _swagger.ApiProperty)({
-        description: 'The creation timestamp of the auction'
-    }),
     _ts_metadata("design:type", typeof Date === "undefined" ? Object : Date)
 ], Auction.prototype, "createdAt", void 0);
 _ts_decorate([
@@ -105,11 +99,17 @@ _ts_decorate([
         type: 'timestamptz',
         nullable: true
     }),
-    (0, _swagger.ApiProperty)({
-        description: 'The last update timestamp of the auction'
-    }),
     _ts_metadata("design:type", typeof Date === "undefined" ? Object : Date)
 ], Auction.prototype, "updatedAt", void 0);
+_ts_decorate([
+    (0, _typeorm.OneToMany)(()=>_auctionBidentity.Bid, (bid)=>bid.auction),
+    (0, _swagger.ApiProperty)({
+        type: ()=>[
+                _auctionBidentity.Bid
+            ]
+    }),
+    _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
+], Auction.prototype, "bids", void 0);
 _ts_decorate([
     (0, _typeorm.ManyToOne)(()=>_nftentity.NFT, (nft)=>nft.auctions),
     (0, _swagger.ApiProperty)({
@@ -133,20 +133,10 @@ _ts_decorate([
         referencedColumnName: 'phone'
     }),
     (0, _swagger.ApiProperty)({
-        type: ()=>_userentity.User,
-        description: 'The user who placed the highest bid'
+        type: ()=>_userentity.User
     }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
 ], Auction.prototype, "highestBidder", void 0);
-_ts_decorate([
-    (0, _typeorm.OneToMany)(()=>_auctionBidentity.Bid, (bid)=>bid.auction),
-    (0, _swagger.ApiProperty)({
-        type: ()=>[
-                _auctionBidentity.Bid
-            ]
-    }),
-    _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
-], Auction.prototype, "bids", void 0);
 Auction = _ts_decorate([
     (0, _typeorm.Entity)({
         name: 'auctions'

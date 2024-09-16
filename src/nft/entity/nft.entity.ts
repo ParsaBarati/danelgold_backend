@@ -7,11 +7,13 @@ import {
   UpdateDateColumn, 
   Relation, 
   OneToMany,
-  JoinColumn
+  JoinColumn,
+  Index
 } from 'typeorm';
 import { CollectionEntity } from '@/collection/entity/collection.entity';
 import { Auction } from '@/auction/entity/auction.entity';
 import { User } from '@/user/entity/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'nfts'})
 export class NFT {
@@ -27,7 +29,8 @@ export class NFT {
   @Column()
   imageURL: string;
 
-  @Column()
+  @Column({ unique: true })
+  @Index({ unique: true })
   metadataURL: string;
 
   @Column()
@@ -46,16 +49,20 @@ export class NFT {
   updatedAt: Date;
 
   @OneToMany(() => Auction, (auctions) => auctions.nft)
+  @ApiProperty({ type: () => [NFT] })
   auctions: Relation<NFT[]>
 
   @ManyToOne(() => CollectionEntity, (collectionEntity) => collectionEntity.nfts)
+  @ApiProperty({ type: () => CollectionEntity })
   collectionEntity: Relation<CollectionEntity>;
 
   @ManyToOne(() => User, (creator) => creator.createdNfts)
   @JoinColumn({ name: 'creatorPhone',referencedColumnName: 'phone' })
+  @ApiProperty({ type: () => User })
   creator: Relation<User>;
 
   @ManyToOne(() => User, (owner) => owner.ownedNfts)
   @JoinColumn({ name: 'ownerPhone',referencedColumnName: 'phone' })
+  @ApiProperty({ type: () => User })
   owner: Relation<User>;
 }

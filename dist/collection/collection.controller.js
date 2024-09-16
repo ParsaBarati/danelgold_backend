@@ -64,6 +64,20 @@ let CollectionsController = class CollectionsController {
             return yield _this.collectionsService.createCollection(createCollectionDto, creatorPhone);
         })();
     }
+    addNftToCollection(collectionId, nftId, req) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const currentOwnerPhone = req.user.result.phone;
+            return yield _this.collectionsService.addNftToCollection(collectionId, nftId, currentOwnerPhone);
+        })();
+    }
+    removeNftFromCollection(nftId, req) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const currentOwnerPhone = req.user.result.phone;
+            return yield _this.collectionsService.removeNftFromCollection(nftId, currentOwnerPhone);
+        })();
+    }
     updateCollection(collectionId, req, updateCollectionDto) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -73,14 +87,23 @@ let CollectionsController = class CollectionsController {
         })();
     }
     getAllCollections(page, limit, search, sort, sortOrder) {
-        const query = {
-            page,
-            limit,
-            search,
-            sort,
-            sortOrder
-        };
-        return this.collectionsService.getAllCollections(query);
+        var _this = this;
+        return _async_to_generator(function*() {
+            const query = {
+                page,
+                limit,
+                search,
+                sort,
+                sortOrder
+            };
+            return yield _this.collectionsService.getAllCollections(query);
+        })();
+    }
+    getCollectionById(collectionId) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            return yield _this.collectionsService.getAuctionById(collectionId);
+        })();
     }
     constructor(collectionsService){
         this.collectionsService = collectionsService;
@@ -97,6 +120,30 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", Promise)
 ], CollectionsController.prototype, "createCollection", null);
+_ts_decorate([
+    (0, _common.Post)(':/collectionId/add/nftId'),
+    _ts_param(0, (0, _common.Param)('collectionId', _common.ParseIntPipe)),
+    _ts_param(1, (0, _common.Param)('nftId', _common.ParseIntPipe)),
+    _ts_param(2, (0, _common.Req)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        Number,
+        Number,
+        typeof _express.Request === "undefined" ? Object : _express.Request
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], CollectionsController.prototype, "addNftToCollection", null);
+_ts_decorate([
+    (0, _common.Post)(':/collectionId/remove/nftId'),
+    _ts_param(0, (0, _common.Param)('nftId', _common.ParseIntPipe)),
+    _ts_param(1, (0, _common.Req)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        Number,
+        typeof _express.Request === "undefined" ? Object : _express.Request
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], CollectionsController.prototype, "removeNftFromCollection", null);
 _ts_decorate([
     (0, _common.Put)('/:id'),
     _ts_param(0, (0, _common.Param)(':collectionId', _common.ParseIntPipe)),
@@ -125,8 +172,17 @@ _ts_decorate([
         String,
         String
     ]),
-    _ts_metadata("design:returntype", void 0)
+    _ts_metadata("design:returntype", Promise)
 ], CollectionsController.prototype, "getAllCollections", null);
+_ts_decorate([
+    (0, _common.Get)('/:id'),
+    _ts_param(0, (0, _common.Param)('collectionId', _common.ParseIntPipe)),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        Number
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], CollectionsController.prototype, "getCollectionById", null);
 CollectionsController = _ts_decorate([
     (0, _common.Controller)('collection'),
     _ts_metadata("design:type", Function),

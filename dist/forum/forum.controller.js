@@ -10,6 +10,7 @@ Object.defineProperty(exports, "ForumController", {
 });
 const _common = require("@nestjs/common");
 const _forumservice = require("./forum.service");
+const _swagger = require("@nestjs/swagger");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -151,6 +152,8 @@ _ts_decorate([
     _ts_metadata("design:returntype", void 0)
 ], ForumController.prototype, "removePost", null);
 ForumController = _ts_decorate([
+    (0, _swagger.ApiTags)('Forum'),
+    (0, _swagger.ApiBearerAuth)(),
     (0, _common.Controller)('forum'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

@@ -39,11 +39,6 @@ _ts_decorate([
 ], MintNFTDto.prototype, "imageURL", void 0);
 _ts_decorate([
     (0, _swagger.ApiProperty)(),
-    (0, _classvalidator.IsString)(),
-    _ts_metadata("design:type", String)
-], MintNFTDto.prototype, "metadataURL", void 0);
-_ts_decorate([
-    (0, _swagger.ApiProperty)(),
     (0, _classvalidator.IsInt)(),
     _ts_metadata("design:type", Number)
 ], MintNFTDto.prototype, "price", void 0);

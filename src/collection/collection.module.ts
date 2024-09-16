@@ -5,10 +5,11 @@ import { User } from "@/user/entity/user.entity";
 import { PaginationService } from "@/common/paginate/pagitnate.service";
 import { CollectionEntity } from "./entity/collection.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { NFT } from "@/nft/entity/nft.entity";
 
 
 @Module({
-    imports:[TypeOrmModule.forFeature([CollectionEntity,User])],
+    imports:[TypeOrmModule.forFeature([CollectionEntity,User,NFT])],
     controllers:[CollectionsController],
     providers:[CollectionsService,PaginationService]
 })

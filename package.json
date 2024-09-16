@@ -55,6 +55,7 @@
     "express-useragent": "^1.0.15",
     "fs-extra": "^11.2.0",
     "googleapis": "^140.0.1",
+    "ipfs-http-client": "^50.1.2",
     "jalali-moment": "^3.3.11",
     "jsonwebtoken": "^9.0.2",
     "kavenegar": "^1.1.4",

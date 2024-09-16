@@ -8,6 +8,7 @@ Object.defineProperty(exports, "ParticipateAuctionDto", {
         return ParticipateAuctionDto;
     }
 });
+const _swagger = require("@nestjs/swagger");
 const _classvalidator = require("class-validator");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -21,6 +22,7 @@ function _ts_metadata(k, v) {
 let ParticipateAuctionDto = class ParticipateAuctionDto {
 };
 _ts_decorate([
+    (0, _swagger.ApiProperty)(),
     (0, _classvalidator.IsNotEmpty)(),
     (0, _classvalidator.IsNumber)(),
     (0, _classvalidator.Min)(0),

@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Req, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
 import { NFTsService } from '@/nft/nft.service';
-import { NFT } from '@/nft/entity/nft.entity';
 import { MintNFTDto } from './dto/MintNFT.dto';
 import { Request } from 'express';
-import { UpdateNFTDto } from './dto/UpdateNFT.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('NFT')
+@ApiBearerAuth()
 @Controller('nft')
 export class NFTsController {
   constructor(private readonly nftsService: NFTsService) {}
@@ -16,22 +17,6 @@ export class NFTsController {
   ){
     const creatorPhone = (req.user as any).result.phone
     return await this.nftsService.mintNFT(mintNFTDto,creatorPhone);
-  }
-
-  @Put('/:id')
-  async updateMint(
-    @Param('nftId',ParseIntPipe) nftId: number,
-    @Req () req: Request,
-    @Body() updateNFTDto: UpdateNFTDto
-  ){
-    const currentOwnerPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.role;
-    return await this.nftsService.updateNFT(
-      nftId,
-      updateNFTDto,
-      currentOwnerPhone,
-      currentUserRoles
-    )
   }
 
   @Delete('/:id')

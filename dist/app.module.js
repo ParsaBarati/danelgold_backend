@@ -45,6 +45,7 @@ const _userservice = require("./user/user.service");
 const _userentity = require("./user/entity/user.entity");
 const _tokenentity = require("./auth/token/entity/token.entity");
 const _smsservice = require("./services/sms.service");
+const _IPFSservice = require("./services/IPFS.service");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -172,6 +173,7 @@ AppModule = _ts_decorate([
         providers: [
             _appservice.AppService,
             _userservice.UserService,
+            _IPFSservice.IPFSService,
             _smsservice.SmsService,
             _jwtstrategy.JwtStrategy,
             {

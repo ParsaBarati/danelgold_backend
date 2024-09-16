@@ -14,6 +14,7 @@ const _typeorm1 = require("typeorm");
 const _nftentity = require("./entity/nft.entity");
 const _responseutil = require("../utils/response.util");
 const _userentity = require("../user/entity/user.entity");
+const _IPFSservice = require("../services/IPFS.service");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -61,7 +62,13 @@ let NFTsService = class NFTsService {
     mintNFT(mintNFTDto, creatorPhone) {
         var _this = this;
         return _async_to_generator(function*() {
-            const { name, description, imageURL, metadataURL, price } = mintNFTDto;
+            const { name, description, imageURL, price } = mintNFTDto;
+            const metadata = {
+                name,
+                description,
+                image: imageURL,
+                price
+            };
             const creator = yield _this.userRepository.findOne({
                 where: {
                     phone: creatorPhone
@@ -70,6 +77,7 @@ let NFTsService = class NFTsService {
             if (!creator) {
                 throw new _common.NotFoundException('کاربر یافت نشد');
             }
+            const metadataURL = yield _this.ipfsService.uploadMetadataToIPFS(metadata);
             const nft = {
                 name,
                 description,
@@ -82,39 +90,6 @@ let NFTsService = class NFTsService {
             };
             const newNFT = yield _this.nftsRepository.save(nft);
             return (0, _responseutil.createResponse)(201, newNFT);
-        })();
-    }
-    updateNFT(nftId, updateNFTDto, currentOwnerPhone, currentUserRoles) {
-        var _this = this;
-        return _async_to_generator(function*() {
-            const nft = yield _this.nftsRepository.findOne({
-                where: {
-                    id: nftId
-                },
-                relations: [
-                    'owner'
-                ]
-            });
-            if (!nft) {
-                throw new _common.NotFoundException('NFT یافت نشد');
-            }
-            const isOwner = nft.ownerPhone === currentOwnerPhone;
-            const isAdmin = currentUserRoles.includes(_userentity.UserRole.ADMIN);
-            if (!isOwner && !isAdmin) {
-                throw new _common.BadRequestException('شما مجاز به ویرایش نیستید');
-            }
-            if (updateNFTDto.name !== undefined) {
-                nft.name = updateNFTDto.name;
-            }
-            if (updateNFTDto.description !== undefined) {
-                nft.description = updateNFTDto.description;
-            }
-            if (updateNFTDto.price !== undefined) {
-                nft.price = updateNFTDto.price;
-            }
-            nft.updatedAt = new Date();
-            const updatedNFT = yield _this.nftsRepository.save(nft);
-            return (0, _responseutil.createResponse)(200, updatedNFT);
         })();
     }
     burnNFT(nftId, currentOwnerPhone, currentUserRoles) {
@@ -181,9 +156,10 @@ let NFTsService = class NFTsService {
             return (0, _responseutil.createResponse)(200, existingNFT);
         })();
     }
-    constructor(nftsRepository, userRepository){
+    constructor(nftsRepository, userRepository, ipfsService){
         this.nftsRepository = nftsRepository;
         this.userRepository = userRepository;
+        this.ipfsService = ipfsService;
     }
 };
 NFTsService = _ts_decorate([
@@ -193,7 +169,8 @@ NFTsService = _ts_decorate([
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
-        typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository
+        typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
+        typeof _IPFSservice.IPFSService === "undefined" ? Object : _IPFSservice.IPFSService
     ])
 ], NFTsService);
 

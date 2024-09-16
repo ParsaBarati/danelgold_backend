@@ -15,6 +15,7 @@ const _collectionentity = require("./entity/collection.entity");
 const _responseutil = require("../utils/response.util");
 const _userentity = require("../user/entity/user.entity");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
+const _nftentity = require("../nft/entity/nft.entity");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -178,9 +179,72 @@ let CollectionsService = class CollectionsService {
             return (0, _responseutil.createResponse)(200, existingCollection);
         })();
     }
-    constructor(collectionsRepository, userRepository, paginationService){
+    addNftToCollection(nftId, collectionId, currentOwnerPhone) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const nft = yield _this.nftsRepository.findOne({
+                where: {
+                    id: nftId
+                },
+                relations: [
+                    'owner'
+                ]
+            });
+            const collection = yield _this.collectionsRepository.findOne({
+                where: {
+                    id: collectionId
+                }
+            });
+            if (!nft) {
+                throw new _common.NotFoundException('NFT پیدا نشد');
+            }
+            if (!collection) {
+                throw new _common.NotFoundException('مجموعه پیدا نشد');
+            }
+            const isOwner = nft.ownerPhone === currentOwnerPhone;
+            if (!isOwner) {
+                throw new _common.ForbiddenException('فقط مالک می‌تواند این NFT را به مجموعه اضافه کند');
+            }
+            nft.collectionEntity = collection;
+            yield _this.nftsRepository.save(nft);
+            return {
+                message: 'NFT با موفقیت به مجموعه اضافه شد'
+            };
+        })();
+    }
+    removeNftFromCollection(nftId, currentOwnerPhone) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const nft = yield _this.nftsRepository.findOne({
+                where: {
+                    id: nftId
+                },
+                relations: [
+                    'owner',
+                    'collection'
+                ]
+            });
+            if (!nft) {
+                throw new _common.NotFoundException('NFT پیدا نشد');
+            }
+            const isOwner = nft.ownerPhone === currentOwnerPhone;
+            if (!isOwner) {
+                throw new _common.ForbiddenException('فقط مالک می‌تواند این NFT را از مجموعه حذف کند');
+            }
+            if (!nft.collectionEntity) {
+                throw new _common.BadRequestException('NFT در هیچ مجموعه‌ای نیست');
+            }
+            nft.collectionEntity = null;
+            yield _this.nftsRepository.save(nft);
+            return {
+                message: 'NFT با موفقیت از مجموعه حذف شد'
+            };
+        })();
+    }
+    constructor(collectionsRepository, userRepository, nftsRepository, paginationService){
         this.collectionsRepository = collectionsRepository;
         this.userRepository = userRepository;
+        this.nftsRepository = nftsRepository;
         this.paginationService = paginationService;
     }
 };
@@ -188,8 +252,10 @@ CollectionsService = _ts_decorate([
     (0, _common.Injectable)(),
     _ts_param(0, (0, _typeorm.InjectRepository)(_collectionentity.CollectionEntity)),
     _ts_param(1, (0, _typeorm.InjectRepository)(_userentity.User)),
+    _ts_param(2, (0, _typeorm.InjectRepository)(_nftentity.NFT)),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
+        typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _pagitnateservice.PaginationService === "undefined" ? Object : _pagitnateservice.PaginationService

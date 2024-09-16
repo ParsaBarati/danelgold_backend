@@ -27,7 +27,7 @@ const datasource = new _typeorm.DataSource({
         __dirname + '/@migrations/*{.ts,.js}'
     ],
     logging: false,
-    synchronize: false,
+    synchronize: true,
     cache: false
 });
 const _default = datasource;

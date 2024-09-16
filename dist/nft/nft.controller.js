@@ -12,7 +12,7 @@ const _common = require("@nestjs/common");
 const _nftservice = require("./nft.service");
 const _MintNFTdto = require("./dto/MintNFT.dto");
 const _express = require("express");
-const _UpdateNFTdto = require("./dto/UpdateNFT.dto");
+const _swagger = require("@nestjs/swagger");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -64,14 +64,6 @@ let NFTsController = class NFTsController {
             return yield _this.nftsService.mintNFT(mintNFTDto, creatorPhone);
         })();
     }
-    updateMint(nftId, req, updateNFTDto) {
-        var _this = this;
-        return _async_to_generator(function*() {
-            const currentOwnerPhone = req.user.result.phone;
-            const currentUserRoles = req.user.result.role;
-            return yield _this.nftsService.updateNFT(nftId, updateNFTDto, currentOwnerPhone, currentUserRoles);
-        })();
-    }
     burnNFT(nftId, req) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -102,19 +94,6 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], NFTsController.prototype, "MintNFT", null);
 _ts_decorate([
-    (0, _common.Put)('/:id'),
-    _ts_param(0, (0, _common.Param)('nftId', _common.ParseIntPipe)),
-    _ts_param(1, (0, _common.Req)()),
-    _ts_param(2, (0, _common.Body)()),
-    _ts_metadata("design:type", Function),
-    _ts_metadata("design:paramtypes", [
-        Number,
-        typeof _express.Request === "undefined" ? Object : _express.Request,
-        typeof _UpdateNFTdto.UpdateNFTDto === "undefined" ? Object : _UpdateNFTdto.UpdateNFTDto
-    ]),
-    _ts_metadata("design:returntype", Promise)
-], NFTsController.prototype, "updateMint", null);
-_ts_decorate([
     (0, _common.Delete)('/:id'),
     _ts_param(0, (0, _common.Param)('nftId', _common.ParseIntPipe)),
     _ts_param(1, (0, _common.Req)()),
@@ -135,6 +114,8 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], NFTsController.prototype, "getNFTById", null);
 NFTsController = _ts_decorate([
+    (0, _swagger.ApiTags)('NFT'),
+    (0, _swagger.ApiBearerAuth)(),
     (0, _common.Controller)('nft'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

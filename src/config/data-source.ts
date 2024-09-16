@@ -13,7 +13,7 @@ const datasource = new DataSource({
   entities: [__dirname + '**/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/@migrations/*{.ts,.js}'],
   logging: false,
-  synchronize: false,
+  synchronize: true,
   cache: false,
 });
 

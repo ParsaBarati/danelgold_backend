@@ -10,7 +10,7 @@ import { Request } from 'express';
 
 @ApiTags('Auction')
 @ApiBearerAuth()
-@Controller('auctions')
+@Controller('auction')
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}
 

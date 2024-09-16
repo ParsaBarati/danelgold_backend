@@ -2,7 +2,10 @@ import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common'
 import { ForumService } from './forum.service';
 import { ForumTopic } from './entity/forum-topic.entity';
 import { ForumPost } from './entity/forum-post.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Forum')
+@ApiBearerAuth()
 @Controller('forum')
 export class ForumController {
   constructor(private readonly forumService: ForumService) {}

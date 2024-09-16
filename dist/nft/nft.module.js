@@ -14,6 +14,7 @@ const _nftcontroller = require("./nft.controller");
 const _nftservice = require("./nft.service");
 const _userentity = require("../user/entity/user.entity");
 const _typeorm = require("@nestjs/typeorm");
+const _IPFSservice = require("../services/IPFS.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -34,7 +35,8 @@ NFTModule = _ts_decorate([
             _nftcontroller.NFTsController
         ],
         providers: [
-            _nftservice.NFTsService
+            _nftservice.NFTsService,
+            _IPFSservice.IPFSService
         ]
     })
 ], NFTModule);

@@ -168,7 +168,7 @@ _ts_decorate([
 AuctionsController = _ts_decorate([
     (0, _swagger.ApiTags)('Auction'),
     (0, _swagger.ApiBearerAuth)(),
-    (0, _common.Controller)('auctions'),
+    (0, _common.Controller)('auction'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         typeof _auctionservice.AuctionsService === "undefined" ? Object : _auctionservice.AuctionsService

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CollectionEntity } from '@/collection/entity/collection.entity';
@@ -7,6 +7,7 @@ import { ApiResponses, createResponse } from '@/utils/response.util';
 import { User, UserRole } from '@/user/entity/user.entity';
 import { UpdateCollectionDto } from '@/collection/dto/UpdateCollection.dto';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
+import { NFT } from '@/nft/entity/nft.entity';
 
 @Injectable()
 export class CollectionsService {
@@ -15,6 +16,8 @@ export class CollectionsService {
     private collectionsRepository: Repository<CollectionEntity>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(NFT)
+    private nftsRepository: Repository<NFT>,
 
     private readonly paginationService: PaginationService
   ) {}
@@ -179,4 +182,68 @@ export class CollectionsService {
 
       return createResponse(200,existingCollection)
   }
+
+  async addNftToCollection(
+    nftId: number,
+    collectionId: number,
+    currentOwnerPhone: string,
+  ): Promise<{ message: string }> {
+
+    const nft = await this.nftsRepository.findOne({
+      where: { id: nftId },
+      relations: ['owner'],
+    });
+  
+    const collection = await this.collectionsRepository.findOne({
+      where: { id: collectionId },
+    });
+  
+    if (!nft) {
+      throw new NotFoundException('NFT پیدا نشد');
+    }
+    if (!collection) {
+      throw new NotFoundException('مجموعه پیدا نشد');
+    }
+  
+    const isOwner = nft.ownerPhone === currentOwnerPhone;
+    if (!isOwner) {
+      throw new ForbiddenException('فقط مالک می‌تواند این NFT را به مجموعه اضافه کند');
+    }
+  
+    nft.collectionEntity = collection;
+    await this.nftsRepository.save(nft);
+  
+    return { message: 'NFT با موفقیت به مجموعه اضافه شد' };
+  }
+
+  async removeNftFromCollection(
+    nftId: number,
+    currentOwnerPhone: string,
+  ): Promise<{ message: string }> {
+
+    const nft = await this.nftsRepository.findOne({
+      where: { id: nftId },
+      relations: ['owner', 'collection'],
+    });
+  
+    if (!nft) {
+      throw new NotFoundException('NFT پیدا نشد');
+    }
+  
+    const isOwner = nft.ownerPhone === currentOwnerPhone;
+    if (!isOwner) {
+      throw new ForbiddenException('فقط مالک می‌تواند این NFT را از مجموعه حذف کند');
+    }
+  
+    if (!nft.collectionEntity) {
+      throw new BadRequestException('NFT در هیچ مجموعه‌ای نیست');
+    }
+  
+    nft.collectionEntity = null;
+    await this.nftsRepository.save(nft);
+  
+    return { message: 'NFT با موفقیت از مجموعه حذف شد' };
+  }
+  
+  
 }

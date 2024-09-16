@@ -29,7 +29,6 @@ export class Auction {
   @Column('decimal', { precision: 18, scale: 8 })
   currentBid: number;
 
-  @ApiProperty({ enum: AuctionStatus })
   @Column('enum', {
     enum: AuctionStatus,
     default: AuctionStatus.Active
@@ -40,12 +39,14 @@ export class Auction {
   isSms: boolean | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  @ApiProperty({ description: 'The creation timestamp of the auction' })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true })
-  @ApiProperty({ description: 'The last update timestamp of the auction' })
   updatedAt: Date;
+
+  @OneToMany(() => Bid, (bid) => bid.auction)
+  @ApiProperty({ type: () => [Bid] })
+  bids: Relation<Bid[]>;
 
   @ManyToOne(() => NFT, (nft) => nft.auctions)
   @ApiProperty({ type: () => NFT })
@@ -57,10 +58,7 @@ export class Auction {
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'highestBidderPhone', referencedColumnName: 'phone' })
-  @ApiProperty({ type: () => User, description: 'The user who placed the highest bid' })
+  @ApiProperty({ type: () => User })
   highestBidder: Relation<User>;
 
-  @OneToMany(() => Bid, (bid) => bid.auction)
-  @ApiProperty({ type: () => [Bid] })
-  bids: Relation<Bid[]>;
 }

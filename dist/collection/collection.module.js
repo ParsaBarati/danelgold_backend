@@ -15,6 +15,7 @@ const _userentity = require("../user/entity/user.entity");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
 const _collectionentity = require("./entity/collection.entity");
 const _typeorm = require("@nestjs/typeorm");
+const _nftentity = require("../nft/entity/nft.entity");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -28,7 +29,8 @@ CollectionEntityModule = _ts_decorate([
         imports: [
             _typeorm.TypeOrmModule.forFeature([
                 _collectionentity.CollectionEntity,
-                _userentity.User
+                _userentity.User,
+                _nftentity.NFT
             ])
         ],
         controllers: [

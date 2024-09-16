@@ -18,6 +18,32 @@ export class CollectionsController {
     return await this.collectionsService.createCollection(createCollectionDto,creatorPhone)
   }
 
+  @Post(':/collectionId/add/nftId')
+  async addNftToCollection(
+    @Param('collectionId',ParseIntPipe) collectionId:number,
+    @Param('nftId',ParseIntPipe) nftId:number,
+    @Req () req:Request
+  ){
+    const currentOwnerPhone = (req.user as any).result.phone;
+    return await this.collectionsService.addNftToCollection(
+      collectionId,
+      nftId,
+      currentOwnerPhone
+    )
+  }
+
+  @Post(':/collectionId/remove/nftId')
+  async removeNftFromCollection(
+    @Param('nftId',ParseIntPipe) nftId:number,
+    @Req () req:Request
+  ){
+    const currentOwnerPhone = (req.user as any).result.phone;
+    return await this.collectionsService.removeNftFromCollection(
+      nftId,
+      currentOwnerPhone
+    )
+  }
+
   @Put('/:id')
   async updateCollection(
     @Param(':collectionId',ParseIntPipe) collectionId: number,
@@ -35,7 +61,7 @@ export class CollectionsController {
   }
 
   @Get('all')
-  getAllCollections(
+  async getAllCollections(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('search') search?: string,
@@ -43,7 +69,14 @@ export class CollectionsController {
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ){
     const query = { page, limit, search, sort, sortOrder };
-    return this.collectionsService.getAllCollections(query);
+    return await this.collectionsService.getAllCollections(query);
+  }
+
+  @Get('/:id')
+  async getCollectionById(
+    @Param('collectionId',ParseIntPipe) collectionId:number
+  ){
+    return await this.collectionsService.getAuctionById(collectionId)
   }
 
 }

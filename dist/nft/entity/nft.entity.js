@@ -12,6 +12,7 @@ const _typeorm = require("typeorm");
 const _collectionentity = require("../../collection/entity/collection.entity");
 const _auctionentity = require("../../auction/entity/auction.entity");
 const _userentity = require("../../user/entity/user.entity");
+const _swagger = require("@nestjs/swagger");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -43,7 +44,12 @@ _ts_decorate([
     _ts_metadata("design:type", String)
 ], NFT.prototype, "imageURL", void 0);
 _ts_decorate([
-    (0, _typeorm.Column)(),
+    (0, _typeorm.Column)({
+        unique: true
+    }),
+    (0, _typeorm.Index)({
+        unique: true
+    }),
     _ts_metadata("design:type", String)
 ], NFT.prototype, "metadataURL", void 0);
 _ts_decorate([
@@ -74,10 +80,18 @@ _ts_decorate([
 ], NFT.prototype, "updatedAt", void 0);
 _ts_decorate([
     (0, _typeorm.OneToMany)(()=>_auctionentity.Auction, (auctions)=>auctions.nft),
+    (0, _swagger.ApiProperty)({
+        type: ()=>[
+                NFT
+            ]
+    }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
 ], NFT.prototype, "auctions", void 0);
 _ts_decorate([
     (0, _typeorm.ManyToOne)(()=>_collectionentity.CollectionEntity, (collectionEntity)=>collectionEntity.nfts),
+    (0, _swagger.ApiProperty)({
+        type: ()=>_collectionentity.CollectionEntity
+    }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
 ], NFT.prototype, "collectionEntity", void 0);
 _ts_decorate([
@@ -86,6 +100,9 @@ _ts_decorate([
         name: 'creatorPhone',
         referencedColumnName: 'phone'
     }),
+    (0, _swagger.ApiProperty)({
+        type: ()=>_userentity.User
+    }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
 ], NFT.prototype, "creator", void 0);
 _ts_decorate([
@@ -93,6 +110,9 @@ _ts_decorate([
     (0, _typeorm.JoinColumn)({
         name: 'ownerPhone',
         referencedColumnName: 'phone'
+    }),
+    (0, _swagger.ApiProperty)({
+        type: ()=>_userentity.User
     }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)
 ], NFT.prototype, "owner", void 0);

@@ -18,10 +18,6 @@ export class MintNFTDto{
     imageURL: string;
 
     @ApiProperty()
-    @IsString()
-    metadataURL: string;
-
-    @ApiProperty()
     @IsInt()
     price: number;
 }
