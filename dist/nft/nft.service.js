@@ -135,7 +135,7 @@ let NFTsService = class NFTsService {
                 'nft.id',
                 'nft.name',
                 'nft.description',
-                'nft.imageUrl',
+                'nft.imageURL',
                 'nft.matadataUrl',
                 'nft.price',
                 'nft.createdAt',

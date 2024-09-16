@@ -207,7 +207,7 @@ let SubscribeService = class SubscribeService {
             windowEnd.setSeconds(currentTimestamp.getSeconds() + 30);
             const currentAuction = yield _this.auctionRepository.createQueryBuilder('auctions').leftJoinAndSelect('auctions.nft', 'nft').addSelect([
                 'nft.name',
-                'nft.imageUrl'
+                'nft.imageURL'
             ]).where('auctions.start >= :windowStart', {
                 windowStart
             }).andWhere('auctions.start <= :windowEnd', {

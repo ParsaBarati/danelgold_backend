@@ -160,7 +160,7 @@ let CollectionsService = class CollectionsService {
                 'nft.id',
                 'nft.name',
                 'nft.description',
-                'nft.imageUrl',
+                'nft.imageURL',
                 'nft.matadataUrl',
                 'nft.ownerPhone',
                 'nft.creatorPhone',
