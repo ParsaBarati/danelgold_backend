@@ -30,7 +30,7 @@ export class NFTsService {
       image: imageURL,
       price,
     };
-
+  
     const creator = await this.userRepository.findOne({
       where: { phone: creatorPhone },
     });

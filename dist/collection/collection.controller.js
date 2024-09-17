@@ -13,6 +13,7 @@ const _collectionservice = require("./collection.service");
 const _express = require("express");
 const _CreateCollectiondto = require("./dto/CreateCollection.dto");
 const _UpdateCollectiondto = require("./dto/UpdateCollection.dto");
+const _swagger = require("@nestjs/swagger");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -184,6 +185,8 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], CollectionsController.prototype, "getCollectionById", null);
 CollectionsController = _ts_decorate([
+    (0, _swagger.ApiTags)('Collection'),
+    (0, _swagger.ApiBearerAuth)(),
     (0, _common.Controller)('collection'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { SupportTicket } from './entity/support-ticket.entity';
 import { SupportTicketsService } from './support-ticket.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Support_Ticket')
+@ApiBearerAuth()
 @Controller('support-tickets')
 export class SupportTicketsController {
   constructor(private readonly supportTicketsService: SupportTicketsService) {}

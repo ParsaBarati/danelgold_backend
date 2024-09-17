@@ -159,7 +159,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       .getOne();
 
     if (!currentAuction) {
-      console.log('No class found at the current timestamp');
+      console.log('No auction found at the current timestamp');
       return;
     }
 

@@ -4,7 +4,10 @@ import { CollectionEntity } from '@/collection/entity/collection.entity';
 import { Request } from 'express';
 import { CreateCollectionDto } from '@/collection/dto/CreateCollection.dto';
 import { UpdateCollectionDto } from '@/collection/dto/UpdateCollection.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Collection')
+@ApiBearerAuth()
 @Controller('collection')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}

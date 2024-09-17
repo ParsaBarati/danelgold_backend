@@ -1,23 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
+export class MintNFTDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
 
-export class MintNFTDto{
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description?: string;
 
-    @ApiProperty()
-    @IsString()
-    name: string;
+  @ApiProperty()
+  @IsString()
+  imageURL: string;
 
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    description?: string;
-
-    @ApiProperty()
-    @IsString()
-    imageURL: string;
-
-    @ApiProperty()
-    @IsInt()
-    price: number;
+  @ApiProperty()
+  @IsInt()
+  price: number;
 }

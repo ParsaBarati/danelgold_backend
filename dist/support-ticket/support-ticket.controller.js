@@ -10,6 +10,7 @@ Object.defineProperty(exports, "SupportTicketsController", {
 });
 const _common = require("@nestjs/common");
 const _supportticketservice = require("./support-ticket.service");
+const _swagger = require("@nestjs/swagger");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -89,6 +90,8 @@ _ts_decorate([
     _ts_metadata("design:returntype", void 0)
 ], SupportTicketsController.prototype, "remove", null);
 SupportTicketsController = _ts_decorate([
+    (0, _swagger.ApiTags)('Support_Ticket'),
+    (0, _swagger.ApiBearerAuth)(),
     (0, _common.Controller)('support-tickets'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
