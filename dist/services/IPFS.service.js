@@ -9,7 +9,8 @@ Object.defineProperty(exports, "IPFSService", {
     }
 });
 const _common = require("@nestjs/common");
-const _ipfshttpclient = require("ipfs-http-client");
+const _axios = /*#__PURE__*/ _interop_require_default(require("axios"));
+const _formdata = /*#__PURE__*/ _interop_require_default(require("form-data"));
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -39,49 +40,92 @@ function _async_to_generator(fn) {
         });
     };
 }
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _interop_require_default(obj) {
+    return obj && obj.__esModule ? obj : {
+        default: obj
+    };
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for(var i = decorators.length - 1; i >= 0; i--)if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 }
-function _ts_metadata(k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-}
 let IPFSService = class IPFSService {
-    uploadToIPFS(content) {
+    getHeaders(form) {
+        return {
+            headers: _object_spread({
+                Authorization: `Bearer ${this.pinataJWT}`
+            }, form.getHeaders())
+        };
+    }
+    // Upload file to IPFS
+    uploadFileToIPFS(file) {
         var _this = this;
         return _async_to_generator(function*() {
+            const form = new _formdata.default();
+            form.append('file', file.buffer, file.originalname);
             try {
-                const result = yield _this.ipfs.add(content);
-                return `https://ipfs.infura.io/ipfs/${result.path}`;
+                const response = yield _axios.default.post(_this.pinataEndpoint, form, _this.getHeaders(form));
+                return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
             } catch (error) {
-                throw new Error(`Error uploading to IPFS: ${error}`);
+                console.error('Error uploading file to IPFS:', error);
+                throw new Error('IPFS file upload failed');
             }
         })();
     }
+    // Upload metadata to IPFS
     uploadMetadataToIPFS(metadata) {
         var _this = this;
         return _async_to_generator(function*() {
-            const metadataBuffer = Buffer.from(JSON.stringify(metadata));
-            return _this.uploadToIPFS(metadataBuffer);
+            const form = new _formdata.default();
+            form.append('metadata', JSON.stringify(metadata));
+            try {
+                const response = yield _axios.default.post(_this.pinataMetadataEndpoint, form, _this.getHeaders(form));
+                return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
+            } catch (error) {
+                console.error('Error uploading metadata to IPFS:', error);
+                throw new Error('IPFS metadata upload failed');
+            }
         })();
     }
     constructor(){
-        this.ipfs = (0, _ipfshttpclient.create)({
-            host: 'ipfs.infura.io',
-            port: 5001,
-            protocol: 'https',
-            headers: {
-                authorization: 'Basic ' + Buffer.from('<projectId>:<projectSecret>').toString('base64')
-            }
-        });
+        this.pinataEndpoint = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
+        this.pinataMetadataEndpoint = 'https://api.pinata.cloud/pinning/pinJSONToIPFS';
+        // Using JWT for authentication
+        this.pinataJWT = process.env.PINATA_JWT;
     }
 };
 IPFSService = _ts_decorate([
-    (0, _common.Injectable)(),
-    _ts_metadata("design:type", Function),
-    _ts_metadata("design:paramtypes", [])
+    (0, _common.Injectable)()
 ], IPFSService);
 
 //# sourceMappingURL=IPFS.service.js.map

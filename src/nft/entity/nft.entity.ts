@@ -23,10 +23,10 @@ export class NFT {
   @Column()
   name: string;
 
-  @Column({type: 'text',nullable: true})
+  @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column()
+  @Column({type: 'varchar'})
   imageURL: string;
 
   @Column({ unique: true })
@@ -39,30 +39,30 @@ export class NFT {
   @Column()
   creatorPhone: string;
 
-  @Column('decimal', { precision: 18, scale: 8 })
+  @Column('decimal', { precision: 18, scale: 8, nullable: false }) 
   price: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({type: 'timestamp', nullable: true})
+  @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
   @OneToMany(() => Auction, (auctions) => auctions.nft)
-  @ApiProperty({ type: () => [NFT] })
-  auctions: Relation<NFT[]>
+  @ApiProperty({ type: () => [Auction] })
+  auctions: Relation<Auction[]>;
 
   @ManyToOne(() => CollectionEntity, (collectionEntity) => collectionEntity.nfts)
   @ApiProperty({ type: () => CollectionEntity })
   collectionEntity: Relation<CollectionEntity>;
 
   @ManyToOne(() => User, (creator) => creator.createdNfts)
-  @JoinColumn({ name: 'creatorPhone',referencedColumnName: 'phone' })
+  @JoinColumn({ name: 'creatorPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   creator: Relation<User>;
 
   @ManyToOne(() => User, (owner) => owner.ownedNfts)
-  @JoinColumn({ name: 'ownerPhone',referencedColumnName: 'phone' })
+  @JoinColumn({ name: 'ownerPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   owner: Relation<User>;
 }

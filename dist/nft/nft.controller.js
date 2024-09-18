@@ -44,58 +44,6 @@ function _async_to_generator(fn) {
         });
     };
 }
-function _define_property(obj, key, value) {
-    if (key in obj) {
-        Object.defineProperty(obj, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-        });
-    } else {
-        obj[key] = value;
-    }
-    return obj;
-}
-function _object_spread(target) {
-    for(var i = 1; i < arguments.length; i++){
-        var source = arguments[i] != null ? arguments[i] : {};
-        var ownKeys = Object.keys(source);
-        if (typeof Object.getOwnPropertySymbols === "function") {
-            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-            }));
-        }
-        ownKeys.forEach(function(key) {
-            _define_property(target, key, source[key]);
-        });
-    }
-    return target;
-}
-function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-    if (Object.getOwnPropertySymbols) {
-        var symbols = Object.getOwnPropertySymbols(object);
-        if (enumerableOnly) {
-            symbols = symbols.filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-            });
-        }
-        keys.push.apply(keys, symbols);
-    }
-    return keys;
-}
-function _object_spread_props(target, source) {
-    source = source != null ? source : {};
-    if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-        ownKeys(Object(source)).forEach(function(key) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-    }
-    return target;
-}
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -111,16 +59,12 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let NFTsController = class NFTsController {
-    mintNFT(file, mintNFTDto, req) {
+    mintNFT(imageURL, mintNFTDataDto, req) {
         var _this = this;
         return _async_to_generator(function*() {
             const creatorPhone = req.user.result.phone;
-            const imageURL = yield _this.ipfsService.uploadToIPFS(file.buffer);
-            // Create an updated MintNFTDto with the URL
-            const updatedMintNFTDto = _object_spread_props(_object_spread({}, mintNFTDto), {
-                imageURL
-            });
-            return yield _this.nftsService.mintNFT(updatedMintNFTDto, creatorPhone);
+            const NFTImageURL = yield _this.ipfsService.uploadFileToIPFS(imageURL);
+            return yield _this.nftsService.mintNFT(creatorPhone, mintNFTDataDto.name, mintNFTDataDto.price, NFTImageURL, mintNFTDataDto.description);
         })();
     }
     burnNFT(nftId, req) {
@@ -149,18 +93,10 @@ _ts_decorate([
         type: _MintNFTdto.MintNFTDto
     }),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('imageURL')),
-    (0, _swagger.ApiOperation)({
-        summary: 'Mint a new NFT'
-    }),
-    (0, _swagger.ApiResponse)({
-        status: 201,
-        description: 'The NFT has been successfully minted.'
-    }),
-    _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
-        maxSize: 5 * 1024 * 1024
-    }).addFileTypeValidator({
-        fileType: 'image/jpeg,image/png,image/webp,image/svg+xml'
-    }).build({
+    (0, _common.UsePipes)(new _common.ValidationPipe({
+        transform: true
+    })),
+    _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().build({
         errorHttpStatusCode: _common.HttpStatus.UNPROCESSABLE_ENTITY
     }))),
     _ts_param(1, (0, _common.Body)()),
@@ -168,14 +104,14 @@ _ts_decorate([
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         typeof Express === "undefined" || typeof Express.Multer === "undefined" || typeof Express.Multer.File === "undefined" ? Object : Express.Multer.File,
-        typeof _MintNFTdto.MintNFTDto === "undefined" ? Object : _MintNFTdto.MintNFTDto,
+        typeof _MintNFTdto.MintNFTDataDto === "undefined" ? Object : _MintNFTdto.MintNFTDataDto,
         typeof _express.Request === "undefined" ? Object : _express.Request
     ]),
     _ts_metadata("design:returntype", Promise)
 ], NFTsController.prototype, "mintNFT", null);
 _ts_decorate([
     (0, _common.Delete)('/:nftId'),
-    _ts_param(0, (0, _common.Param)('nftId', _common.ParseIntPipe)),
+    _ts_param(0, (0, _common.Param)('nftId')),
     _ts_param(1, (0, _common.Req)()),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
@@ -186,7 +122,7 @@ _ts_decorate([
 ], NFTsController.prototype, "burnNFT", null);
 _ts_decorate([
     (0, _common.Get)('/:nftId'),
-    _ts_param(0, (0, _common.Param)('nftId', _common.ParseIntPipe)),
+    _ts_param(0, (0, _common.Param)('nftId')),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         Number

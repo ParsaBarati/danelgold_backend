@@ -36,6 +36,7 @@ import { User } from './user/entity/user.entity';
 import { Token } from './auth/token/entity/token.entity';
 import { SmsService } from './services/sms.service';
 import { IPFSService } from './services/IPFS.service';
+import { PinataModule } from './pinta/pinta.module';
 
 
 @Module({
@@ -88,6 +89,7 @@ import { IPFSService } from './services/IPFS.service';
     SubscribeModule,
     PaymentModule,
     TokenModule,
+    PinataModule
   ],
   controllers: [AppController],
   providers: [
@@ -113,6 +115,7 @@ import { IPFSService } from './services/IPFS.service';
       useClass: AllExceptionsFilter,
     },
   ],
+  exports:[IPFSService]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

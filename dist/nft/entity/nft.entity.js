@@ -40,7 +40,9 @@ _ts_decorate([
     _ts_metadata("design:type", String)
 ], NFT.prototype, "description", void 0);
 _ts_decorate([
-    (0, _typeorm.Column)(),
+    (0, _typeorm.Column)({
+        type: 'varchar'
+    }),
     _ts_metadata("design:type", String)
 ], NFT.prototype, "imageURL", void 0);
 _ts_decorate([
@@ -63,7 +65,8 @@ _ts_decorate([
 _ts_decorate([
     (0, _typeorm.Column)('decimal', {
         precision: 18,
-        scale: 8
+        scale: 8,
+        nullable: false
     }),
     _ts_metadata("design:type", Number)
 ], NFT.prototype, "price", void 0);
@@ -82,7 +85,7 @@ _ts_decorate([
     (0, _typeorm.OneToMany)(()=>_auctionentity.Auction, (auctions)=>auctions.nft),
     (0, _swagger.ApiProperty)({
         type: ()=>[
-                NFT
+                _auctionentity.Auction
             ]
     }),
     _ts_metadata("design:type", typeof _typeorm.Relation === "undefined" ? Object : _typeorm.Relation)

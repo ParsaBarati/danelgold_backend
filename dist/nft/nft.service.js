@@ -59,26 +59,25 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let NFTsService = class NFTsService {
-    mintNFT(mintNFTDto, creatorPhone) {
+    mintNFT(creatorPhone, name, price, imageURL, description) {
         var _this = this;
         return _async_to_generator(function*() {
-            const { name, description, imageURL, price } = mintNFTDto;
-            const metadata = {
-                name,
-                description,
-                image: imageURL,
-                price
-            };
             const creator = yield _this.userRepository.findOne({
                 where: {
                     phone: creatorPhone
                 }
             });
             if (!creator) {
-                throw new _common.NotFoundException('کاربر یافت نشد');
+                throw new _common.NotFoundException('User not found');
             }
+            const metadata = {
+                name,
+                description,
+                image: imageURL,
+                price
+            };
             const metadataURL = yield _this.ipfsService.uploadMetadataToIPFS(metadata);
-            const nft = {
+            const nft = _this.nftsRepository.create({
                 name,
                 description,
                 imageURL,
@@ -87,7 +86,7 @@ let NFTsService = class NFTsService {
                 createdAt: new Date(),
                 creator,
                 owner: creator
-            };
+            });
             const newNFT = yield _this.nftsRepository.save(nft);
             return (0, _responseutil.createResponse)(201, newNFT);
         })();
@@ -104,16 +103,16 @@ let NFTsService = class NFTsService {
                 ]
             });
             if (!nft) {
-                throw new _common.NotFoundException('NFT یافت نشد');
+                throw new _common.NotFoundException('NFT not found');
             }
-            const isOwner = nft.ownerPhone === currentOwnerPhone;
+            const isOwner = nft.owner.phone === currentOwnerPhone;
             const isAdmin = currentUserRoles.includes(_userentity.UserRole.ADMIN);
             if (!isOwner && !isAdmin) {
-                throw new _common.ForbiddenException('فقط مالک می‌تواند این NFT را بسوزاند');
+                throw new _common.ForbiddenException('Only the owner can burn this NFT');
             }
             yield _this.nftsRepository.remove(nft);
             return {
-                message: 'NFT با موفقیت سوزانده شد'
+                message: 'NFT successfully burned'
             };
         })();
     }
@@ -125,34 +124,33 @@ let NFTsService = class NFTsService {
                     id: nftId
                 },
                 relations: [
+                    'creator',
+                    'owner',
                     'collections'
                 ]
             });
             if (!nft) {
-                throw new _common.NotFoundException('NFT یافت نشد');
+                throw new _common.NotFoundException('NFT not found');
             }
             const existingNFT = yield _this.nftsRepository.createQueryBuilder('nfts').leftJoinAndSelect('nfts.creator', 'creator').leftJoinAndSelect('nfts.owner', 'owner').leftJoinAndSelect('nfts.collections', 'collection').select([
                 'nft.id',
                 'nft.name',
                 'nft.description',
                 'nft.imageURL',
-                'nft.matadataUrl',
+                'nft.metadataURL',
                 'nft.price',
                 'nft.createdAt',
-                'nft.updatedAt'
-            ]).addSelect([
+                'nft.updatedAt',
                 'creator.firstName',
-                'creator.lastName'
-            ]).addSelect([
+                'creator.lastName',
                 'owner.firstName',
-                'owner.lastName'
-            ]).addSelect([
+                'owner.lastName',
                 'collection.id',
                 'collection.name',
                 'collection.description'
             ]).where('nfts.id = :nftId', {
                 nftId
-            });
+            }).getOne();
             return (0, _responseutil.createResponse)(200, existingNFT);
         })();
     }

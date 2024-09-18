@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Req, Query, DefaultValuePipe, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, HttpStatus, ParseFilePipeBuilder } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Req, UseInterceptors, UploadedFile, HttpStatus, ParseFilePipeBuilder, UsePipes, ValidationPipe } from '@nestjs/common';
 import { NFTsService } from '@/nft/nft.service';
-import { MintNFTDto } from './dto/MintNFT.dto';
+import { MintNFTDataDto, MintNFTDto } from './dto/MintNFT.dto';
 import { Request } from 'express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IPFSService } from '@/services/IPFS.service';
 
@@ -17,55 +17,40 @@ export class NFTsController {
 
   @Post('mint')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: MintNFTDto,
-  })
+  @ApiBody({ type: MintNFTDto })
   @UseInterceptors(FileInterceptor('imageURL'))
-  @ApiOperation({ summary: 'Mint a new NFT' })
-  @ApiResponse({
-    status: 201,
-    description: 'The NFT has been successfully minted.',
-  })
+  @UsePipes(new ValidationPipe({ transform: true }))  
   async mintNFT(
     @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({ fileType: 'image/jpeg,image/png,image/webp,image/svg+xml' })
-        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+      new ParseFilePipeBuilder().build({
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      }),
     )
-    file: Express.Multer.File,
-    @Body() mintNFTDto: MintNFTDto,
-    @Req() req: Request
+    imageURL: Express.Multer.File,
+    @Body() mintNFTDataDto: MintNFTDataDto,
+    @Req() req: Request,
   ) {
     const creatorPhone = (req.user as any).result.phone;
-
-    const imageURL = await this.ipfsService.uploadToIPFS(file.buffer);
-
-    const updatedMintNFTDto: MintNFTDto = {
-      ...mintNFTDto,
-      imageURL, 
-    };
-
-    return await this.nftsService.mintNFT(updatedMintNFTDto, creatorPhone);
-  }
-
-  @Delete('/:nftId')
-  async burnNFT(
-    @Param('nftId', ParseIntPipe) nftId: number,
-    @Req() req: Request
-  ) {
-    const currentOwnerPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.role;
-    return await this.nftsService.burnNFT(
-      nftId,
-      currentOwnerPhone,
-      currentUserRoles
+    const NFTImageURL = await this.ipfsService.uploadFileToIPFS(imageURL);
+  
+    return await this.nftsService.mintNFT(
+      creatorPhone,
+      mintNFTDataDto.name,
+      mintNFTDataDto.price,
+      NFTImageURL, 
+      mintNFTDataDto.description,
     );
   }
 
+  @Delete('/:nftId')
+  async burnNFT(@Param('nftId') nftId: number, @Req() req: Request) {
+    const currentOwnerPhone = (req.user as any).result.phone;
+    const currentUserRoles = (req.user as any).result.role;
+    return await this.nftsService.burnNFT(nftId, currentOwnerPhone, currentUserRoles);
+  }
+
   @Get('/:nftId')
-  async getNFTById(
-    @Param('nftId', ParseIntPipe) nftId: number
-  ) {
+  async getNFTById(@Param('nftId') nftId: number) {
     return this.nftsService.getNFTById(nftId);
   }
 }

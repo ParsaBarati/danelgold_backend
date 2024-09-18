@@ -46,6 +46,7 @@ const _userentity = require("./user/entity/user.entity");
 const _tokenentity = require("./auth/token/entity/token.entity");
 const _smsservice = require("./services/sms.service");
 const _IPFSservice = require("./services/IPFS.service");
+const _pintamodule = require("./pinta/pinta.module");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -165,7 +166,8 @@ AppModule = _ts_decorate([
             _uploadmodule.UploadModule,
             _subscribemodule.SubscribeModule,
             _paymentmodule.PaymentModule,
-            _tokenmodule.TokenModule
+            _tokenmodule.TokenModule,
+            _pintamodule.PinataModule
         ],
         controllers: [
             _appcontroller.AppController
@@ -192,6 +194,9 @@ AppModule = _ts_decorate([
                 provide: _core.APP_FILTER,
                 useClass: _globalerror.AllExceptionsFilter
             }
+        ],
+        exports: [
+            _IPFSservice.IPFSService
         ]
     })
 ], AppModule);
