@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ES2021", // Updated target
     "module": "commonjs",
+    "declaration": true,
     "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
     "outDir": "./dist",
     "baseUrl": "./src",
+    "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["./*"]
@@ -22,10 +23,8 @@
     "sourceMap": true,
     "incremental": true,
     "typeRoots": ["node_modules/@types"],
-    "types": ["node", "express", "multer"],
-    "removeComments": true,
-    "declaration": true
+    "types": ["node", "express", "multer"]
   },
-  "include": ["src/**/**/**/*", "src/common/types/custom-session.d.ts", "scripts", "test", "typechain", "hardhat.config.ts"],
+  "include": ["src/**/*", "src/common/types/custom-session.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

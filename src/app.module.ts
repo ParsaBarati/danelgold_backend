@@ -37,6 +37,12 @@ import { Token } from './auth/token/entity/token.entity';
 import { SmsService } from './services/sms.service';
 import { IPFSService } from './services/IPFS.service';
 import { PinataModule } from './pinta/pinta.module';
+import { StoriesModule } from './stories/stories.module';
+import { PostsModule } from './posts/posts.module';
+import { PostsController } from './posts/posts.controller';
+import { LikePostModule } from './Social/Post/like-post/like-post.module';
+import { LikePostModule } from './src/social/like-post/like-post.module';
+import { PostsController } from './posts/posts.controller';
 
 
 @Module({
@@ -89,9 +95,12 @@ import { PinataModule } from './pinta/pinta.module';
     SubscribeModule,
     PaymentModule,
     TokenModule,
-    PinataModule
+    PinataModule,
+    StoriesModule,
+    PostsModule,
+    LikePostModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, PostsController],
   providers: [
     AppService,
     UserService,

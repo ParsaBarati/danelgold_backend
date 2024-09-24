@@ -10,7 +10,7 @@ const datasource = new DataSource({
   database: process.env.DATABASE_PG_DB,
   username: process.env.USERNAME_PG_DB,
   password: process.env.PASSWORD_PG_DB,
-  entities: [__dirname + '**/**/*.entity{.ts,.js}'],
+  entities: [__dirname + '**/**/**/**/.entity{.ts,.js}'],
   migrations: [__dirname + '/@migrations/*{.ts,.js}'],
   logging: false,
   synchronize: true,
