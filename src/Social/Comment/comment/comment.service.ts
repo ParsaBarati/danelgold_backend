@@ -618,8 +618,8 @@ export class CommentService {
         'comment.createdAt',
         'comment.updatedAt',
         'comment.likes',
-        'post.id',
         'comment.dislikes',
+        'post.id',
       ])
       .addSelect([
         'replies.id',

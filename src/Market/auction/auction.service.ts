@@ -9,7 +9,6 @@ import { ParticipateAuctionDto } from '@/Market/auction/dto/ParticipateAuction.d
 import { Bid } from './entity/auctionBid.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
-import { SmsService } from '@/services/sms.service';
 import { CronJob } from 'cron';
 
 @Injectable()

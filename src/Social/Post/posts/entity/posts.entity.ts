@@ -40,12 +40,6 @@ export class Post {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ default: false })
-  isArchived: boolean;
-
-  @Column({ default: true })
-  isPublic: boolean;
-
   @OneToMany(() => Comment, comments => comments.post, { cascade: true })
   @ApiProperty({ type: () => [Comment] })
   comments: Relation<Comment[]>;

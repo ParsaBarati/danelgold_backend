@@ -56,7 +56,7 @@ export class CommentController {
   @ApiNotFoundResponse({description:'دوره پیدا نشد!',example:{statusCode:404}})
   @Post('/:storyId')
   async CommentStory(
-    @Param('storyId') storyId: number,
+    @Param('storyId',ParseIntPipe) storyId: number,
     @Req() req : Request,
     @Body() createCommentDTO: CreateCommentDTO,
   ) {
@@ -69,7 +69,7 @@ export class CommentController {
   @ApiNotFoundResponse({description:'کامنتی پیدا نشد!',example:{statusCode:404}})
   @Put(':commentId')
   async updateComment(
-    @Param('commentId') commentId: number,
+    @Param('commentId',ParseIntPipe) commentId: number,
     @Req() req: Request,
     @Body() updateCommentDto: UpdateCommentDTO,
   ) {
@@ -83,7 +83,7 @@ export class CommentController {
   @ApiConflictResponse({description:'دیدگاه پاسخ دارد',example:{statusCode:409}})
   @Delete(':commentId')
   async deleteComment(
-    @Param('commentId') commentId: number,
+    @Param('commentId',ParseIntPipe) commentId: number,
     @Req() req: Request,
   ) {
   const currentUserPhone = (req.user as any).result.phone; 
@@ -138,15 +138,15 @@ export class CommentController {
   return await this.commentsService.getAllStoryComments(query);
   }
 
-  @ApiOperation({summary:'Get Comments By Course'})
+  @ApiOperation({summary:'Get Comments By Post'})
   @ApiOkResponse({description:'دیدگاه های دوره',example:{statusCode:200}})
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'sortBy', required: false })
   @ApiQuery({ name: 'sortOrder', required: false })
   @Get('/post/:id')
-  async getCommentsByCourse(
-    @Param('id') postId: number,
+  async getCommentsByPost(
+    @Param('id',ParseIntPipe) postId: number,
     @Req () req : Request,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -164,22 +164,45 @@ export class CommentController {
       );
   }
 
+  @ApiOperation({summary:'Get Comments By Story'})
+  @ApiOkResponse({description:'دیدگاه های دوره',example:{statusCode:200}})
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'sortBy', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false })
+  @Get('/story/:id')
+  async getCommentsByStory(
+    @Param('id',ParseIntPipe) storyId: number,
+    @Req () req : Request,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('sortBy') sort?: string,
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+  ) {
+    const currentUserPhone = (req.user as any).result.phone;
+    const currentUserRoles = (req.user as any).result.roles || []; 
+    const query = { page, limit, sort, sortOrder };   
+      return await this.commentsService.getCommentsByStory(
+        storyId,
+        currentUserPhone,
+        currentUserRoles,
+        query
+      );
+  }
+
   @ApiOperation({summary:'getPostCommentsByUser'})
   @ApiOkResponse({description:'موفقیت آمیز',example:{statusCode:200}})
   @ApiNotFoundResponse({description:'کاربر بافت نشد',example:{statusCode:404}})
   @ApiQuery({ name: 'postId', required: false })
   @Get('/user/postComments')
  async getPostCommentsByUser(
-  @Query('postId') postId: string | undefined,
+  @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
   @Req() req: Request,
  ){
   const phone = (req.user as any).result.phone;
   const currentUserPhone = (req.user as any).result.phone;
-  const parsedPostId = postId ? parseInt(postId, 10) : undefined;
-  if (parsedPostId !== undefined && isNaN(parsedPostId)) {
-    throw new BadRequestException('postId must be a number');
-  }
-  return await this.commentsService.getPostCommentsByUser(currentUserPhone, phone, parsedPostId);
+
+  return await this.commentsService.getPostCommentsByUser(currentUserPhone, phone, postId);
  }
 
  @ApiOperation({summary:'getStoryCommentsByUser'})
@@ -188,16 +211,13 @@ export class CommentController {
   @ApiQuery({ name: 'storyId', required: false })
   @Get('/user/storyComments')
  async getStoryCommentsByUser(
-  @Query('storyId') storyId: string | undefined,
+  @Query('storyId', new DefaultValuePipe(1), ParseIntPipe) storyId: number | undefined,
   @Req() req: Request,
  ){
   const phone = (req.user as any).result.phone;
   const currentUserPhone = (req.user as any).result.phone;
-  const parsedStoryId = storyId ? parseInt(storyId, 10) : undefined;
-  if (parsedStoryId !== undefined && isNaN(parsedStoryId)) {
-    throw new BadRequestException('storyId must be a number');
-  }
-  return await this.commentsService.getStoryCommentsByUser(currentUserPhone, phone, parsedStoryId);
+  
+  return await this.commentsService.getStoryCommentsByUser(currentUserPhone, phone, storyId);
  }
 }
  
