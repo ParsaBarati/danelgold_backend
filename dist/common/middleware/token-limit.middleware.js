@@ -9,7 +9,7 @@ Object.defineProperty(exports, "AuthMiddleware", {
     }
 });
 const _common = require("@nestjs/common");
-const _tokenservice = require("../../auth/token/token.service");
+const _tokenservice = require("../../User/auth/token/token.service");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);

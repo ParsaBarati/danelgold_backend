@@ -21,7 +21,7 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userPhone: string;
 
   @Column({type: 'int', nullable:true })
@@ -49,11 +49,11 @@ export class Comment {
   @ApiProperty({ type: () => [Reply]} )
   replies: Relation<Reply[]>;
 
-  @OneToMany(() => (likeComment), commentlikes => commentlikes.comment, { cascade: true })
+  @OneToMany(() => (likeComment), commentlikes => commentlikes.comment)
   @ApiProperty({ type: () => [likeComment]} )
   commentlikes: Relation<likeComment[]>;
 
-  @ManyToOne(() => (User), user => user.comments, { cascade: true })
+  @ManyToOne(() => (User), user => user.comments)
   @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;

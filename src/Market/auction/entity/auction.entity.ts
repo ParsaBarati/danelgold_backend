@@ -48,6 +48,12 @@ export class Auction {
   @Column({ type: 'boolean', default: false, nullable: true })
   isSms: boolean | null;
 
+  @Column( { type: 'varchar'} )
+  creatorPhone: string;
+
+  @Column({ type: 'varchar' })
+  highestBidderPhone: string;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
@@ -63,10 +69,11 @@ export class Auction {
   nft: Relation<NFT>;
 
   @ManyToOne(() => User, (creator) => creator.auctions)
+  @JoinColumn( { name: 'creatorPhone',referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   creator: Relation<User>;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, (highestBidder) => highestBidder.auctions)
   @JoinColumn({ name: 'highestBidderPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   highestBidder: Relation<User>;

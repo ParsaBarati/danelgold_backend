@@ -2,16 +2,15 @@ import { Injectable, NotFoundException, ConflictException, UnauthorizedException
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm/index';
 import * as bcrypt from 'bcryptjs';
-import { User, UserRole } from '@/user/entity/user.entity';
-import { SignupDto } from '@/auth/dto/signup-dto';
-import { UpdateUserDTO } from '@/user/dto/update-user.dto';
+import { User, UserRole } from '@/User/user/entity/user.entity';
+import { SignupDto } from '@/User/auth/dto/signup-dto';
+import { UpdateUserDTO } from '@/User/user/dto/update-user.dto';
 import { ApiResponses, createResponse } from '@/utils/response.util';
-import { UserInformation } from '@/user/interface/userInformation.interface';
-import { Subscribe } from '@/subscribe/entity/subscribe.entity';
-import { Token } from '@/auth/token/entity/token.entity';
+import { UserInformation } from '@/User/user/interface/userInformation.interface';
+import { Subscribe } from '@/User/subscribe/entity/subscribe.entity';
+import { Token } from '@/User/auth/token/entity/token.entity';
 import { SmsService } from '@/services/sms.service';
-import { ConfigService } from '@nestjs/config';
-import { editDateUser } from '@/user/dto/edit-user-date.dto';
+import { editDateUser } from '@/User/user/dto/edit-user-date.dto';
 import { CreateUserByAdminDTO } from './dto/create-user.dto';
 import { PaginationResult } from '@/common/paginate/pagitnate.service';
 
@@ -174,7 +173,6 @@ export class UserService {
         'user.role as role',
         'user.grade as grade',
         'user.lastLogin as lastLogin',
-        'user.skuTest as skuTest',
         'MAX(userDetail.ip) as ip',
         'MAX(userDetail.platform) as platform',
         'MAX(userDetail.browser) as browser',
@@ -183,19 +181,19 @@ export class UserService {
         'MAX(userDetail.loginDate) as lastLoginDate',
       ])
       .groupBy(
-        'user.id, user.firstName, user.lastName, user.phone, user.roles, user.grade, user.lastLogin, user.skuTest',
+        'user.id, user.firstName, user.lastName, user.phone, user.role, user.lastLogin',
       )
       .orderBy(`user.${validatedSortBy}`, sortOrder);
 
     if (searchInput) {
       queryBuilder = queryBuilder.andWhere(
-        `(CONCAT(user.firstName, ' ', user.lastName) ILIKE :searchInput OR user.phone ILIKE :searchInput OR CAST(user.skuTest AS TEXT) ILIKE :searchInput)`,
+        `(CONCAT(user.firstName, ' ', user.lastName) ILIKE :searchInput OR user.phone ILIKE :searchInput)`,
         { searchInput: `%${searchInput}%` },
       );
     }
 
     if (role !== undefined && role !== '') {
-      queryBuilder = queryBuilder.andWhere('user.roles = :roles', { role });
+      queryBuilder = queryBuilder.andWhere('user.role = :role', { role });
     }
 
     if (all === 'true') {

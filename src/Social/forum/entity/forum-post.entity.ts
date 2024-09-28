@@ -5,7 +5,8 @@ import {
     CreateDateColumn, 
     UpdateDateColumn, 
     ManyToOne, 
-    Relation 
+    Relation, 
+    JoinColumn
 } from 'typeorm';
 import { User } from '@/User/user/entity/user.entity';
 import { ForumTopic } from './forum-topic.entity';
@@ -14,6 +15,9 @@ import { ForumTopic } from './forum-topic.entity';
 export class ForumPost {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'varchar' })
+  userPhone: string;
 
   @Column('text')
   content: string;
@@ -28,5 +32,6 @@ export class ForumPost {
   topic: Relation<ForumTopic>;
 
   @ManyToOne(() => User, user => user.forumPosts)
+  @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
   user: Relation<User>;
 }

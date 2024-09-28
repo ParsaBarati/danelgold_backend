@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/user/entity/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,6 +7,7 @@ import {
   JoinColumn,
   Relation,
 } from 'typeorm';
+import { User } from '@/User/user/entity/user.entity';
 
 @Entity('subscribe')
 export class Subscribe {
@@ -26,11 +26,7 @@ export class Subscribe {
   @Column({ type: 'boolean', default: false })
   isActive: boolean;
 
-  @Column({ type: 'text', nullable: true })
-  userPhone: string | null;
-
   @ManyToOne(() => User, (user) => user.subscribes, { cascade: true })
-  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

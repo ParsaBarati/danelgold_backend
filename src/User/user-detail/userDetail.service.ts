@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { UserDetail } from './entity/userDetail.entity';
 import { CreateUserDetailDTO } from './dto/create-userDetail.dto';
 import { UpdateUserDetailDTO } from './dto/update-userDetail.dto';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 import {
   PaginationResult,
   PaginationService,

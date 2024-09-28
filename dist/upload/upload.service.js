@@ -16,7 +16,7 @@ const _path = require("path");
 const _fsextra = /*#__PURE__*/ _interop_require_default(require("fs-extra"));
 const _responseutil = require("../utils/response.util");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
-const _userentity = require("../user/entity/user.entity");
+const _userentity = require("../User/user/entity/user.entity");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);

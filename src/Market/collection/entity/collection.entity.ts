@@ -23,7 +23,7 @@ export class CollectionEntity {
   @Column({type: 'text', nullable: true})
   description: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   creatorPhone: string;
 
   @CreateDateColumn()

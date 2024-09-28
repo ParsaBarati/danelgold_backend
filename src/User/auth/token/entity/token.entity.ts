@@ -4,9 +4,10 @@ import {
   Column,
   ManyToOne,
   Relation,
+  JoinColumn,
 } from 'typeorm';
-import { User } from '@/user/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '@/User/user/entity/user.entity';
 
 @Entity('tokens')
 export class Token {

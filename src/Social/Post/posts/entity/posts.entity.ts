@@ -6,7 +6,8 @@ import {
     OneToMany, 
     CreateDateColumn, 
     UpdateDateColumn, 
-    Relation
+    Relation,
+    JoinColumn
 } from 'typeorm';
 import { User } from '@/User/user/entity/user.entity';
 import { Comment } from '@/Social/Comment/comment/entity/comment.entity';
@@ -17,6 +18,9 @@ import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'varchar' })
+  userPhone: string;
 
   @Column({ type: 'text' })
   mediaUrl: string;
@@ -46,11 +50,12 @@ export class Post {
   @ApiProperty({ type: () => [Comment] })
   comments: Relation<Comment[]>;
 
-  @OneToMany(() => likePost, postLikes => postLikes.post, { cascade: true })
+  @OneToMany(() => likePost, postLikes => postLikes.post)
   @ApiProperty({ type: () => [likePost] })
   postLikes: Relation<likePost[]>;
 
-  @ManyToOne(() => User, user => user.posts, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.posts)
+  @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

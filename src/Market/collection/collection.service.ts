@@ -101,7 +101,7 @@ export class CollectionsService {
 
     const queryBuilder = this.collectionsRepository
       .createQueryBuilder('collections')
-      .leftJoinAndSelect('collections.users','user')
+      .leftJoinAndSelect('collections.user','user')
       .select([
         'collections.id',
         'collections.name',
@@ -149,7 +149,7 @@ export class CollectionsService {
       .createQueryBuilder('collections')
       .leftJoinAndSelect('collections.nfts','nft')
       .leftJoinAndSelect('collections.user','collectionUser')
-      .leftJoinAndSelect('nfts.users','nftUser')
+      .leftJoinAndSelect('nfts.user','nftUser')
       .select([
         'collections.id',
         'collections.name',

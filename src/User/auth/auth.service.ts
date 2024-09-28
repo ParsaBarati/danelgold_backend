@@ -1,4 +1,4 @@
-import { UserDetailService } from '@/user-detail/userDetail.service';
+import { UserDetailService } from '@/User/user-detail/userDetail.service';
 import {
   Injectable,
   NotFoundException,
@@ -18,9 +18,9 @@ import { Repository } from 'typeorm';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Request } from 'express';
 import { TokenService } from './token/token.service';
-import { User } from '@/user/entity/user.entity';
-import { UserService } from '@/user/user.service';
-import { UserDetail } from '@/user-detail/entity/userDetail.entity';
+import { User } from '@/User/user/entity/user.entity';
+import { UserService } from '@/User/user/user.service';
+import { UserDetail } from '@/User/user-detail/entity/userDetail.entity';
 import { 
   getBrowserVersion, 
   getUserBrowser, 

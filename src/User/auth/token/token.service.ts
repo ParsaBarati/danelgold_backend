@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Token } from './entity/token.entity';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 
 @Injectable()

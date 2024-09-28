@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Relation, Generated, PrimaryColumn, OneToOne } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Relation, Generated, PrimaryColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Token } from '@/User/auth/token/entity/token.entity';
 import { UserDetail } from '@/User/user-detail/entity/userDetail.entity';
@@ -22,13 +22,12 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
-@Entity({ name: 'users'})
+@Entity({ name: 'user'})
 export class User {
-  @Column()
-  @Generated('increment')
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ type: 'varchar', unique: true, length: 11 })
+  @Column({ type: 'varchar', unique: true, length: 11 })
   phone: string;
 
   @Column({ type: 'varchar' })
@@ -45,9 +44,6 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true })
   imageUrl: string | null;
-
-  @Column({ nullable: true })
-  walletAddress: string;
 
   @Column({
     type: 'enum',
@@ -87,7 +83,7 @@ export class User {
 
   @OneToMany(() => NFT, (nfts) => nfts.owner)
   @ApiProperty({ type: () => [NFT]} )
-  ownedNfts: NFT[];
+  ownedNfts: Relation<NFT[]>;
 
   @OneToMany(() => Auction, (auctions) => auctions.creator)
   @ApiProperty({ type: () => [Auction] })

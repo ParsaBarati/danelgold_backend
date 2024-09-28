@@ -9,7 +9,7 @@ import fs from 'fs-extra';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
 
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 
 @Injectable()
 export class UploadService {

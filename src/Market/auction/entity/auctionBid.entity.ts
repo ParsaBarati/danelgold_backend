@@ -16,6 +16,12 @@ export class Bid {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar' })
+  userPhone: string;
+
+  @Column( { type: 'int' })
+  auctionId: number;
+
   @Column('decimal', { precision: 18, scale: 8 })
   amount: number;
 

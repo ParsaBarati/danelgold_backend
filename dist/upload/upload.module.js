@@ -17,7 +17,7 @@ const _config = require("@nestjs/config");
 const _uplaodentity = require("./entity/uplaod.entity");
 const _multerutils = require("../common/utils/multer.utils");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
-const _userentity = require("../user/entity/user.entity");
+const _userentity = require("../User/user/entity/user.entity");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

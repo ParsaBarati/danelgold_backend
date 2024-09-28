@@ -8,7 +8,7 @@ import { Public } from '@/common/decorators/public.decorator';
 import { LoginDto } from './dto/login-with-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ApiResponses } from '@/utils/response.util';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 import {
   ApiBearerAuth,
   ApiConflictResponse,

@@ -28,12 +28,12 @@ export class likeComment {
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @ManyToOne(() => Comment, (comment) => comment.commentlikes, { cascade: true })
+  @ManyToOne(() => Comment, (comment) => comment.commentlikes)
   @JoinColumn({ name: 'commentId', referencedColumnName: 'id' })
   @ApiProperty({ type: () => Comment })
   comment: Relation<Comment>;
 
-  @ManyToOne(() => User, (user) => user.commentlikes, { cascade: true })
+  @ManyToOne(() => User, (user) => user.commentlikes)
   @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;

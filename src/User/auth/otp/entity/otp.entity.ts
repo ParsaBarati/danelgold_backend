@@ -5,7 +5,7 @@ export class OTP {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   phone: string
 
   @Column({ type: 'varchar' })

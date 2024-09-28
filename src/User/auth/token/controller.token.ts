@@ -1,6 +1,5 @@
-import { TokenService } from '@/auth/token/token.service';
+import { TokenService } from '@/User/auth/token/token.service';
 import { Controller, Get, Param } from '@nestjs/common';
-import { PhoneDto } from '@/auth/dto/login-with-otp.dto';
 
 @Controller('token')
 export class TokenController {

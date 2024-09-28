@@ -33,10 +33,10 @@ export class NFT {
   @Index({ unique: true })
   metadataURL: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   ownerPhone: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   creatorPhone: string;
 
   @Column('decimal', { precision: 18, scale: 8, nullable: false }) 

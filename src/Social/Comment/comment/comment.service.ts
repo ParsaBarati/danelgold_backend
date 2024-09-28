@@ -99,7 +99,7 @@ export class CommentService {
       const commentCount =
         userCommentCounts.get(`${userPhone}-${storyId}`) || 0;
 
-      if (commentCount >= MAX_COMMENTS_PER_Post) {
+      if (commentCount >= MAX_COMMENTS_PER_Story) {
         throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
       }
     }

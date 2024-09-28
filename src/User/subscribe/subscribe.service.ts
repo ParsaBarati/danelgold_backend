@@ -8,14 +8,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscribe } from './entity/subscribe.entity';
 import { Repository } from 'typeorm';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 import { SubscribeDto } from './dto/Subscription.dto';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { SmsService } from '@/services/sms.service';
 import * as webPush from 'web-push';
 import { CronJob } from 'cron';
 import { configDotenv } from 'dotenv';
-import { Auction } from '@/auction/entity/auction.entity';
+import { Auction } from '@/Market/auction/entity/auction.entity';
 
 configDotenv();
 

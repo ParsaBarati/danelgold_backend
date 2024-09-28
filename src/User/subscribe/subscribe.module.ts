@@ -3,9 +3,9 @@ import { SubscribeController } from './subscribe.controller';
 import { SubscribeService } from './subscribe.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscribe } from './entity/subscribe.entity';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 import { SmsService } from '@/services/sms.service';
-import { Auction } from '@/auction/entity/auction.entity';
+import { Auction } from '@/Market/auction/entity/auction.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Subscribe, User,Auction])],

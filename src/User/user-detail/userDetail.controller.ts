@@ -1,4 +1,3 @@
-import { UserDetailService } from '@/user-detail/userDetail.service';
 import {
   Controller,
   DefaultValuePipe,
@@ -8,6 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UserDetailService } from '@/User/user-detail/userDetail.service';
 
 @ApiTags('User Detail')
 @ApiBearerAuth()

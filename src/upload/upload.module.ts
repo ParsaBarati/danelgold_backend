@@ -7,7 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Upload } from './entity/uplaod.entity';
 import { multerConfigFactory } from '@/common/utils/multer.utils';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
-import { User } from '@/user/entity/user.entity';
+import { User } from '@/User/user/entity/user.entity';
 
 @Module({
   imports: [

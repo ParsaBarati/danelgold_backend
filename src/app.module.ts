@@ -35,6 +35,12 @@ import { IPFSService } from './services/IPFS.service';
 import { PinataModule } from './NFT/pinta/pinta.module';
 import { StoriesModule } from './Social/stories/stories.module';
 import { PostsModule } from './Social/Post/posts/posts.module';
+import { Story } from './Social/stories/entity/stories.entity';
+import { Comment } from './Social/Comment/comment/entity/comment.entity';
+import { Reply } from './Social/reply/entity/reply.entity';
+import { likeComment } from './Social/Comment/like-comment/entity/like-comment.entity';
+import { Post } from './Social/Post/posts/entity/posts.entity';
+import { likePost } from './Social/Post/like-post/entity/like-post.entity';
 
 
 @Module({
@@ -68,7 +74,13 @@ import { PostsModule } from './Social/Post/posts/posts.module';
     }),
     TypeOrmModule.forFeature([
       User,
-      Token
+      Token,
+      Story,
+      Comment,
+      likeComment,
+      Reply,
+      Post,
+      likePost,
     ]),
     AuctionModule,
     CollectionEntityModule,

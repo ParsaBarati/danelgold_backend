@@ -24,7 +24,6 @@ export class AuctionsService {
     private readonly userRepository: Repository<User>,
 
     private readonly paginationService: PaginationService,
-    private readonly smsService: SmsService
   ) {}
 
   async createAuction(
@@ -181,7 +180,7 @@ export class AuctionsService {
     const existingAuction = await this.auctionsRepository
       .createQueryBuilder('auctions')
       .leftJoinAndSelect('auctions.nfts','nft')
-      .leftJoinAndSelect('nfts.users','user')
+      .leftJoinAndSelect('nfts.user','user')
       .select([
         'auctions.id',
         'auctions.title',
@@ -207,7 +206,7 @@ export class AuctionsService {
       ])
       .addSelect([
         'user.firstName',
-        'user.lastName'
+        'user.lastName',
       ])
       .where('auctions.id = :auctionId', { auctionId })
 
