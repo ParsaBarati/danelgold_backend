@@ -9,7 +9,7 @@ import { Request } from 'express';
 export class LikePostController {
     constructor(private readonly likePostService: LikePostService) {}
 
-    @ApiOperation({summary:'Like Comment'})
+    @ApiOperation({summary:'Like Post'})
     @ApiOkResponse({description:'Liked',example:{statusCode:200}})
     @Post('/:postId/like')
     async likePost(

@@ -12,7 +12,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@/User/user/entity/user.entity';
 import { Reply } from '@/Social/reply/entity/reply.entity';
-import { Story } from '@/Social/stories/entity/stories.entity';
+import { Story } from '@/Social/Story/stories/entity/stories.entity';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
 

@@ -43,14 +43,15 @@ const _tokenentity = require("./User/auth/token/entity/token.entity");
 const _smsservice = require("./services/sms.service");
 const _IPFSservice = require("./services/IPFS.service");
 const _pintamodule = require("./NFT/pinta/pinta.module");
-const _storiesmodule = require("./Social/stories/stories.module");
+const _storiesmodule = require("./Social/Story/stories/stories.module");
 const _postsmodule = require("./Social/Post/posts/posts.module");
-const _storiesentity = require("./Social/stories/entity/stories.entity");
+const _storiesentity = require("./Social/Story/stories/entity/stories.entity");
 const _commententity = require("./Social/Comment/comment/entity/comment.entity");
 const _replyentity = require("./Social/reply/entity/reply.entity");
 const _likecommententity = require("./Social/Comment/like-comment/entity/like-comment.entity");
 const _postsentity = require("./Social/Post/posts/entity/posts.entity");
 const _likepostentity = require("./Social/Post/like-post/entity/like-post.entity");
+const _likestoryentity = require("./Social/Story/like-story/entity/like-story.entity");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -158,7 +159,8 @@ AppModule = _ts_decorate([
                 _likecommententity.likeComment,
                 _replyentity.Reply,
                 _postsentity.Post,
-                _likepostentity.likePost
+                _likepostentity.likePost,
+                _likestoryentity.likeStory
             ]),
             _auctionmodule.AuctionModule,
             _collectionmodule.CollectionEntityModule,

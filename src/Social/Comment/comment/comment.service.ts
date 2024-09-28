@@ -17,7 +17,7 @@ import {
 import { CreateCommentDTO } from './dto/CreateComment';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
-import { Story } from '@/Social/stories/entity/stories.entity';
+import { Story } from '@/Social/Story/stories/entity/stories.entity';
 
 
 const MAX_COMMENTS_PER_Post = 5;

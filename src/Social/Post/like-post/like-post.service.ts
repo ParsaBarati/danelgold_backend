@@ -23,7 +23,7 @@ export class LikePostService {
         );
     
         if (!likablePost) {
-            throw new NotFoundException('کامنتی پیدا نشد!');
+            throw new NotFoundException('پستی پیدا نشد!');
         }
     
         let existingLike = await this.likePostRepository.findOne({
@@ -62,11 +62,11 @@ export class LikePostService {
       userPhone: string, 
     ): Promise<{ isDislike: number }> {
         
-        const dislikableComment = await this.postRepository.findOneBy(
+        const dislikablePost = await this.postRepository.findOneBy(
           {id: postId}
         );
     
-        if (!dislikableComment) {
+        if (!dislikablePost) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
     
@@ -76,27 +76,27 @@ export class LikePostService {
     
         if (!existingDislike) {
             existingDislike = this.likePostRepository.create({
-                post: dislikableComment,
+                post: dislikablePost,
                 userPhone,
                 isLike: -1,
             });
-            dislikableComment.dislikes++;
+            dislikablePost.dislikes++;
         } else {
             if (existingDislike.isLike === -1) {
                 existingDislike.isLike = 0;
-                dislikableComment.dislikes--;
+                dislikablePost.dislikes--;
             } else if (existingDislike.isLike === 1) {
                 existingDislike.isLike = -1;
-                dislikableComment.dislikes++;
-                dislikableComment.likes--;
+                dislikablePost.dislikes++;
+                dislikablePost.likes--;
             } else {
                 existingDislike.isLike = -1;
-                dislikableComment.dislikes++;
+                dislikablePost.dislikes++;
             }
         }
     
         await this.likePostRepository.save(existingDislike);
-        await this.postRepository.save(dislikableComment);
+        await this.postRepository.save(dislikablePost);
     
         return { isDislike: existingDislike.isLike };
     }

@@ -21,7 +21,7 @@ const datasource = new _typeorm.DataSource({
     username: process.env.USERNAME_PG_DB,
     password: process.env.PASSWORD_PG_DB,
     entities: [
-        __dirname + '**/**/**/**/.entity{.ts,.js}'
+        __dirname + '**/**/**/**.entity{.ts,.js}'
     ],
     migrations: [
         __dirname + '/@migrations/*{.ts,.js}'

@@ -9,13 +9,14 @@ import { Bid } from '@/Market/auction/entity/auctionBid.entity';
 import { SupportTicket } from '@/Social/support-ticket/entity/support-ticket.entity';
 import { ForumTopic } from '@/Social/forum/entity/forum-topic.entity';
 import { ForumPost } from '@/Social/forum/entity/forum-post.entity';
-import { Story } from '@/Social/stories/entity/stories.entity';
+import { Story } from '@/Social/Story/stories/entity/stories.entity';
 import { Comment } from '@/Social/Comment/comment/entity/comment.entity';
 import { NFT } from '@/NFT/nft/entity/nft.entity';
 import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
 import { Reply } from '@/Social/reply/entity/reply.entity';
+import { likeStory } from '@/Social/Story/like-story/entity/like-story.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -128,4 +129,8 @@ export class User {
   @OneToMany(() => (likePost), postLikes => postLikes.user)
   @ApiProperty({ type: () => [likePost] })
   postLikes: Relation<likePost[]>
+
+  @OneToMany(() => (likeStory), storyLikes => storyLikes.user)
+  @ApiProperty({ type: () => [likeStory] })
+  storyLikes: Relation<likeStory[]>
 }

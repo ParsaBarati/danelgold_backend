@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn, Up
 import { User } from '@/User/user/entity/user.entity';
 import { Comment } from '@/Social/Comment/comment/entity/comment.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { likeStory } from '../../like-story/entity/like-story.entity';
 
 @Entity('stories')
 export class Story {
@@ -14,21 +15,25 @@ export class Story {
   @Column({ type: 'text' })
   mediaUrl: string;
 
+  @Column({ type: 'int', default: 0 })
+  likes: number;
+
+  @Column({ type: 'int', default: 0 })
+  dislikes: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @Column({ type: 'timestamp', nullable: false })
   expiresAt: Date;
 
-  @Column({ default: false })
-  isArchived: boolean;
-
-  @Column({ default: true })
-  isPublic: boolean;
-
   @OneToMany(() => Comment, comments => comments.story)
   @ApiProperty({ type: () => [Comment] })
   comments: Relation<Comment[]>
+
+  @OneToMany(() => likeStory, storyLikes => storyLikes.story)
+  @ApiProperty({ type: () => [likeStory] })
+  storyLikes: Relation<likeStory[]>;
 
   @ManyToOne(() => User, user => user.stories)
   @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
