@@ -8,41 +8,33 @@ import typeormDataSource from './config/data-source';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { OtpModule } from './auth/otp/otp.module';
-import { JwtAuthGuard } from './auth/guards/jwt.guard';
-import { RolesGuard } from './auth/guards/roles.guard';
-import { JwtStrategy } from './auth/strategy/jwt.strategy';
-import { TokenModule } from './auth/token/token.module';
-import { UserModule } from './user/user.module';
+import { AuthModule } from './User/auth/auth.module';
+import { OtpModule } from './User/auth/otp/otp.module';
+import { JwtAuthGuard } from './User/auth/guards/jwt.guard';
+import { RolesGuard } from './User/auth/guards/roles.guard';
+import { JwtStrategy } from './User/auth/strategy/jwt.strategy';
+import { TokenModule } from './User/auth/token/token.module';
+import { UserModule } from './User/user/user.module';
 import { SessionModule } from './session/session.module';
-import { SubscribeModule } from './subscribe/subscribe.module';
-import { UserDetailModule } from './user-detail/userDetail.module';
-import { PaymentModule } from './payment/payment.module';
+import { SubscribeModule } from './User/subscribe/subscribe.module';
+import { UserDetailModule } from './User/user-detail/userDetail.module';
 import { UploadModule } from './upload/upload.module';
-import { WalletModule } from './wallet/wallet.module';
-import { walletTransaction } from './wallet/entity/walletTransaction.entity';
 import { LoggingInterceptor } from './common/utils/logger.interseptor';
 import { AllExceptionsFilter } from './common/exeptionFilters/global.error';
 import { UserAgentMiddleware } from './common/middleware/user-agent.middleware';
-import { AuctionModule } from './auction/auction.module';
-import { CollectionEntityModule } from './collection/collection.module';
-import { NFTModule } from './nft/nft.module';
-import { ForumModule } from './forum/forum.module';
-import { SupportTicketModule } from './support-ticket/support-ticket.module';
-import { TransactionModule } from './transaction/transaction.module';
-import { UserService } from './user/user.service';
-import { User } from './user/entity/user.entity';
-import { Token } from './auth/token/entity/token.entity';
+import { AuctionModule } from './Market/auction/auction.module';
+import { CollectionEntityModule } from './Market/collection/collection.module';
+import { NFTModule } from './NFT/nft/nft.module';
+import { ForumModule } from './Social/forum/forum.module';
+import { SupportTicketModule } from './Social/support-ticket/support-ticket.module';
+import { UserService } from './User/user/user.service';
+import { User } from './User/user/entity/user.entity';
+import { Token } from './User/auth/token/entity/token.entity';
 import { SmsService } from './services/sms.service';
 import { IPFSService } from './services/IPFS.service';
-import { PinataModule } from './pinta/pinta.module';
-import { StoriesModule } from './stories/stories.module';
-import { PostsModule } from './posts/posts.module';
-import { PostsController } from './posts/posts.controller';
-import { LikePostModule } from './Social/Post/like-post/like-post.module';
-import { LikePostModule } from './src/social/like-post/like-post.module';
-import { PostsController } from './posts/posts.controller';
+import { PinataModule } from './NFT/pinta/pinta.module';
+import { StoriesModule } from './Social/stories/stories.module';
+import { PostsModule } from './Social/Post/posts/posts.module';
 
 
 @Module({
@@ -83,9 +75,6 @@ import { PostsController } from './posts/posts.controller';
     NFTModule,
     ForumModule,
     SupportTicketModule,
-    WalletModule,
-    walletTransaction,
-    TransactionModule,
     AuthModule,
     UserModule,
     UserDetailModule,
@@ -93,14 +82,12 @@ import { PostsController } from './posts/posts.controller';
     SessionModule,
     UploadModule,
     SubscribeModule,
-    PaymentModule,
     TokenModule,
     PinataModule,
     StoriesModule,
     PostsModule,
-    LikePostModule
   ],
-  controllers: [AppController, PostsController],
+  controllers: [AppController,],
   providers: [
     AppService,
     UserService,
