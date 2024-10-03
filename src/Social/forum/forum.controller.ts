@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Req, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
 import { ForumService } from './forum.service';
 import { ForumTopic } from './entity/forum-topic.entity';
 import { ForumPost } from './entity/forum-post.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { CreateTopicDto } from './dto/createTopic.dto';
+import { UpdateTopicDto } from './dto/updateTopic.dto';
 
 @ApiTags('Forum')
 @ApiBearerAuth()
@@ -10,28 +13,39 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ForumController {
   constructor(private readonly forumService: ForumService) {}
 
-  @Post('topics')
-  createTopic(@Body() createTopicDto: Partial<ForumTopic>) {
-    return this.forumService.createTopic(createTopicDto);
+
+  @Post('topic')
+  async createTopic(
+    @Req() req:Request,
+    @Body() createTopicDto: CreateTopicDto
+  ){
+    const userPhone = (req.user as any).result.phone;
+    return await this.forumService.createTopic(userPhone,createTopicDto)
   }
 
-  @Get('topics')
-  findAllTopics() {
-    return this.forumService.findAllTopics();
+  @Put('topic/:id')
+  async updateTopic(
+    @Param('topicId',ParseIntPipe) topicId:number,
+    @Req() req:Request,
+    @Body() updateTopicDto: UpdateTopicDto
+  ){
+    const currentUserPhone = (req.user as any).result.phone;
+    return await this.forumService.updateTopic(
+      topicId,
+      currentUserPhone,
+      updateTopicDto
+    )
   }
 
-  @Get('topics/:id')
-  findOneTopic(@Param('id') id: number) {
-    return this.forumService.findOneTopic(id);
-  }
-
-  @Put('topics/:id')
-  updateTopic(@Param('id') id: number, @Body() updateTopicDto: Partial<ForumTopic>) {
-    return this.forumService.updateTopic(id, updateTopicDto);
-  }
-
-  @Delete('topics/:id')
-  removeTopic(@Param('id') id: number) {
-    return this.forumService.removeTopic(id);
+  @Get('allTopics')
+  async getAllTopics(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+    @Query('sortBy') sort?: string,
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+  ){
+    const query = { page, limit, search, sort, sortOrder };
+    return await this.forumService.getAllTopics(query)
   }
 }

@@ -12,7 +12,7 @@ import {
 import { User } from '@/User/user/entity/user.entity';
 import { ForumPost } from './forum-post.entity';
 
-@Entity()
+@Entity({ name: 'topics' })
 export class ForumTopic {
   @PrimaryGeneratedColumn()
   id: number;

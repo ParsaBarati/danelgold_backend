@@ -14,7 +14,7 @@ export class RSTController{
         return await this.rstService.RST(stId,content)
     }
 
-    @Put()
+    @Put('/:rstId')
     async URST(
         @Param('rstId',ParseIntPipe) rstId: number,
         @Body() content?: string

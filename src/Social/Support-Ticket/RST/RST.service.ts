@@ -38,7 +38,8 @@ export class RSTService{
 
         const rst = {
             content,
-            parentSTId: stId
+            parentSTId: stId,
+            createdAt: new Date()
         }
 
         const savedRST = await this.rstRepository.save(rst);
@@ -60,6 +61,8 @@ export class RSTService{
         if (content) {
             rst.content = content;
         }
+
+        rst.updatedAt = new Date()
 
         const updatedRST = await this.rstRepository.save(rst);
 

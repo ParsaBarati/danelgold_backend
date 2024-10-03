@@ -22,7 +22,7 @@ export class SupportTicketsController {
     return await this.supportTicketsService.createST(userPhone,createSTDto)
   }
 
-  @Put()
+  @Put('/:stId')
   async updateST(
     @Param('stId',ParseIntPipe) stId:number,
     @Req() req:Request,
@@ -36,7 +36,7 @@ export class SupportTicketsController {
     )
   }
 
-  @Delete()
+  @Delete('/:stId')
   async removeST(
     @Param('stId',ParseIntPipe) stId:number,
     @Req() req:Request,
@@ -46,7 +46,7 @@ export class SupportTicketsController {
   }
 
   @Roles(UserRole.ADMIN)
-  @Patch()
+  @Patch('/:stId')
   async closeST(
     @Param('stId',ParseIntPipe) stId:number,
   ){
