@@ -26,7 +26,7 @@ import { AuctionModule } from './Market/auction/auction.module';
 import { CollectionEntityModule } from './Market/collection/collection.module';
 import { NFTModule } from './NFT/nft/nft.module';
 import { ForumModule } from './Social/forum/forum.module';
-import { SupportTicketModule } from './Social/support-ticket/support-ticket.module';
+import { SupportTicketModule } from './Social/Support-Ticket/ST/support-ticket.module';
 import { UserService } from './User/user/user.service';
 import { User } from './User/user/entity/user.entity';
 import { Token } from './User/auth/token/entity/token.entity';
@@ -37,11 +37,12 @@ import { StoriesModule } from './Social/Story/stories/stories.module';
 import { PostsModule } from './Social/Post/posts/posts.module';
 import { Story } from './Social/Story/stories/entity/stories.entity';
 import { Comment } from './Social/Comment/comment/entity/comment.entity';
-import { Reply } from './Social/reply/entity/reply.entity';
+import { Reply } from './Social/Comment/replyComment/entity/reply.entity';
 import { likeComment } from './Social/Comment/like-comment/entity/like-comment.entity';
 import { Post } from './Social/Post/posts/entity/posts.entity';
 import { likePost } from './Social/Post/like-post/entity/like-post.entity';
 import { likeStory } from './Social/Story/like-story/entity/like-story.entity';
+import { RSTModule } from './Social/Support-Ticket/RST/RST.module';
 
 
 @Module({
@@ -100,6 +101,7 @@ import { likeStory } from './Social/Story/like-story/entity/like-story.entity';
     PinataModule,
     StoriesModule,
     PostsModule,
+    RSTModule,
   ],
   controllers: [AppController,],
   providers: [

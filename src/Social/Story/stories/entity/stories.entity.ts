@@ -6,7 +6,7 @@ import { likeStory } from '../../like-story/entity/like-story.entity';
 
 @Entity('stories')
 export class Story {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar' })
@@ -23,6 +23,9 @@ export class Story {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @Column({ type: 'timestamp', nullable: false })
   expiresAt: Date;

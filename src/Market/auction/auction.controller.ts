@@ -16,10 +16,10 @@ export class AuctionsController {
 
   @Roles(UserRole.ADMIN)
   @Post()
-  create(
+  async createAuction(
     @Body() createAuctionDto: CreateAuctionDto
   ){
-    return this.auctionsService.createAuction(createAuctionDto);
+    return await this.auctionsService.createAuction(createAuctionDto);
   }
 
   @Post('participate/:id')

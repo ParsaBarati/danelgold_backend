@@ -36,7 +36,7 @@ const _auctionmodule = require("./Market/auction/auction.module");
 const _collectionmodule = require("./Market/collection/collection.module");
 const _nftmodule = require("./NFT/nft/nft.module");
 const _forummodule = require("./Social/forum/forum.module");
-const _supportticketmodule = require("./Social/support-ticket/support-ticket.module");
+const _supportticketmodule = require("./Social/Support-Ticket/ST/support-ticket.module");
 const _userservice = require("./User/user/user.service");
 const _userentity = require("./User/user/entity/user.entity");
 const _tokenentity = require("./User/auth/token/entity/token.entity");
@@ -47,11 +47,12 @@ const _storiesmodule = require("./Social/Story/stories/stories.module");
 const _postsmodule = require("./Social/Post/posts/posts.module");
 const _storiesentity = require("./Social/Story/stories/entity/stories.entity");
 const _commententity = require("./Social/Comment/comment/entity/comment.entity");
-const _replyentity = require("./Social/reply/entity/reply.entity");
+const _replyentity = require("./Social/Comment/replyComment/entity/reply.entity");
 const _likecommententity = require("./Social/Comment/like-comment/entity/like-comment.entity");
 const _postsentity = require("./Social/Post/posts/entity/posts.entity");
 const _likepostentity = require("./Social/Post/like-post/entity/like-post.entity");
 const _likestoryentity = require("./Social/Story/like-story/entity/like-story.entity");
+const _RSTmodule = require("./Social/Support-Ticket/RST/RST.module");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -177,7 +178,8 @@ AppModule = _ts_decorate([
             _tokenmodule.TokenModule,
             _pintamodule.PinataModule,
             _storiesmodule.StoriesModule,
-            _postsmodule.PostsModule
+            _postsmodule.PostsModule,
+            _RSTmodule.RSTModule
         ],
         controllers: [
             _appcontroller.AppController

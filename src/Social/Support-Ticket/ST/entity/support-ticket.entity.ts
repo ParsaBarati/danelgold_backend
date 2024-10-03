@@ -1,5 +1,7 @@
 import { User } from '@/User/user/entity/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Relation, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Relation, JoinColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { RST } from '../../RST/entity/RST.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum TicketStatus {
   OPEN = 'open',
@@ -7,7 +9,7 @@ export enum TicketStatus {
   CLOSED = 'closed',
 }
 
-@Entity()
+@Entity({ name: 'ST' })
 export class SupportTicket {
   @PrimaryGeneratedColumn()
   id: number;
@@ -30,6 +32,13 @@ export class SupportTicket {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => RST, (rsts) => rsts.parentST)
+  @ApiProperty({ type: () => RST })
+  rsts: Relation<RST[]>
 
   @ManyToOne(() => User, (user) => user.supportTickets)
   @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})

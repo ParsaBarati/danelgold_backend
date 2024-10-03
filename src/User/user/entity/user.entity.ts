@@ -6,7 +6,7 @@ import { Subscribe } from '@/User/subscribe/entity/subscribe.entity';
 import { CollectionEntity } from '@/Market/collection/entity/collection.entity';
 import { Auction } from '@/Market/auction/entity/auction.entity';
 import { Bid } from '@/Market/auction/entity/auctionBid.entity';
-import { SupportTicket } from '@/Social/support-ticket/entity/support-ticket.entity';
+import { SupportTicket } from '@/Social/Support-Ticket/ST/entity/support-ticket.entity';
 import { ForumTopic } from '@/Social/forum/entity/forum-topic.entity';
 import { ForumPost } from '@/Social/forum/entity/forum-post.entity';
 import { Story } from '@/Social/Story/stories/entity/stories.entity';
@@ -15,7 +15,7 @@ import { NFT } from '@/NFT/nft/entity/nft.entity';
 import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
-import { Reply } from '@/Social/reply/entity/reply.entity';
+import { Reply } from '@/Social/Comment/replyComment/entity/reply.entity';
 import { likeStory } from '@/Social/Story/like-story/entity/like-story.entity';
 
 export enum UserRole {

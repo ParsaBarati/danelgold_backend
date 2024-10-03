@@ -4,7 +4,7 @@ import { CommentService } from './comment.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from './entity/comment.entity';
 import { User } from '@/User/user/entity/user.entity';
-import { Reply } from '@/Social/reply/entity/reply.entity';
+import { Reply } from '@/Social/Comment/replyComment/entity/reply.entity';
 import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
 
