@@ -23,6 +23,15 @@ export class ForumController {
     return await this.forumService.createTopic(userPhone,createTopicDto)
   }
 
+  @Post('forumPost')
+  async createPost(
+    @Req() req:Request,
+    @Body() content: string
+  ){
+    const userPhone = (req.user as any).result.phone;
+    return await this.forumService.createPost(userPhone,content)
+  }
+
   @Put('topic/:id')
   async updateTopic(
     @Param('topicId',ParseIntPipe) topicId:number,
@@ -37,6 +46,20 @@ export class ForumController {
     )
   }
 
+  @Put('forumPost/:id')
+  async updatePost(
+    @Param('postId',ParseIntPipe) postId:number,
+    @Req() req:Request,
+    @Body() content?: string
+  ){
+    const currentUserPhone = (req.user as any).result.phone;
+    return await this.forumService.updatePost(
+      postId,
+      currentUserPhone,
+      content
+    )
+  }
+
   @Get('allTopics')
   async getAllTopics(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -47,5 +70,17 @@ export class ForumController {
   ){
     const query = { page, limit, search, sort, sortOrder };
     return await this.forumService.getAllTopics(query)
+  }
+
+  @Get('allPosts')
+  async getAllPosts(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+    @Query('sortBy') sort?: string,
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+  ){
+    const query = { page, limit, search, sort, sortOrder };
+    return await this.forumService.getAllPosts(query)
   }
 }

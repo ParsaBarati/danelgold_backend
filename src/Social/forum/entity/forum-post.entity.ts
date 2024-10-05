@@ -11,7 +11,7 @@ import {
 import { User } from '@/User/user/entity/user.entity';
 import { ForumTopic } from './forum-topic.entity';
 
-@Entity()
+@Entity({ name: 'forumPosts' })
 export class ForumPost {
   @PrimaryGeneratedColumn()
   id: number;

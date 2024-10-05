@@ -49,6 +49,31 @@ export class ForumService {
     return createResponse(201,savedTopic);
   }
 
+  async createPost(
+    userPhone:string, 
+    content: string
+  ):Promise<ApiResponses<ForumPost>>{
+
+    const user = await this.userRepository.findOne({
+      where: { phone: userPhone }
+    })
+
+    if(!user){
+      throw new NotFoundException('کاربر یافت نشد')
+    }
+
+    
+    const post = {
+      user,
+      content,
+      createAt: new Date()
+    }
+
+    const savedPost = await this.postsRepository.save(post);
+
+    return createResponse(201,savedPost);
+  }
+
   async updateTopic(
     topicId: number,
     currentUserPhone: string, 
@@ -73,6 +98,33 @@ export class ForumService {
     const updatedTopic = await this.topicsRepository.save(topic);
 
     return createResponse(200,updatedTopic);
+  }
+
+  async updatePost(
+    postId: number,
+    currentUserPhone: string,
+    content?: string
+  ):Promise<ApiResponses<ForumPost>>{
+
+    const post = await this.postsRepository.findOneBy({ id: postId });
+
+    if(!post){
+      throw new NotFoundException('پست در فروم یافت نشد')
+    }
+
+    if(post.userPhone !== currentUserPhone){
+      throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
+    }
+
+    if(content){
+      post.content = content
+    }
+
+    post.updatedAt = new Date();
+
+    const updatedPost = await this.postsRepository.save(post);
+
+    return createResponse(200,updatedPost);
   }
 
   async getAllTopics(
@@ -109,6 +161,46 @@ export class ForumService {
 
       if(search){
         queryBuilder.andWhere('(topics.content ILKE :search)',
+          {search: `%${search}%`}
+        )
+      }
+
+      return createResponse(200,paginationResult)
+  }
+
+  async getAllPosts(
+    query: any
+  ):Promise<ApiResponses<PaginationResult<any>>>{
+
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sort = 'id',
+      sortOrder = 'DESC',
+    } = query;
+
+    const queryBuilder = this.postsRepository
+      .createQueryBuilder('forumPosts')
+      .select([
+        'forumPosts.id',
+        'forumPosts.userPhone',
+        'forumPosts.content',
+        'forumPosts.createdAt',
+        'forumPosts.updatedAt'
+      ])
+      .orderBy(`forumPosts.${sort}`, sortOrder)
+      .skip((page - 1) * limit)
+      .take(limit)
+
+      const paginationResult = await this.paginationService.paginate(
+        queryBuilder,
+        page,
+        limit,
+      );
+
+      if(search){
+        queryBuilder.andWhere('(forumPosts.content ILKE :search)',
           {search: `%${search}%`}
         )
       }
