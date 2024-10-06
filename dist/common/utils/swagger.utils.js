@@ -12,7 +12,6 @@ const _buffer = require("buffer");
 const _swagger = require("@nestjs/swagger");
 const _dotenv = require("dotenv");
 const _common = require("@nestjs/common");
-// import metadata from '@base/metadata';
 (0, _dotenv.config)({
     path: '.develop.env'
 });
@@ -32,17 +31,16 @@ let SwaggerHelper = class SwaggerHelper {
                 ]
             }
         }).build();
-        // Use Express middleware instead of Fastify hooks
         const expressApp = app.getHttpAdapter().getInstance();
         expressApp.use((request, reply, next)=>this.basicAuthInterceptor(request, reply, next));
-        // SwaggerModule.loadPluginMetadata(metadata);
         const document = _swagger.SwaggerModule.createDocument(app, config);
         _swagger.SwaggerModule.setup(this.basePath, app, document, {
             swaggerOptions: {
                 persistAuthorization: true,
                 tagsSorter: 'alpha',
                 operationsSorter: 'alpha'
-            }
+            },
+            customJs: '/public/swagger-custom.js'
         });
     }
     getBasePath() {

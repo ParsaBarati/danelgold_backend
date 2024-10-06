@@ -14,6 +14,9 @@ export class Token {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true})
+  userPhone: string;
+
   @Column()
   token: string;
 

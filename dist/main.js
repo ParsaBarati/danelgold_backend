@@ -61,9 +61,12 @@ function _bootstrap() {
         const config = new _swagger.DocumentBuilder().setTitle('Danel Gold').setDescription('project danel gold api').setVersion('1.0').addTag('DanelGold').addBearerAuth().build();
         const document = _swagger.SwaggerModule.createDocument(app, config);
         _swagger.SwaggerModule.setup('/api', app, document);
-        yield new _swaggerutils.SwaggerHelper().setup(app);
-        yield app.listen(process.env.PORT, '0.0.0.0');
-        console.log(`running on port ${process.env.PORT}...`);
+        if (_swaggerutils.SwaggerHelper.prototype.setup) {
+            yield new _swaggerutils.SwaggerHelper().setup(app);
+        }
+        const port = process.env.PORT || 3000;
+        yield app.listen(port, '0.0.0.0');
+        console.log(`running on port ${port}...`);
         function bytesToMB(bytes) {
             return bytes / (1024 * 1024);
         }
@@ -81,8 +84,5 @@ function _bootstrap() {
     return _bootstrap.apply(this, arguments);
 }
 bootstrap();
-function metadata() {
-    throw new Error('Function not implemented.');
-}
 
 //# sourceMappingURL=main.js.map

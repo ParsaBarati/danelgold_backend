@@ -17,9 +17,11 @@ export class AuctionsController {
   @Roles(UserRole.ADMIN)
   @Post()
   async createAuction(
+    @Req() req:Request,
     @Body() createAuctionDto: CreateAuctionDto
   ){
-    return await this.auctionsService.createAuction(createAuctionDto);
+    const creatorPhone = (req.user as any).result.phone;
+    return await this.auctionsService.createAuction(creatorPhone,createAuctionDto);
   }
 
   @Post('participate/:id')

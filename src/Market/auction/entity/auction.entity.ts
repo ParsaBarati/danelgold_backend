@@ -51,8 +51,8 @@ export class Auction {
   @Column( { type: 'varchar'} )
   creatorPhone: string;
 
-  @Column({ type: 'varchar' })
-  highestBidderPhone: string;
+  @Column({ type: 'varchar', nullable: true })
+  highestBidderPhone: string | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

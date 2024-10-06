@@ -2,7 +2,6 @@ import { Buffer } from 'buffer';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config as dotenvConfig } from 'dotenv';
 import { UnauthorizedException } from '@nestjs/common';
-// import metadata from '@base/metadata';
 
 dotenvConfig({ path: '.develop.env' });
 
@@ -33,13 +32,12 @@ export class SwaggerHelper {
       })
       .build();
 
-    // Use Express middleware instead of Fastify hooks
     const expressApp = app.getHttpAdapter().getInstance();
+
     expressApp.use((request, reply, next) =>
       this.basicAuthInterceptor(request, reply, next),
     );
 
-    // SwaggerModule.loadPluginMetadata(metadata);
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup(this.basePath, app, document, {
       swaggerOptions: {
@@ -47,6 +45,7 @@ export class SwaggerHelper {
         tagsSorter: 'alpha',
         operationsSorter: 'alpha',
       },
+      customJs: '/public/swagger-custom.js',
     });
   }
 

@@ -7,6 +7,7 @@ import { SwaggerHelper } from '@/common/utils/swagger.utils';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
+
   app.enableCors({ origin: true, credentials: true });
 
   app.useGlobalPipes(
@@ -29,9 +30,14 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api', app, document);
-  await new SwaggerHelper().setup(app);
-  await app.listen(process.env.PORT, '0.0.0.0');
-  console.log(`running on port ${process.env.PORT}...`);
+
+  if (SwaggerHelper.prototype.setup) {
+    await new SwaggerHelper().setup(app);  
+  }
+
+  const port = process.env.PORT || 3000;  
+  await app.listen(port, '0.0.0.0');
+  console.log(`running on port ${port}...`);
 
   function bytesToMB(bytes) {
     return bytes / (1024 * 1024); 
@@ -54,6 +60,4 @@ async function bootstrap() {
 }
 
 bootstrap();
-function metadata(): Promise<Record<string, any>> {
-  throw new Error('Function not implemented.');
-}
+

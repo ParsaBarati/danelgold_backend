@@ -26,6 +26,7 @@ export class AuctionsService {
   ) {}
 
   async createAuction(
+    creatorPhone: string,
     createAuctionDto:CreateAuctionDto
   ): Promise<ApiResponses<Auction>> {
 
@@ -38,6 +39,21 @@ export class AuctionsService {
       isSms
      } = createAuctionDto;
 
+     const creator = await this.userRepository.findOne({ where: { phone:creatorPhone } });
+
+    if (!creator) {
+      throw new NotFoundException('Creator not found');
+    }
+
+    let highestBidder = null;
+    
+    if (highestBidder) {
+    highestBidder = await this.userRepository.findOne({ where: { phone: highestBidder} });
+    if (!highestBidder) {
+      throw new NotFoundException('Highest bidder not found');
+    }
+    }
+
      if (endTime && startTime && endTime < startTime) {
       throw new BadRequestException(
         'تاریخ پایان مزایده نمی تواند زودتر از تاریخ شروع آن باشد',
@@ -48,6 +64,9 @@ export class AuctionsService {
       title,
       startTime,
       endTime,
+      creator: creator,
+      creatorPhone: creator.phone ,
+      highestBidderPhone: highestBidder ? highestBidder.phone : null,
       startingBid,
       currentBid,
       isSms: isSms,
