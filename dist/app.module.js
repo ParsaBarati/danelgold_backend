@@ -147,8 +147,10 @@ AppModule = _ts_decorate([
                 useFactory: (configService)=>{
                     const synchronize = configService.get('NODE_ENV') === 'development';
                     console.log('synchronize ' + synchronize);
+                    console.log(_datasource.default.options);
                     return _object_spread_props(_object_spread({}, _datasource.default.options), {
-                        autoLoadEntities: true
+                        autoLoadEntities: true,
+                        connectTimeoutMS: 30000
                     });
                 }
             }),

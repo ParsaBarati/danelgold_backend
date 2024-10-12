@@ -18,7 +18,7 @@ export class MintNFTDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  description?: string;
+  text?: string;
 
   @ApiProperty()
   @IsInt()
@@ -34,7 +34,7 @@ export class MintNFTDataDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  description?: string;
+  text?: string;
 
   @ApiProperty()
   @IsInt()

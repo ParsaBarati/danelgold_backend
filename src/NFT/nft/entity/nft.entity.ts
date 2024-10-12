@@ -23,21 +23,24 @@ export class NFT {
   @Column()
   name: string;
 
-  @Column({ type: 'text', nullable: true })
-  description: string;
-
   @Column({type: 'varchar'})
-  imageURL: string;
+  image: string;
+
+  @Column({ type: 'text' })
+  text: string;
 
   @Column({ unique: true })
   @Index({ unique: true })
-  metadataURL: string;
+  metadataUrl: string;
 
   @Column({ type: 'varchar' })
   ownerPhone: string;
 
   @Column({ type: 'varchar' })
-  creatorPhone: string;
+  artist: string;
+
+  @Column()
+  collectionId: number;
 
   @Column('decimal', { precision: 18, scale: 8, nullable: false }) 
   price: number;
@@ -53,11 +56,12 @@ export class NFT {
   auctions: Relation<Auction[]>;
 
   @ManyToOne(() => CollectionEntity, (collectionEntity) => collectionEntity.nfts)
+  @JoinColumn({ name: 'collectionId', referencedColumnName: 'id' })
   @ApiProperty({ type: () => CollectionEntity })
   collectionEntity: Relation<CollectionEntity>;
 
   @ManyToOne(() => User, (creator) => creator.createdNfts)
-  @JoinColumn({ name: 'creatorPhone', referencedColumnName: 'phone' })
+  @JoinColumn({ name: 'artist', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   creator: Relation<User>;
 

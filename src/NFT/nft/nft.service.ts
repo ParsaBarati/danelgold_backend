@@ -17,26 +17,25 @@ export class NFTsService {
   ) {}
 
   async mintNFT(
-    creatorPhone: string,
+    artist: string,
     name: string,
     price: number,
-    imageURL: string, 
-    description?: string,
+    image: string,
+    text: string 
   ): Promise<ApiResponses<NFT>> {
-    const creator = await this.userRepository.findOne({ where: { phone: creatorPhone } });
+    const creator = await this.userRepository.findOne({ where: { phone: artist } });
   
     if (!creator) {
       throw new NotFoundException('User not found');
     }
   
-    const metadata = { name, description, image: imageURL, price };
-    const metadataURL = await this.ipfsService.uploadMetadataToIPFS(metadata);
+    const metadata = { name, image: image, price };
+    const metadataUrl = await this.ipfsService.uploadMetadataToIPFS(metadata);
   
     const nft = this.nftsRepository.create({
       name,
-      description,
-      imageURL,
-      metadataURL,
+      image,
+      metadataUrl,
       price,
       createdAt: new Date(),
       creator,
@@ -78,9 +77,21 @@ export class NFTsService {
       .leftJoinAndSelect('nfts.owner', 'owner')
       .leftJoinAndSelect('nfts.collections', 'collection')
       .select([
-        'nft.id', 'nft.name', 'nft.description', 'nft.imageURL', 'nft.metadataURL', 'nft.price', 'nft.createdAt', 'nft.updatedAt',
-        'creator.firstName', 'creator.lastName', 'owner.firstName', 'owner.lastName',
-        'collection.id', 'collection.name', 'collection.description',
+        'nft.id', 
+        'nft.name', 
+        'nft.text', 
+        'nft.image', 
+        'nft.metadataUrl', 
+        'nft.price', 
+        'nft.createdAt', 
+        'nft.updatedAt',
+        'creator.firstName', 
+        'creator.lastName', 
+        'owner.firstName', 
+        'owner.lastName',
+        'collection.id', 
+        'collection.name', 
+        'collection.description',
       ])
       .where('nfts.id = :nftId', { nftId })
       .getOne();

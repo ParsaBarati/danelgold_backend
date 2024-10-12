@@ -44,15 +44,15 @@ export class NFTsController {
     @Body() mintNFTDataDto: MintNFTDataDto,
     @Req() req: Request,
   ) {
-    const creatorPhone = (req.user as any).result.phone;
+    const artist = (req.user as any).result.phone;
     const NFTImageURL = await this.ipfsService.uploadFileToIPFS(imageURL);
   
     return await this.nftsService.mintNFT(
-      creatorPhone,
+      artist,
       mintNFTDataDto.name,
       mintNFTDataDto.price,
       NFTImageURL, 
-      mintNFTDataDto.description,
+      mintNFTDataDto.text,
     );
   }
 

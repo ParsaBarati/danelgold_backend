@@ -173,7 +173,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     const payload = {
       title: currentAuction.title,
       body: `${currentAuction.nft.name} در حال برگزاری است`,
-      icon: currentAuction.nft.imageURL,
+      icon: currentAuction.nft.image,
       badge: ``,
     };
 

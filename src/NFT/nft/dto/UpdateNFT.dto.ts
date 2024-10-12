@@ -12,7 +12,7 @@ export class UpdateNFTDto{
     @ApiProperty()
     @IsString()
     @IsOptional()
-    description?: string;
+    text?: string;
 
     @ApiProperty()
     @IsInt()

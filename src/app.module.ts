@@ -68,9 +68,13 @@ import { RSTModule } from './Social/Support-Ticket/RST/RST.module';
         const synchronize = configService.get('NODE_ENV') === 'development';
 
         console.log('synchronize ' + synchronize);
+        console.log(typeormDataSource.options);
+
+
         return {
           ...typeormDataSource.options,
           autoLoadEntities: true,
+          connectTimeoutMS: 30000,
         };
       },
     }),

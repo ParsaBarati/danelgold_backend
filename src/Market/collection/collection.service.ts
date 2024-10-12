@@ -27,7 +27,7 @@ export class CollectionsService {
     creatorPhone: string
   ): Promise<ApiResponses<CollectionEntity>> {
 
-    const { name, description } = createCollectionDto
+    const { name, text, cover } = createCollectionDto
 
     const creator = await this.userRepository.findOne({
       where:{ phone:creatorPhone}
@@ -39,7 +39,8 @@ export class CollectionsService {
     
     const collection = {
       name,
-      description,
+      text,
+      cover,
       creator,
       createdAt: new Date()
     }
@@ -76,8 +77,12 @@ export class CollectionsService {
       collection.name = updateCollectionDto.name
     }
 
-    if (updateCollectionDto.description !== undefined){
-      collection.description = updateCollectionDto.description
+    if (updateCollectionDto.text !== undefined){
+      collection.text = updateCollectionDto.text
+    }
+
+    if (updateCollectionDto.cover !== undefined){
+      collection.cover = updateCollectionDto.cover
     }
 
     collection.updatedAt = new Date();
@@ -105,7 +110,8 @@ export class CollectionsService {
       .select([
         'collections.id',
         'collections.name',
-        'collections.description',
+        'collections.text',
+        'collections.cover',
         'collections.createdAt',
         'collections.updatedAt'
       ])
@@ -153,7 +159,8 @@ export class CollectionsService {
       .select([
         'collections.id',
         'collections.name',
-        'collections.description',
+        'collections.text',
+        'collections.cover',
         'collections.creatorPhone',
         'collections.createdAt',
         'collections.updatedAt'

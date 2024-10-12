@@ -21,7 +21,10 @@ export class CollectionEntity {
   name: string;
 
   @Column({type: 'text', nullable: true})
-  description: string;
+  text: string;
+
+  @Column({ type: 'text', nullable: true })
+  cover: string;
 
   @Column({ type: 'varchar' })
   creatorPhone: string;

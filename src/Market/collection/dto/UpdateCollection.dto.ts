@@ -12,5 +12,10 @@ export class UpdateCollectionDto{
     @ApiProperty()
     @IsString()
     @IsOptional()
-    description?: string;
+    text?: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    cover?: string;
 }
