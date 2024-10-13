@@ -169,7 +169,7 @@ export class CollectionsService {
         'nft.id',
         'nft.name',
         'nft.description',
-        'nft.imageURL',
+        'nft.image',
         'nft.matadataUrl',
         'nft.ownerPhone',
         'nft.creatorPhone',
