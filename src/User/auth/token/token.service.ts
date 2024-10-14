@@ -48,7 +48,7 @@ export class TokenService {
       roles: user.role,
       firstName: user.firstName,
       lastName: user.lastName,
-      imageUrl: user.imageUrl,
+      profilePic: user.profilePic,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,
     };

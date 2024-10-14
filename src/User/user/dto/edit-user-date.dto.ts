@@ -23,7 +23,7 @@ export class editDateUser {
   @ApiProperty()
   @IsString({ message: 'عکس را درست انتخاب کنید' })
   @IsOptional()
-  imageUrl?: string;
+  profilePic?: string;
 
   @ApiProperty()
   @IsString()

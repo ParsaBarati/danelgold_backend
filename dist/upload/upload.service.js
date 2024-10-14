@@ -284,11 +284,11 @@ let UploadService = class UploadService {
                 destination: file.destination
             });
             const savedUpload = yield _this.uploadRepository.save(newUpload);
-            user.imageUrl = `${process.env.BASE_URL_UPLOAD}` + `${savedUpload.destination.replace(/\\/g, '/')}` + `/${encodeURIComponent(savedUpload.name)}`;
+            user.profilePic = `${process.env.BASE_URL_UPLOAD}` + `${savedUpload.destination.replace(/\\/g, '/')}` + `/${encodeURIComponent(savedUpload.name)}`;
             yield _this.userRepository.save(user);
             const uploadWithLink = _object_spread_props(_object_spread({}, savedUpload), {
-                link: user.imageUrl,
-                imageUrl: user.imageUrl
+                link: user.profilePic,
+                profilePic: user.profilePic
             });
             return (0, _responseutil.createResponse)(200, uploadWithLink, 'عکس پروفایل با موفقیت آپلود شد');
         })();

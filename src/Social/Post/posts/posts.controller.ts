@@ -2,7 +2,7 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { PostService } from './posts.service';
 import { Request } from 'express';
 import { CreatePostDto } from './dto/createPost.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from './dto/updatePost.dto';
 
 @ApiTags('Post')
@@ -42,7 +42,7 @@ export class PostsController {
         return await this.postService.deletePost(postId,currentUserPhone)
     }
 
-    @Get()
+    @Get('postComment')
     async getPostCommentsByUser(
        @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
        @Req() req: Request,
@@ -51,9 +51,21 @@ export class PostsController {
       return await this.postService.getPostsByUser(phone, postId);
     }
 
+    @ApiQuery({ name: 'page', required: false })
+    @ApiQuery({ name: 'limit', required: false })
+    @Get()
+    async getExplorer(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    ){
+      const query = { page, limit };
+      return this.postService.getExplorer(query);
+    }
+} 
 
 
 
 
 
-}
+
+

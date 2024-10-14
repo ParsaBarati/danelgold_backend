@@ -53,6 +53,12 @@ const _postsentity = require("./Social/Post/posts/entity/posts.entity");
 const _likepostentity = require("./Social/Post/like-post/entity/like-post.entity");
 const _likestoryentity = require("./Social/Story/like-story/entity/like-story.entity");
 const _RSTmodule = require("./Social/Support-Ticket/RST/RST.module");
+const _clubentity = require("./Social/Club/entity/club.entity");
+const _messagemodule = require("./Social/Message/message.module");
+const _notificationmodule = require("./Social/Notification/notification.module");
+const _walletmodule = require("./NFT/wallet/wallet.module");
+const _cryptoentity = require("./NFT/Crypto/entity/crypto.entity");
+const _followentity = require("./Social/Follow/entity/follow.entity");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -157,13 +163,16 @@ AppModule = _ts_decorate([
             _typeorm.TypeOrmModule.forFeature([
                 _userentity.User,
                 _tokenentity.Token,
+                _clubentity.Club,
                 _storiesentity.Story,
                 _commententity.Comment,
                 _likecommententity.likeComment,
                 _replyentity.Reply,
                 _postsentity.Post,
                 _likepostentity.likePost,
-                _likestoryentity.likeStory
+                _likestoryentity.likeStory,
+                _cryptoentity.CryptoEntity,
+                _followentity.FollowUser
             ]),
             _auctionmodule.AuctionModule,
             _collectionmodule.CollectionEntityModule,
@@ -181,7 +190,10 @@ AppModule = _ts_decorate([
             _pintamodule.PinataModule,
             _storiesmodule.StoriesModule,
             _postsmodule.PostsModule,
-            _RSTmodule.RSTModule
+            _RSTmodule.RSTModule,
+            _messagemodule.MessageModule,
+            _notificationmodule.NotificationModule,
+            _walletmodule.WalletModule
         ],
         controllers: [
             _appcontroller.AppController

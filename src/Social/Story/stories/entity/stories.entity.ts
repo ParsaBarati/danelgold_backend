@@ -13,6 +13,9 @@ export class Story {
   userPhone: string;
 
   @Column({ type: 'text' })
+  thumbnail: string;
+
+  @Column({ type: 'text' })
   mediaUrl: string;
 
   @Column({ type: 'int', default: 0 })
@@ -32,22 +35,21 @@ export class Story {
 
   @OneToMany(() => Comment, comments => comments.story)
   @ApiProperty({ type: () => [Comment] })
-  comments: Relation<Comment[]>
+  comments: Relation<Comment[]>;
 
   @OneToMany(() => likeStory, storyLikes => storyLikes.story)
   @ApiProperty({ type: () => [likeStory] })
   storyLikes: Relation<likeStory[]>;
 
   @ManyToOne(() => User, user => user.stories)
-  @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
+  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   user: Relation<User>;
 
   @ManyToMany(() => User)
   @JoinTable({
     name: 'story_viewers',
     joinColumn: { name: 'storyId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'viewerId', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'viewerId', referencedColumnName: 'id' },
   })
   viewers: Relation<User[]>;
-
 }

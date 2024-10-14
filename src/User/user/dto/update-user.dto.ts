@@ -37,7 +37,7 @@ export class UpdateUserDTO {
   @ApiProperty()
   @IsString({message:'عکس را درست انتخاب کنید'})
   @IsOptional()
-  imageUrl?: string;
+  profilePic?: string;
 
   @ApiProperty()
   @IsString()

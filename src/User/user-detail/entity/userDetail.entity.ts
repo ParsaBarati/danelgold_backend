@@ -2,8 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
-  JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
@@ -32,7 +31,7 @@ export class UserDetail {
   @Column({ type: 'timestamptz', nullable: true })
   loginDate: Date;
 
-  @ManyToOne(() => User, (user) => user.userDetail)
+  @OneToOne(() => User, (user) => user.userDetail)
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

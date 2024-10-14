@@ -133,7 +133,7 @@ export class AuthService {
       lastName: user.lastName,
       phone: user.phone,
       roles: user.role,
-      imageUrl: user.imageUrl,
+      profilePic: user.profilePic,
       lastLogin: user.lastLogin,
     };
     await this.userService.updateUser(user.phone, updateUserDTO);
@@ -181,7 +181,7 @@ export class AuthService {
       lastName: user.lastName,
       phone: user.phone,
       roles: user.role,
-      imageUrl: user.imageUrl,
+      profilePic: user.profilePic,
       lastLogin: user.lastLogin,
     };
     await this.userService.updateUser(user.phone, updateUserDTO);

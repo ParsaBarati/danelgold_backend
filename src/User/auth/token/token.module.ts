@@ -12,11 +12,14 @@ import { TokenController } from './controller.token';
 import { User } from '@/User/user/entity/user.entity';
 import { UserService } from '@/User/user/user.service';
 import { SmsService } from '@/services/sms.service';
+import { Post } from '@/Social/Post/posts/entity/posts.entity';
+import { Story } from '@/Social/Story/stories/entity/stories.entity';
+import { Club } from '@/Social/Club/entity/club.entity';
 
 @Module({
   imports: [
     UserModule,
-    TypeOrmModule.forFeature([Token,User]),
+    TypeOrmModule.forFeature([Token,User,Post,Story,Club]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

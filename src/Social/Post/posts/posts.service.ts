@@ -6,6 +6,7 @@ import { CreatePostDto } from "./dto/createPost.dto";
 import { ApiResponses, createResponse } from "@/utils/response.util";
 import { User } from "@/User/user/entity/user.entity";
 import { UpdatePostDto } from "./dto/updatePost.dto";
+import { PaginationService } from "@/common/paginate/pagitnate.service";
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class PostService{
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        private readonly userRepository: Repository<User>,
+        private readonly paginationService: PaginationService
     ){}
 
     async createPost(
@@ -117,5 +119,54 @@ export class PostService{
           const posts = await queryBuilder.getMany();
           
           return createResponse(200,posts)
+    }
+
+    async getExplorer(query: any): Promise<any> {
+
+        const { page, limit } = query
+
+        const queryBuilder = this.postRepository
+          .createQueryBuilder('post')
+          .leftJoinAndSelect('post.user', 'user') 
+          .select([
+            'post.id',
+            'post.mediaUrl',
+            'post.caption',
+            'user.id',
+            'user.name',
+            'user.pic',
+            'user.username',
+            'user.email',
+            'user.phone',
+          ])
+          .orderBy('post.createdAt', 'DESC'); 
+    
+        const paginationResult = await this.paginationService.paginate(
+          queryBuilder,
+          page,
+          limit,
+        );
+    
+        const transformedPosts = paginationResult.data.map((post) => ({
+          id: post.id,
+          img: post.mediaUrl,
+          caption: post.caption,
+          user: {
+            id: post.user.id,
+            name: post.user.username,
+            pic: post.user.profilePic,
+            username: post.user.username,
+            email: post.user.email,
+            phone: post.user.phone,
+          },
+        }));
+    
+        return {
+          posts: transformedPosts,
+          total: paginationResult.total,
+          page: paginationResult.page,
+          limit: paginationResult.limit,
+          totalPages: paginationResult.totalPages,
+        };
     }
 }

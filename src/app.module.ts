@@ -43,6 +43,12 @@ import { Post } from './Social/Post/posts/entity/posts.entity';
 import { likePost } from './Social/Post/like-post/entity/like-post.entity';
 import { likeStory } from './Social/Story/like-story/entity/like-story.entity';
 import { RSTModule } from './Social/Support-Ticket/RST/RST.module';
+import { Club } from './Social/Club/entity/club.entity';
+import { MessageModule } from './Social/Message/message.module';
+import { NotificationModule } from './Social/Notification/notification.module';
+import { WalletModule } from './NFT/wallet/wallet.module';
+import { CryptoEntity } from './NFT/Crypto/entity/crypto.entity';
+import { FollowUser } from './Social/Follow/entity/follow.entity';
 
 
 @Module({
@@ -81,13 +87,16 @@ import { RSTModule } from './Social/Support-Ticket/RST/RST.module';
     TypeOrmModule.forFeature([
       User,
       Token,
+      Club,
       Story,
       Comment,
       likeComment,
       Reply,
       Post,
       likePost,
-      likeStory
+      likeStory,
+      CryptoEntity,
+      FollowUser
     ]),
     AuctionModule,
     CollectionEntityModule,
@@ -106,6 +115,9 @@ import { RSTModule } from './Social/Support-Ticket/RST/RST.module';
     StoriesModule,
     PostsModule,
     RSTModule,
+    MessageModule,
+    NotificationModule,
+    WalletModule,
   ],
   controllers: [AppController,],
   providers: [

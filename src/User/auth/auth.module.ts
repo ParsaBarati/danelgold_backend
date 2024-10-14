@@ -18,10 +18,13 @@ import { PaginationService } from '@/common/paginate/pagitnate.service';
 import { ConfigModule } from '@nestjs/config';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { Post } from '@/Social/Post/posts/entity/posts.entity';
+import { Story } from '@/Social/Story/stories/entity/stories.entity';
+import { Club } from '@/Social/Club/entity/club.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,UserDetail,Token]),
+    TypeOrmModule.forFeature([User,UserDetail,Token,Post,Story,Club]),
     PassportModule,
     UserModule,
     OtpModule,

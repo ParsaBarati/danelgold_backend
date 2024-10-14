@@ -1,7 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Req, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Req, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
 import { ForumService } from './forum.service';
-import { ForumTopic } from './entity/forum-topic.entity';
-import { ForumPost } from './entity/forum-post.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CreateTopicDto } from './dto/createTopic.dto';

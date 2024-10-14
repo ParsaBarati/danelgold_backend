@@ -33,7 +33,7 @@ export class likeComment {
   @ApiProperty({ type: () => Comment })
   comment: Relation<Comment>;
 
-  @ManyToOne(() => User, (user) => user.commentlikes)
+  @ManyToOne(() => User, (user) => user.commentLikes)
   @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;

@@ -4,7 +4,7 @@ export interface VerifyWithOtpUser {
   firstName: string;
   lastName: string;
   email: string;
-  imageUrl?: string;
+  profilePic?: string;
   createdAt: Date;
   lastLogin: Date;
 }

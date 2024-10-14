@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Relation, Generated, PrimaryColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Generated, ManyToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Token } from '@/User/auth/token/entity/token.entity';
 import { UserDetail } from '@/User/user-detail/entity/userDetail.entity';
@@ -17,19 +17,28 @@ import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
 import { Reply } from '@/Social/Comment/replyComment/entity/reply.entity';
 import { likeStory } from '@/Social/Story/like-story/entity/like-story.entity';
+import { Club } from '@/Social/Club/entity/club.entity';
+import { Message } from '@/Social/Message/entity/message.entity';
+import { Notification } from '@/Social/Notification/entity/notification.entity';
+import { Wallet } from '@/NFT/wallet/entity/wallet.entity';
+import { CryptoEntity } from '@/NFT/Crypto/entity/crypto.entity';
+import { FollowUser } from '@/Social/Follow/entity/follow.entity';
 
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
 }
 
-@Entity({ name: 'user'})
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', unique: true, length: 11 })
   phone: string;
+
+  @Column({ type: 'varchar', unique: true })
+  username: string; 
 
   @Column({ type: 'varchar' })
   firstName: string;
@@ -44,7 +53,7 @@ export class User {
   email: string;
 
   @Column({ type: 'varchar', nullable: true })
-  imageUrl: string | null;
+  profilePic: string | null;
 
   @Column({
     type: 'enum',
@@ -62,13 +71,21 @@ export class User {
   @Column({ type: 'timestamptz', nullable: true })
   lastLogin: Date | null;
 
+  @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
+  @ApiProperty({ type: () => UserDetail })
+  userDetail: Relation<UserDetail>;
+
+  @OneToMany(() => FollowUser, (followUser) => followUser.follower)
+  @ApiProperty({ type: () => [FollowUser] })
+  followers: Relation<FollowUser[]>;
+
+  @OneToMany(() => FollowUser, (followUser) => followUser.following)
+  @ApiProperty({ type: () => [FollowUser] })
+  following: Relation<FollowUser[]>;
+
   @OneToMany(() => Token, (token) => token.user)
   @ApiProperty({ type: () => [Token] })
   tokens: Relation<Token[]>;
-
-  @OneToMany(() => UserDetail, (userDetail) => userDetail.user)
-  @ApiProperty({ type: () => [UserDetail] })
-  userDetail: Relation<UserDetail[]>;
 
   @OneToMany(() => Subscribe, (subscribes) => subscribes.user)
   @ApiProperty({ type: () => [Subscribe] })
@@ -83,54 +100,83 @@ export class User {
   createdNfts: Relation<NFT[]>;
 
   @OneToMany(() => NFT, (nfts) => nfts.owner)
-  @ApiProperty({ type: () => [NFT]} )
+  @ApiProperty({ type: () => [NFT] })
   ownedNfts: Relation<NFT[]>;
 
   @OneToMany(() => Auction, (auctions) => auctions.creator)
   @ApiProperty({ type: () => [Auction] })
   auctions: Relation<Auction[]>;
 
-  @OneToMany(() => Bid, bid => bid.user)
+  @OneToMany(() => Bid, (bid) => bid.user)
   @ApiProperty({ type: () => [Bid] })
   bids: Relation<Bid[]>;
 
-  @OneToMany(() => (SupportTicket), tickets => tickets.user)
+  @OneToMany(() => SupportTicket, (tickets) => tickets.user)
   @ApiProperty({ type: () => [SupportTicket] })
   supportTickets: Relation<SupportTicket[]>;
 
-  @OneToMany(() => (ForumTopic), topics => topics.user)
+  @OneToMany(() => ForumTopic, (topics) => topics.user)
   @ApiProperty({ type: () => [ForumTopic] })
   forumTopics: Relation<ForumTopic[]>;
 
-  @OneToMany(() => (ForumPost), posts => posts.user)
+  @OneToMany(() => ForumPost, (posts) => posts.user)
   @ApiProperty({ type: () => [ForumPost] })
   forumPosts: Relation<ForumPost[]>;
 
-  @OneToMany(() => (Story) , stories => stories.user)
+  @OneToMany(() => Story, (stories) => stories.user)
   @ApiProperty({ type: () => [Story] })
-  stories: Relation<Story[]>
+  stories: Relation<Story[]>;
 
-  @OneToMany(() => (Post) , posts => posts.user)
+  @OneToMany(() => Post, (posts) => posts.user)
   @ApiProperty({ type: () => [Post] })
-  posts: Relation<Post[]>
+  posts: Relation<Post[]>;
 
-  @OneToMany(() => (Comment), comments => comments.user)
-  @ApiProperty({ type:() => [Comment] })
-  comments: Relation<Comment[]>
+  @OneToMany(() => Comment, (comments) => comments.user)
+  @ApiProperty({ type: () => [Comment] })
+  comments: Relation<Comment[]>;
 
-  @OneToMany(() => (Reply), replies => replies.user)
-  @ApiProperty({ type:() => [Reply] })
-  replies: Relation<Reply[]>
+  @OneToMany(() => Reply, (replies) => replies.user)
+  @ApiProperty({ type: () => [Reply] })
+  replies: Relation<Reply[]>;
 
-  @OneToMany(() => (likeComment), commentlikes => commentlikes.user)
+  @OneToMany(() => likeComment, (commentLikes) => commentLikes.user)
   @ApiProperty({ type: () => [likeComment] })
-  commentlikes: Relation<likeComment[]>
+  commentLikes: Relation<likeComment[]>;
 
-  @OneToMany(() => (likePost), postLikes => postLikes.user)
+  @OneToMany(() => likePost, (postLikes) => postLikes.user)
   @ApiProperty({ type: () => [likePost] })
-  postLikes: Relation<likePost[]>
+  postLikes: Relation<likePost[]>;
 
-  @OneToMany(() => (likeStory), storyLikes => storyLikes.user)
+  @OneToMany(() => likeStory, (storyLikes) => storyLikes.user)
   @ApiProperty({ type: () => [likeStory] })
-  storyLikes: Relation<likeStory[]>
+  storyLikes: Relation<likeStory[]>;
+
+  @OneToMany(() => Message, (sentMessages) => sentMessages.sender)
+  @ApiProperty({ type: () => [Message] })
+  sentMessages: Relation<Message[]>;
+
+  @OneToMany(() => Message, (receivedMessages) => receivedMessages.receiver)
+  @ApiProperty({ type: () => [Message] })
+  receivedMessages: Relation<Message[]>;
+
+  @OneToMany(() => Notification, (sentNotifications) => sentNotifications.user)
+  @ApiProperty({ type: () => [Notification] })
+  sentNotifications: Relation<Notification[]>;
+
+  @OneToMany(() => Notification, (receivedNotifications) => receivedNotifications.user)
+  @ApiProperty({ type: () => [Notification] })
+  receivedNotifications: Relation<Notification[]>;
+
+  @OneToMany(() => Wallet, (wallets) => wallets.user)
+  @ApiProperty({ type: () => [Wallet] })
+  wallets: Relation<Wallet[]>;
+
+  @OneToMany(() => CryptoEntity, (cryptos) => cryptos.user)
+  @ApiProperty({ type: () => [CryptoEntity] })
+  cryptos: Relation<CryptoEntity[]>;
+
+  @ManyToOne(() => Club, (club) => club.members)
+  @ApiProperty({ type: () => Club })
+  club: Relation<Club>;
+
 }

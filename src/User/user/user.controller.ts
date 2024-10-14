@@ -94,6 +94,12 @@ export class UserController {
     return await this.userService.getUserDataWithToken(userPhone);
   }
 
+  @Get('homepage')
+  async getHomepageData(){
+    return await this.getHomepageData()
+  }
+
+
   @Roles(UserRole.ADMIN)
   @Get('user/:phone')
   async getUserByPhone(

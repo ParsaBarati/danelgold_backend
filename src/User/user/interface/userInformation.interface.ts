@@ -4,7 +4,7 @@ export interface UserInformation {
   lastName: string;
   phone: string;
   roles: string;
-  imageUrl: string;
+  profilePic: string;
   createdAt: Date;
   updatedAt: Date;
 }

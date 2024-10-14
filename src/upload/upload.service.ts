@@ -209,7 +209,7 @@ export class UploadService {
 
     const savedUpload = await this.uploadRepository.save(newUpload);
 
-    user.imageUrl =
+    user.profilePic =
       `${process.env.BASE_URL_UPLOAD}` +
       `${savedUpload.destination.replace(/\\/g, '/')}` +
       `/${encodeURIComponent(savedUpload.name)}`;
@@ -217,8 +217,8 @@ export class UploadService {
 
     const uploadWithLink = {
       ...savedUpload,
-      link: user.imageUrl,
-      imageUrl: user.imageUrl,
+      link: user.profilePic,
+      profilePic: user.profilePic,
     };
 
     return createResponse(
