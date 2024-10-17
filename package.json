@@ -79,7 +79,7 @@
     "web3": "^4.12.1"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.0.0",
+    "@nestjs/cli": "^10.4.5",
     "@nestjs/schematics": "^10.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@swc/cli": "^0.4.0",
