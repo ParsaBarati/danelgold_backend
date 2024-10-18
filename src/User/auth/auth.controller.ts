@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login-with-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ApiResponses } from '@/utils/response.util';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -14,6 +15,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { TokenService } from './token/token.service';
 import { OtpService } from './otp/otp.service';
@@ -28,93 +30,89 @@ export class AuthController {
     private readonly tokenService: TokenService,
   ) {}
 
-  @ApiCreatedResponse({ description: 'Verification code sent' })
-  @ApiConflictResponse({ description: 'Invalid email or phone number' })
-  @Public()
-  @Post('request-code')
-  async requestVerificationCode(
-    @Body() { email_or_phone }: { email_or_phone: string }
-  ) {
-    const isPhone = /^[0-9]+$/.test(email_or_phone); 
-    const isEmail = /\S+@\S+\.\S+/.test(email_or_phone); 
-  
-    if (isPhone) {
-      await this.authService.sendOTPToPhoneOrEmail(email_or_phone, ''); // Pass empty string for email
-    } else if (isEmail) {
-      await this.authService.sendOTPToPhoneOrEmail('', email_or_phone); // Pass empty string for phone
-    } else {
-      throw new BadRequestException('Invalid email or phone number');
-    }
-  }  
-
-  async verifyOtp(email_or_phone: string, verification_code: string): Promise<boolean> {
-    const isPhone = /^[0-9]+$/.test(email_or_phone);
-    const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
-  
-    if (isPhone) {
-      return await this.otpService.verifyOTP(email_or_phone, verification_code);
-    } else if (isEmail) {
-      return await this.otpService.verifyOTPToEmail(email_or_phone, verification_code);
-    } else {
-      throw new BadRequestException('Invalid email or phone number');
-    }
-  }
-  
-
-  @ApiCreatedResponse({ description: 'Password set successfully' })
-@ApiConflictResponse({ description: 'Passwords do not match' })
+@ApiCreatedResponse({ description: 'Login successful' })
+@ApiUnauthorizedResponse({ description: 'Invalid credentials' })
 @Public()
-@Post('set-password')
-async setPassword(
-  @Body() { password, confirm_password, email_or_phone }: { password: string; confirm_password: string; email_or_phone: string }
-) {
-  if (password !== confirm_password) {
-    throw new BadRequestException('Passwords do not match');
-  }
-
-  // Call the setPassword service function
-  await this.authService.setPassword(password, email_or_phone);
-
-  return {
-    status: 'success',
-    message: 'Password set successfully',
-  };
+@Post('login')
+async login(
+  @Body() { email_or_phone, password }: { email_or_phone: string; password: string }
+){
+  return await this.authService.login(email_or_phone, password);
 }
 
 
-  @ApiOkResponse({ description: 'ok' })
-  @ApiNotFoundResponse({ description: 'کاربر یافت نشد' })
-  @ApiNotAcceptableResponse({ description: 'رمز عبور اشتباه است' })
+  @ApiCreatedResponse({ description: 'Username accepted' })
+  @ApiConflictResponse({ description: 'Username already exists' })
   @Public()
-  @Post('login/password')
-  @HttpCode(200)
-  async loginUserWithPassword(
-    @Body() phoneDTO: LoginDto,
-    @Req() req: Request,
-  ): Promise<ApiResponses<{ token: string; username: string }>> {
-    return this.authService.loginUserWithPassword(phoneDTO, req);
-  }
-
-  @Public()
-  @Post('forgot-password/otp')
-  async forgetPasswordWithOTP(
-    @Body() phone: string,
-    @Body() email: string,
+  @Post('signup/username')
+  async checkUsername(
+    @Body() { username }: { username: string }
   ){
-    return this.authService.forgetPasswordWithOTP(phone);
+    return await this.authService.checkUserNameAvailability(username);
   }
 
+  @ApiCreatedResponse({ description: 'Verification code sent' })
+  @ApiConflictResponse({ description: 'Invalid email or phone number' })
   @Public()
-  @Post('reset-password/otp')
-  async resetPasswordWithOTP(
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ): Promise<ApiResponses<{ login: boolean }>> {
-    return this.authService.resetPasswordWithOTP(resetPasswordDto);
+  @Post('signup/request-code')
+  async requestVerificationCode(
+  @Body() { email_or_phone }: { email_or_phone: string }
+  ){
+    return await this.authService.sendOTPToPhoneOrEmail(email_or_phone)
   }
 
-  @Post('logout')
-  async logout(@Req() req: any) {
-    const token = req.headers.authorization.split(' ')[1];
-    await this.tokenService.deleteToken(token);
+  @ApiCreatedResponse({ description: 'Code verified successfully' })
+  @ApiConflictResponse({ description: 'Invalid verification code' })
+  @Public()
+  @Post('signup/verify-code')
+  async verifyCode(
+  @Body() { email_or_phone, verification_code }: { email_or_phone: string; verification_code: string }
+  ) {
+  return await this.authService.verifyCode(email_or_phone, verification_code);
   }
+
+  @ApiCreatedResponse({ description: 'Password set successfully' })
+  @ApiConflictResponse({ description: 'Passwords do not match' })
+  @Public()
+  @Post('signup/set-password')
+  async setPassword(
+  @Body() { email_or_phone, password, confirm_password }: { email_or_phone: string; password: string; confirm_password: string }
+  ){
+  return await this.authService.setPassword(email_or_phone, password, confirm_password);
+  }
+
+  @ApiCreatedResponse({ description: 'Verification code sent' })
+  @ApiBadRequestResponse({ description: 'User not found' })
+  @Public()
+  @Post('password/forgot')
+  async forgotPassword(
+    @Body() { email_or_phone_or_username }: { email_or_phone_or_username: string }
+  ){
+  return await this.authService.forgotPassword(email_or_phone_or_username);
+  }
+
+  @ApiCreatedResponse({ description: 'Code verified' })
+  @ApiBadRequestResponse({ description: 'Invalid verification code' })
+  @Public()
+  @Post('password/verify-code')
+  async verifyForgotPasswordCode(
+  @Body() { email_or_phone_or_username, verification_code }: { email_or_phone_or_username: string; verification_code: string }
+  ) {
+  const result = await this.authService.verifyForgotPasswordCode(email_or_phone_or_username, verification_code);
+  return result;
+  } 
+
+  @ApiCreatedResponse({ description: 'Password reset successfully' })
+  @ApiBadRequestResponse({ description: 'Passwords do not match' })
+  @Public()
+  @Post('password/reset')
+  async resetPassword(
+  @Body() { password, confirm_password, userId }: { password: string; confirm_password: string; userId: number }
+  ){
+  return await this.authService.resetPassword(password, confirm_password, userId);
+  }
+
+
+
+
 }
