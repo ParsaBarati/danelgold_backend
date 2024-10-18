@@ -235,8 +235,7 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "getUploadById", null);
 UploadController = _ts_decorate([
-    (0, _swagger.ApiTags)('Upload'),
-    (0, _swagger.ApiBearerAuth)(),
+    (0, _swagger.ApiExcludeController)(),
     (0, _common.Controller)('upload'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

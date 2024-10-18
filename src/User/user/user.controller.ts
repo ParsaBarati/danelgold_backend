@@ -80,8 +80,6 @@ export class UserController {
     return {
       status: 200,
       ...result,
-      adminCount: await this.userService.getAdminCount(),
-      userCount: await this.userService.getUserCount(),
     };
   }
 

@@ -24,10 +24,8 @@ export class TokenService {
   }
 
   async createToken(user: User): Promise<string> {
-    const isUser = user.role.includes('user'); 
-    const isAdmin = user.role.includes('admin'); 
 
-    if (isUser) {
+    if (user) {
       const activeTokenCount = await this.tokenRepository
         .createQueryBuilder('token')
         .where('token.userPhone = :userPhone', { userPhone: user.phone })
@@ -45,9 +43,7 @@ export class TokenService {
     const payload = {
       sub: user.phone,
       phone: user.phone,
-      roles: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      userName: user.userName,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,

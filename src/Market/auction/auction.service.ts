@@ -223,8 +223,7 @@ export class AuctionsService {
         'nft.updatedAt'
       ])
       .addSelect([
-        'user.firstName',
-        'user.lastName',
+        'user.userName',
       ])
       .where('auctions.id = :auctionId', { auctionId })
 

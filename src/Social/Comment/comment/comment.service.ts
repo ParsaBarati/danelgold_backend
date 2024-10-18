@@ -49,7 +49,7 @@ export class CommentService {
 
     const user = await this.userRepository.findOne({
       where: { phone: userPhone },
-      select: ['firstName', 'lastName'],
+      select: ['userName',],
     });
 
     if (userCommentCounts.has(`${userPhone}-${postId}`)) {
@@ -71,8 +71,7 @@ export class CommentService {
 
     const newComment = {
       user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        userName: user.userName,
         phone: userPhone,
       },
       postId,
@@ -92,7 +91,7 @@ export class CommentService {
 
     const user = await this.userRepository.findOne({
       where: { phone: userPhone },
-      select: ['firstName', 'lastName'],
+      select: ['userName'],
     });
 
     if (userCommentCounts.has(`${userPhone}-${storyId}`)) {
@@ -114,8 +113,7 @@ export class CommentService {
 
     const newComment = {
       user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        userName: user.userName,
         phone: userPhone,
       },
       storyId,
@@ -261,9 +259,7 @@ export class CommentService {
         'comment.postId',
         'comment.likes',
         'comment.dislikes',
-        'user.firstName',
-        'user.lastName',
-        'user.roles',
+        'user.userName',
       ])
       .addSelect([
         'replies.id',
@@ -272,21 +268,15 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.firstName',
-        'replyUser.lastName',
-        'replyUser.roles',
+        'replyUser.userName',
       ])
       .addSelect([
         'parentComment.id',
-        'parentCommentUser.firstName',
-        'parentCommentUser.lastName',
-        'parentCommentUser.roles',
+        'parentCommentUser.userName',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.firstName',
-        'parentReplyUser.lastName',
-        'parentReplyUser.roles',
+        'parentReplyUser.userName',
       ])
       .where('comment.postId = :postId', { postId })
       .orderBy(`comment.${sort}`, sortOrder)
@@ -377,9 +367,7 @@ export class CommentService {
         'comment.storyId',
         'comment.likes',
         'comment.dislikes',
-        'user.firstName',
-        'user.lastName',
-        'user.roles',
+        'user.userName',
       ])
       .addSelect([
         'replies.id',
@@ -388,21 +376,15 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.firstName',
-        'replyUser.lastName',
-        'replyUser.roles',
+        'replyUser.userName',
       ])
       .addSelect([
         'parentComment.id',
-        'parentCommentUser.firstName',
-        'parentCommentUser.lastName',
-        'parentCommentUser.roles',
+        'parentCommentUser.userName',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.firstName',
-        'parentReplyUser.lastName',
-        'parentReplyUser.roles',
+        'parentReplyUser.userName',
       ])
       .where('comment.storyId = :storyId', { storyId })
       .orderBy(`comment.${sort}`, sortOrder)
@@ -475,9 +457,7 @@ export class CommentService {
         'comment.likes',
         'comment.dislikes',
         'comment.userPhone',
-        'user.firstName',
-        'user.lastName',
-        'user.roles',
+        'user.userName',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -485,7 +465,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.userName ILIKE :search OR comment.userPhone ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -551,9 +531,7 @@ export class CommentService {
         'comment.likes',
         'comment.dislikes',
         'comment.userPhone',
-        'user.firstName',
-        'user.lastName',
-        'user.roles',
+        'user.userName',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -561,7 +539,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.userName ILIKE :search OR comment.userPhone ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -629,15 +607,11 @@ export class CommentService {
         'replies.parentCommentId',
         'replies.parentReplyId',
         'replyUser.phone',
-        'replyUser.firstName',
-        'replyUser.lastName',
-        'replyUser.roles',
+        'replyUser.userName',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.firstName',
-        'parentReplyUser.lastName',
-        'parentReplyUser.roles',
+        'parentReplyUser.userName',
       ])
       .where('comment.userPhone = :phone', { phone });
   
@@ -698,15 +672,11 @@ export class CommentService {
         'replies.parentCommentId',
         'replies.parentReplyId',
         'replyUser.phone',
-        'replyUser.firstName',
-        'replyUser.lastName',
-        'replyUser.roles',
+        'replyUser.userName',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.firstName',
-        'parentReplyUser.lastName',
-        'parentReplyUser.roles',
+        'parentReplyUser.userName',
       ])
       .where('comment.userPhone = :phone', { phone });
   

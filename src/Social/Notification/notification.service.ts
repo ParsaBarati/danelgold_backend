@@ -23,8 +23,6 @@ export class NotificationService {
         'notification.thumb',
         'notification.action',
         'user.id',
-        'user.firstName',
-        'user.lastName',
         'user.profilePic',
         'user.userName',
       ])
@@ -39,7 +37,7 @@ export class NotificationService {
       action: notification.action,
       user: {
         id: notification.user.id,
-        name: `${notification.user.firstName} ${notification.user.lastName}`,
+        name: `${notification.user.userName}`,
         pic: notification.user.profilePic,
         username: notification.user.userName,
       },

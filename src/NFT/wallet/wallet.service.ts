@@ -58,7 +58,7 @@ export class WalletService {
       imgUrl: nft.image,
       creator: {
         id: nft.creator.id,
-        name: `${nft.creator.firstName} ${nft.creator.lastName}`,
+        name: `${nft.creator.userName} ${nft.creator.userName}`,
         username: nft.creator.userName,
         pic: nft.creator.profilePic,
       },

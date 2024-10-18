@@ -153,7 +153,6 @@ export class PostService{
           caption: post.caption,
           user: {
             id: post.user.id,
-            name: post.user.firstName,
             pic: post.user.profilePic,
             username: post.user.userName,
             email: post.user.email,

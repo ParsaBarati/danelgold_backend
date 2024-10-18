@@ -157,13 +157,9 @@ export class UserService {
   ): Promise<ApiResponses<PaginationResult<any>>> {
     const allowedSortFields = [
       'id',
-      'firstName',
-      'lastName',
+      'userName',
       'phone',
-      'roles',
-      'grade',
       'lastLogin',
-      'skuTest',
     ];
 
     const validatedSortBy = allowedSortFields.includes(sort) ? sort : 'id';
@@ -173,11 +169,8 @@ export class UserService {
       .leftJoinAndSelect('user.userDetail', 'userDetail')
       .select([
         'user.id as id',
-        'user.firstName as firstName',
-        'user.lastName as lastName',
+        'user.userName as userName',
         'user.phone as phone',
-        'user.role as role',
-        'user.grade as grade',
         'user.lastLogin as lastLogin',
         'MAX(userDetail.ip) as ip',
         'MAX(userDetail.platform) as platform',
@@ -187,13 +180,13 @@ export class UserService {
         'MAX(userDetail.loginDate) as lastLoginDate',
       ])
       .groupBy(
-        'user.id, user.firstName, user.lastName, user.phone, user.role, user.lastLogin',
+        'user.id, user.userName, user.phone, user.lastLogin',
       )
       .orderBy(`user.${validatedSortBy}`, sortOrder);
 
     if (searchInput) {
       queryBuilder = queryBuilder.andWhere(
-        `(CONCAT(user.firstName, ' ', user.lastName) ILIKE :searchInput OR user.phone ILIKE :searchInput)`,
+        `(CONCAT(user.userName, ' ', ) ILIKE :searchInput OR user.phone ILIKE :searchInput)`,
         { searchInput: `%${searchInput}%` },
       );
     }
@@ -241,8 +234,7 @@ export class UserService {
       .orderBy('userDetail.loginDate', 'DESC')
       .select([
         'user.id',
-        'user.firstName',
-        'user.lastName',
+        'user.userName',
         'user.phone',
         'user.profilePic',
         'user.createdAt',
@@ -299,8 +291,7 @@ export class UserService {
         .where('phone = :phone', { phone: tokenData.user.phone })
         .returning([
           'phone',
-          'firstName',
-          'lastName',
+          'userName',
           'profilePic',
           'updatedAt',
         ])
@@ -338,8 +329,7 @@ export class UserService {
         'story.id',
         'story.thumbnail',
         'user.id',
-        'user.firstName',
-        'user.lastName',
+        'user.userName',
         'user.profilePic',
         'user.userName',
       ])
@@ -360,8 +350,7 @@ export class UserService {
         'post.likes',
         'post.dislikes',
         'user.id',
-        'user.firstName',
-        'user.lastName',
+        'user.userName',
         'user.profilePic',
         'user.userName',
         'COUNT(comments.id) as commentCount',
@@ -390,7 +379,7 @@ export class UserService {
         thumb: story.story_thumbnail,
         user: {
           id: story.user_id,
-          name: `${story.user_firstName} ${story.user_lastName}`,
+          name: `${story.user_userName}`,
           pic: story.user_profilePic,
           username: story.user_username,
         },
@@ -400,7 +389,7 @@ export class UserService {
         thumb: post.post_mediaUrl,
         user: {
           id: post.user_id,
-          name: `${post.user_firstName} ${post.user_lastName}`,
+          name: `${post.user_userName}`,
           pic: post.user_profilePic,
           username: post.user_username,
         },

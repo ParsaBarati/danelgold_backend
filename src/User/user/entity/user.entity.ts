@@ -49,8 +49,8 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isVerified: boolean; // New field to mark user verification status
 
-  @Column()
-  profilePic
+  @Column({ type: 'text'})
+  profilePic: string;
 
   @CreateDateColumn()
   createdAt: Date;

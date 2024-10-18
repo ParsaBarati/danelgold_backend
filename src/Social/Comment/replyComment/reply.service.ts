@@ -30,7 +30,7 @@ export class ReplyService{
         
         const user = await this.userRepository.findOne({
           where: { phone: phone },
-          select: ['firstName', 'lastName'],
+          select: ['userName'],
         });
     
         if (!user) {
@@ -38,7 +38,7 @@ export class ReplyService{
           throw new NotFoundException('User not found');
         }
     
-        console.log(`User found: ${user.firstName} ${user.lastName}`);
+        console.log(`User found: ${user.userName}`);
     
         const existingComment = await this.commentRepository.findOne({ where: { id: parentCommentId } });
     
@@ -49,8 +49,7 @@ export class ReplyService{
     
         const newReply = this.replyRepository.create({
           user: {
-            firstName: user.firstName,
-            lastName: user.lastName,
+            userName: user.userName,
             phone: phone,
           },
           content,
@@ -99,7 +98,7 @@ export class ReplyService{
           where: { phone: currentUserPhone },
         });
 
-        if (reply.userPhone !== currentUserPhone && currentUser.role !== UserRole.ADMIN) {
+        if (reply.userPhone !== currentUserPhone) {
           throw new UnauthorizedException('شما اجازه حذف این پاسخ را ندارید');
         }
     

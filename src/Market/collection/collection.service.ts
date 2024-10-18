@@ -116,8 +116,7 @@ export class CollectionsService {
         'collections.updatedAt'
       ])
       .addSelect([
-        'user.firstName',
-        'user.lastName'
+        'user.userName',
       ])
       .orderBy(`collections.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -178,12 +177,10 @@ export class CollectionsService {
         'nft.updatedAt'
       ])
       .addSelect([
-        'collectionUser.firstName',
-        'collectionUser.lastName'
+        'collectionUser.userName',
       ])
       .addSelect([
-        'nftUser.firstName',
-        'nftUser.lastName'
+        'nftUser.userName',
       ])
       .where('collections.id = :collectionId', { collectionId })
 

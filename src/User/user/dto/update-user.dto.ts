@@ -4,16 +4,9 @@ import { UserRole } from '../entity/user.entity';
 
 export class UpdateUserDTO {
   @ApiProperty()
-  @Matches(/^[آ-ی ]*$/, { message: 'نام خود را فارسی وارد کنید' })
   @IsString()
   @IsOptional()
-  firstName?: string;
-
-  @ApiProperty()
-  @Matches(/^[آ-ی ]*$/, { message: 'نام خانوادگی خود را فارسی وارد کنید' })
-  @IsString()
-  @IsOptional()
-  lastName?: string;
+  userName?: string;
 
   @ApiProperty()
   @Matches(/^09\d{9}$/, { message: 'فرمت شماره همراه صحیح نیست' })
@@ -39,14 +32,4 @@ export class UpdateUserDTO {
   @IsString()
   @IsOptional()
   email?: string;
-
-  @ApiProperty()
-  @IsNumber({}, { message: 'لطفا شناسه آزمون را به عدد وارد کنید' })
-  @IsNotEmpty({message:'ساخت شناسه آزمون اجباری است'})
-  skuTest?: number;
-
-  @ApiProperty()
-  @IsString({message:'پارامتر ارسالی صحیح نیست'})
-  @IsOptional()
-  field?: string;
 }

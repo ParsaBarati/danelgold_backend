@@ -68,7 +68,6 @@ export class SearchService {
         type: 'Users',
         data: users.map((user) => ({
           id: user.id,
-          name: user.firstName,
           username: user.userName,
           pic: user.profilePic,
         })),

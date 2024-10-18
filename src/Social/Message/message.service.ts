@@ -20,13 +20,9 @@ export class MessageService{
           .select([
             'message.id',
             'sender.id',
-            'sender.firstName',
-            'sender.lastName',
             'sender.profilePic',
             'sender.userName',
             'receiver.id',
-            'receiver.firstName',
-            'receiver.lastName',
             'receiver.profilePic',
             'receiver.userName',
             'message.createdAt',
@@ -41,7 +37,7 @@ export class MessageService{
             id: chat.message_id,
             user: {
               id: otherUser.id,
-              name: `${otherUser.firstName} ${otherUser.lastName}`,
+              name: `${otherUser.userName}`,
               pic: otherUser.profilePic,
               username: otherUser.username,
             },
