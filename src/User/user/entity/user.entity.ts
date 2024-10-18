@@ -38,7 +38,7 @@ export class User {
   phone: string;
 
   @Column({ type: 'varchar', unique: true })
-  username: string; 
+  userName: string; 
 
   @Column({ type: 'varchar' })
   firstName: string;

@@ -17,6 +17,11 @@ export class SignupDto {
   @ApiProperty()
   @IsString()
   @IsDefined({ message: 'First name is required' })
+  userName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsDefined({ message: 'First name is required' })
   firstName: string;
 
   @ApiProperty()

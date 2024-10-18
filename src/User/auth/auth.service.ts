@@ -57,7 +57,7 @@ export class AuthService {
   }
 
   async signUpUsers(signupDto: SignupDto, userAgent: any, req: Request) {
-    const { phone, firstName, lastName, password, email } = signupDto;
+    const { phone, userName, firstName, lastName, password, email } = signupDto;
 
     const existingUser = await this.userRepository.findOneBy({ phone });
 
@@ -76,6 +76,7 @@ export class AuthService {
 
 
     const newUser = await this.userService.singupUser({
+      userName,
       firstName,
       lastName,
       phone,
