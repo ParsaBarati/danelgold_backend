@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../../src/user-detail/dto/user-agent.dto.ts"],"sourcesContent":["export class UserAgentDto {\r\n  platform: string;\r\n  browser: string;\r\n  versionBrowser: string;\r\n  versionPlatform: string;\r\n  ip: string;\r\n}\r\n"],"names":["UserAgentDto"],"mappings":";;;;+BAAaA;;;eAAAA;;;AAAN,IAAA,AAAMA,eAAN,MAAMA;AAMb"}

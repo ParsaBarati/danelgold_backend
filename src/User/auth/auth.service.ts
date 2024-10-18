@@ -1,32 +1,26 @@
-import { Injectable, NotFoundException, NotAcceptableException, BadRequestException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { 
+  Injectable, 
+  NotFoundException, 
+  BadRequestException, 
+  UnauthorizedException 
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Request } from 'express';
-import { ApiResponses, createResponse } from '@/utils/response.util';
 import { UserService } from '@/User/user/user.service';
 import { UserDetailService } from '@/User/user-detail/userDetail.service';
 import { OtpService } from './otp/otp.service';
 import { TokenService } from './token/token.service';
 import { User } from '@/User/user/entity/user.entity';
 import { UserDetail } from '@/User/user-detail/entity/userDetail.entity';
-import { SignupDto } from './dto/signup-dto';
-import { LoginDto } from './dto/login-with-password.dto';
-import { VerifyOtpDto } from './dto/verify-otp.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { getUserBrowser, getUserIP, getUserOS, getBrowserVersion, getVersionPlatform } from '@/common/utils/user-agent.util';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly userService: UserService,
     private readonly otpService: OtpService,
-    @InjectRepository(UserDetail)
-    private readonly userDetailRepository: Repository<UserDetail>,
-    private readonly userDetailService: UserDetailService,
     private readonly tokenService: TokenService,
   ) {}
 
@@ -123,31 +117,51 @@ export class AuthService {
     const isPhone = /^[0-9]+$/.test(email_or_phone);
     const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
   
+    const codeAsString = verification_code.toString();
+    let user;
+  
     if (isPhone) {
-      const isValidOTP = await this.otpService.verifyOTP(email_or_phone, verification_code);
+      const isValidOTP = await this.otpService.verifyOTP(email_or_phone, codeAsString);
       if (!isValidOTP) {
         throw new BadRequestException('Invalid verification code');
       }
+      user = await this.userRepository.findOneBy({ phone: email_or_phone });
     } else if (isEmail) {
-      const isValidOTP = await this.otpService.verifyOTP(email_or_phone, verification_code);
+      const isValidOTP = await this.otpService.verifyOTP(email_or_phone, codeAsString);
       if (!isValidOTP) {
         throw new BadRequestException('Invalid verification code');
       }
+      user = await this.userRepository.findOneBy({ email: email_or_phone });
     } else {
       throw new BadRequestException('Invalid phone number or email');
     }
+  
+    if (!user) {
+      user = this.userRepository.create({
+        phone: isPhone ? email_or_phone : null,
+        email: isEmail ? email_or_phone : null,
+        userName: '', // Placeholder, prompt user to set this later
+        password: '', // Placeholder, user will set their password later
+        isVerified: true,
+      });
+      await this.userRepository.save(user);
+    } else {
+      user.isVerified = true;
+      await this.userRepository.save(user);
+    }
+  
     return {
       status: 'success',
-      message: 'Verification code verified successfully',
+      message: 'Verification code verified, user created/updated successfully',
     };
   }
-
+  
   async setPassword(
     email_or_phone: string,
     password: string,
     confirmPassword: string
   ): Promise<any> {
-
+  
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
@@ -169,7 +183,6 @@ export class AuthService {
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);
-    
     user.password = hashedPassword;
   
     await this.userRepository.save(user);
@@ -179,6 +192,7 @@ export class AuthService {
       message: 'Password set successfully',
     };
   }
+  
 
   async forgotPassword(email_or_phone_or_username: string): Promise<any> {
     const isPhone = /^[0-9]+$/.test(email_or_phone_or_username);
@@ -243,8 +257,7 @@ export class AuthService {
   async resetPassword(
     password: string, 
     confirm_password: string, 
-    userId: number
-  ): Promise<void> {
+    userId: number): Promise<void> {
     if (password !== confirm_password) {
       throw new BadRequestException('Passwords do not match');
     }

@@ -34,11 +34,11 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', unique: true, length: 11 })
-  phone: string;
+  @Column({ type: 'varchar', unique: true, length: 11, nullable: true })
+  phone: string | null;
 
-  @Column({ type: 'text' })
-  email: string;
+  @Column({ type: 'text', nullable: true })
+  email: string | null;
 
   @Column({ type: 'varchar', unique: true })
   userName: string;
@@ -49,14 +49,14 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isVerified: boolean; // New field to mark user verification status
 
-  @Column({ type: 'text'})
-  profilePic: string;
+  @Column({ type: 'text',nullable: true})
+  profilePic: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @UpdateDateColumn({ nullable: true})
+  updatedAt: Date | null;
 
   @Column({ type: 'timestamptz', nullable: true })
   lastLogin: Date | null;
