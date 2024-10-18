@@ -6,9 +6,10 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserDetailService } from '@/User/user-detail/userDetail.service';
 
+@ApiExcludeController()
 @Controller('user-detail')
 export class UserDetailController {
   constructor(private readonly userDetailService: UserDetailService) {}

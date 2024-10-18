@@ -1,9 +1,9 @@
 import { Controller, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikePostService } from '@/Social/Post/like-post/like-post.service';
 import { Request } from 'express';
 
-
+@ApiExcludeController()
 @Controller('like-post')
 export class LikePostController {
     constructor(private readonly likePostService: LikePostService) {}

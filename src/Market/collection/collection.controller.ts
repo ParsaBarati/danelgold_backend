@@ -10,12 +10,13 @@ import {
   Query, 
   DefaultValuePipe 
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { CollectionsService } from '@/Market/collection/collection.service';
 import { CreateCollectionDto } from '@/Market/collection/dto/CreateCollection.dto';
 import { UpdateCollectionDto } from '@/Market/collection/dto/UpdateCollection.dto';
 import { Request } from 'express';
 
+@ApiExcludeController()
 @Controller('collection')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}

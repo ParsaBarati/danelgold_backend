@@ -13,13 +13,14 @@ import {
   UsePipes, 
   ValidationPipe 
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { NFTsService } from '@/NFT/nft/nft.service';
 import { MintNFTDataDto, MintNFTDto } from './dto/MintNFT.dto';
 import { IPFSService } from '@/services/IPFS.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
+@ApiExcludeController()
 @Controller('nft')
 export class NFTsController {
   constructor(

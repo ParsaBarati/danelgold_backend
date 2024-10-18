@@ -23,9 +23,9 @@ import { Request, Response } from 'express';
 import { Public } from '@/common/decorators/public.decorator';
 import { PaginationResult } from '@/common/paginate/pagitnate.service';
 import { Upload } from './entity/uplaod.entity';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-
+@ApiExcludeController()
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}

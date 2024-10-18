@@ -17,6 +17,7 @@ import {
   ApiBearerAuth, 
   ApiConflictResponse, 
   ApiCreatedResponse, 
+  ApiExcludeController, 
   ApiNotFoundResponse, 
   ApiOkResponse, 
   ApiOperation, 
@@ -30,7 +31,7 @@ import { CreateCommentDTO } from './dto/CreateComment';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';
 
-
+@ApiExcludeController()
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentsService: CommentService) {}

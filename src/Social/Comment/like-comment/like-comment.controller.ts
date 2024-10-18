@@ -5,10 +5,11 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikeCommentService } from './like-comment.service';
 import { Request } from 'express';
 
+@ApiExcludeController()
 @Controller('like-comment')
 export class LikeCommentController {
   constructor(private readonly likeCommentService: LikeCommentService) {}

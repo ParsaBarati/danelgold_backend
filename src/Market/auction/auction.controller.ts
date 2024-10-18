@@ -4,11 +4,11 @@ import { AuctionsService } from '@/Market/auction/auction.service';
 import { UpdateAuctionDto } from '@/Market/auction/dto/UpdateAuction.dto';
 import { CreateAuctionDto } from '@/Market/auction/dto/CreateAuction.dto';
 import { ParticipateAuctionDto } from '@/Market/auction/dto/ParticipateAuction.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';
 
-
+@ApiExcludeController()
 @Controller('auction')
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}

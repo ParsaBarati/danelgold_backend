@@ -10,11 +10,10 @@ import {
 import { SubscribeService } from './subscribe.service';
 import { SubscribeDto } from './dto/Subscription.dto';
 import { Request } from 'express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { CreateNotificationDto } from './dto/create-notication.dto';
 
-@ApiTags('Subscribe')
-@ApiBearerAuth()
+@ApiExcludeController()
 @Controller('subscribe')
 export class SubscribeController {
   constructor(private readonly subscribeService: SubscribeService) {}

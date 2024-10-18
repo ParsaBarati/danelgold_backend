@@ -11,11 +11,11 @@ import {
 import { CreateReplyDTO } from './dto/CreateReply.dto';
 import { ReplyService } from './reply.service';
 import { UpdateReplyDTO } from './dto/UpdateReply.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiExcludeController, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from '@/common/decorators/roles.decorator';
 
-
+@ApiExcludeController()
 @Controller('reply')
 export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}

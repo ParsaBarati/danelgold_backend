@@ -2,10 +2,10 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { PostService } from './posts.service';
 import { Request } from 'express';
 import { CreatePostDto } from './dto/createPost.dto';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from './dto/updatePost.dto';
 
-
+@ApiExcludeController()
 @Controller('posts')
 export class PostsController {
     constructor( private readonly postService: PostService){}
