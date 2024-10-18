@@ -5,7 +5,7 @@ export class VerifyOtpDto {
   @ApiProperty()
   @Matches(/^09\d{9}$/, { message: 'Invalid phone format' })
   @IsString()
-  @IsDefined({ message: 'Phone is required' })
+  @IsDefined()
   phone: string;
 
   @ApiProperty()

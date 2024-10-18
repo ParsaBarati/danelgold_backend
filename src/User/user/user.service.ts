@@ -33,7 +33,7 @@ export class UserService {
     private readonly smsService: SmsService,
   ) {}
 
-  async singupUser(createUserDTO: SignupDto) {
+  async signupUser(createUserDTO: SignupDto) {
     const existingUser = await this.userRepository.findOne({
       where: { phone: createUserDTO.phone },
     });
@@ -137,10 +137,7 @@ export class UserService {
 
     const userInformation: UserInformation = {
       id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
       phone: user.phone,
-      roles: user.role,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -207,17 +204,9 @@ export class UserService {
 
     if (all === 'true') {
       const users = await queryBuilder.getRawMany();
-      const adminCount = await this.userRepository.count({
-        where: { role: UserRole.ADMIN},
-      });
-      const userCount = await this.userRepository.count({
-        where: { role: UserRole.USER },
-      });
       const response = {
         data: users,
         total: users.length,
-        adminCount,
-        userCount,
         totalPages: 1,
         page: 1,
         limit: users.length,
@@ -241,14 +230,6 @@ export class UserService {
     };
 
     return createResponse(200, response);
-  }
-
-  async getAdminCount(): Promise<number> {
-    return this.userRepository.count({ where: { role: UserRole.ADMIN } });
-  }
-
-  async getUserCount(): Promise<number> {
-    return this.userRepository.count({ where: { role: UserRole.ADMIN } });
   }
 
   async getUserDataWithToken(userPhone: string) {
@@ -306,13 +287,6 @@ export class UserService {
     const updateData: Partial<User> = {
       updatedAt: new Date(),
     };
-
-    if (editData.firstName !== undefined) {
-      updateData.firstName = editData.firstName;
-    }
-    if (editData.lastName !== undefined) {
-      updateData.lastName = editData.lastName;
-    }
     if (editData.profilePic !== undefined) {
       updateData.profilePic = editData.profilePic;
     }
@@ -517,7 +491,6 @@ export class UserService {
   
     return {
       id: user.id,
-      name: `${user.firstName} ${user.lastName}`,
       username: user.userName,
       profilePic: user.profilePic,
       followers: followersCount,

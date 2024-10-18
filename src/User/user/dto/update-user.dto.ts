@@ -30,10 +30,6 @@ export class UpdateUserDTO {
   @IsOptional()
   password?: string;
   
-  @ApiProperty({enum:UserRole})
-  @IsEnum(UserRole,{message:''})
-  roles: UserRole;
-  
   @ApiProperty()
   @IsString({message:'عکس را درست انتخاب کنید'})
   @IsOptional()

@@ -37,30 +37,20 @@ export class User {
   @Column({ type: 'varchar', unique: true, length: 11 })
   phone: string;
 
+  @Column({ type: 'text' })
+  email: string;
+
   @Column({ type: 'varchar', unique: true })
-  userName: string; 
-
-  @Column({ type: 'varchar' })
-  firstName: string;
-
-  @Column({ type: 'varchar' })
-  lastName: string;
+  userName: string;
 
   @Column({ type: 'text' })
   password: string;
 
-  @Column({ type: 'text' })
-  email: string;
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean; // New field to mark user verification status
 
-  @Column({ type: 'varchar', nullable: true })
-  profilePic: string | null;
-
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER,
-  })
-  role: UserRole;
+  @Column()
+  profilePic
 
   @CreateDateColumn()
   createdAt: Date;

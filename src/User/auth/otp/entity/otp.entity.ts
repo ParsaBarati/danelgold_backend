@@ -1,23 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('otp')
 export class OTP {
   @PrimaryGeneratedColumn()
-  id: number
+  id: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  phone: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  email: string; // New field for email OTP
 
   @Column({ type: 'varchar' })
-  phone: string
-
-  @Column({ type: 'varchar' })
-  otp: string
+  otp: string;
 
   @Column({ type: 'boolean', default: false })
-  isVerified: boolean
+  isVerified: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date
+  createdAt: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  expirationTime: Date | null
-
+  expirationTime: Date | null;
 }

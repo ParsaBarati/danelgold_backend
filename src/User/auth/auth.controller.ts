@@ -2,7 +2,6 @@ import { SignupDto } from './dto/signup-dto';
 import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { PhoneDto } from './dto/login-with-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { Public } from '@/common/decorators/public.decorator';
 import { LoginDto } from './dto/login-with-password.dto';
@@ -20,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 
 import { TokenService } from './token/token.service';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -30,23 +30,15 @@ export class AuthController {
     private readonly tokenService: TokenService,
   ) {}
 
-  @ApiOkResponse({
-    description: 'با موفقیت ارسال شد',
-    example: { result: 'number', statusCode: 200 },
-  })
-  @Public()
-  @Post('otp')
-  @HttpCode(200)
-  async loginWithOTP(@Body() phoneDTO: PhoneDto): Promise<ApiResponses<User>> {
-    return this.authService.loginWithOTP(phoneDTO);
-  }
-
   @ApiCreatedResponse({ description: 'با موفقیت ساخته شد' })
   @ApiNotAcceptableResponse({ description: 'رمز یکبار مصرف اشتباه است' })
   @Public()
   @Post('verify/otp')
-  async verifyOtp(@Body() phoneDTO: VerifyOtpDto, @Req() req: Request) {
-    return this.authService.verifyWithOTP(phoneDTO, req);
+  async verifyOtp(
+    @Body() phoneDTO: VerifyOtpDto,
+    @Body() emailDTo: VerifyEmailDto,  
+    @Req() req: Request) {
+    return this.authService.verifyWithOTP(phoneDTO, emailDTo, req);
   }
 
   @ApiOkResponse({ description: 'ok' })
@@ -64,8 +56,10 @@ export class AuthController {
 
   @Public()
   @Post('forgot-password/otp')
-  async forgetPasswordWithOTP(@Body() phoneDto: PhoneDto) {
-    const { phone } = phoneDto;
+  async forgetPasswordWithOTP(
+    @Body() phone: string,
+    @Body() email: string,
+  ){
     return this.authService.forgetPasswordWithOTP(phone);
   }
 
@@ -85,14 +79,6 @@ export class AuthController {
     return this.authService.signUpUsers(signupDto, req['userAgent'], req);
   }
 
-  @Public()
-  @Post('check-phone')
-  @HttpCode(200)
-  async checkUser(
-    @Body() phoneDto: PhoneDto,
-  ): Promise<ApiResponses<{ registered: boolean; login: boolean }>> {
-    return this.authService.checkUser(phoneDto);
-  }
 
   @Post('logout')
   async logout(@Req() req: any) {
