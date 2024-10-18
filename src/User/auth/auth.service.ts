@@ -42,34 +42,53 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-
-  async signUpUsers(signupDto: SignupDto, userAgent: any, req: Request) {
-    const { userName, password, confirmPassword, phone, email } = signupDto;
-  
-    // Step 1: Check if the userName is already taken
+  async checkUserNameAvailability(userName: string): Promise<void> {
     const existingUserName = await this.userRepository.findOne({ where: { userName } });
     if (existingUserName) {
       throw new BadRequestException('Username is already taken');
     }
-  
-    // Step 2: Check if passwords match
+  }
+
+  checkPasswordMatch(password: string, confirmPassword: string): void {
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
-  
-    // Step 3: Check if the user already exists by phone or email
+  }
+
+  async checkUserExists(phone: string, email: string): Promise<void> {
     const existingUser = await this.userRepository.findOne({
       where: [{ phone }, { email }],
     });
-  
     if (existingUser) {
       throw new BadRequestException('User already exists');
     }
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+
+  async sendOTPToPhoneOrEmail(phone: string, email: string): Promise<void> {
+    if (phone) {
+      await this.otpService.sendOTP(phone); // Send OTP for phone verification
+    } else if (email) {
+      await this.otpService.sendOTPToEmail(email); // Send OTP for email verification
+    } else {
+      throw new BadRequestException('No phone or email provided');
+    }
+  }
+
+  async signUpUsers(signupDto: SignupDto, userAgent: any, req: Request) {
+    const { userName, password, confirmPassword, phone, email } = signupDto;
   
-    // Step 4: Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.checkUserNameAvailability(userName);
   
-    // Step 5: Create user entity
+    this.checkPasswordMatch(password, confirmPassword);
+  
+    await this.checkUserExists(phone, email);
+  
+    const hashedPassword = await this.hashPassword(password);
+  
     const newUser = await this.userService.signupUser({
       userName,
       phone,
@@ -78,19 +97,14 @@ export class AuthService {
       confirmPassword
     });
   
-    // Step 6: Send OTP for phone or email verification
-    if (phone) {
-      await this.otpService.sendOTP(phone); // Send OTP for phone verification
-    } else if (email) {
-      await this.otpService.sendOTPToEmail(email); // Send OTP for email verification
-    }
+    await this.sendOTPToPhoneOrEmail(phone, email);
   
-    // Step 7: Return response indicating that OTP is sent
     return createResponse(HttpStatus.OK, {
       message: 'OTP sent to verify your phone or email',
-      register: false, // Registration is not completed yet
+      register: false, 
     });
   }
+  
   
   async verifyWithOTP(
     verifyOtpDto: VerifyOtpDto,

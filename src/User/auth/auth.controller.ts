@@ -31,15 +31,26 @@ export class AuthController {
   ) {}
 
   @ApiCreatedResponse({ description: 'با موفقیت ساخته شد' })
-  @ApiNotAcceptableResponse({ description: 'رمز یکبار مصرف اشتباه است' })
-  @Public()
-  @Post('verify/otp')
-  async verifyOtp(
-    @Body() phoneDTO: VerifyOtpDto,
-    @Body() emailDTo: VerifyEmailDto,  
-    @Req() req: Request) {
-    return this.authService.verifyWithOTP(phoneDTO, emailDTo, req);
-  }
+@ApiNotAcceptableResponse({ description: 'رمز یکبار مصرف اشتباه است' })
+@Public()
+@Post('verify/otp')
+async verifyOtp(
+  @Body() verifyOtpDto: VerifyOtpDto,
+  @Body() verifyEmailDto: VerifyEmailDto,    
+  @Req() req: Request
+) {
+  // Either phone or email will be available, not both.
+  return this.authService.verifyWithOTP( verifyOtpDto, verifyEmailDto, req);
+}
+
+@ApiCreatedResponse({ description: 'ثبت نام با موفقیت انجام شد' })
+@ApiConflictResponse({ description: 'کاربر از قبل وجود دارد' })
+@Public()
+@Post('signup')
+async signUp(@Req() req: Request, @Body() signupDto: SignupDto) {
+  return this.authService.signUpUsers(signupDto, req['userAgent'], req);
+}
+
 
   @ApiOkResponse({ description: 'ok' })
   @ApiNotFoundResponse({ description: 'کاربر یافت نشد' })
@@ -70,15 +81,6 @@ export class AuthController {
   ): Promise<ApiResponses<{ login: boolean }>> {
     return this.authService.resetPasswordWithOTP(resetPasswordDto);
   }
-
-  @ApiCreatedResponse({ description: 'ثبت نام با موفقیت انجام شد' })
-  @ApiConflictResponse({ description: 'کاربر از قبل وجود دارد' })
-  @Public()
-  @Post('signup')
-  async signUp(@Req() req: Request, @Body() signupDto: SignupDto) {
-    return this.authService.signUpUsers(signupDto, req['userAgent'], req);
-  }
-
 
   @Post('logout')
   async logout(@Req() req: any) {
