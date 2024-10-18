@@ -5,8 +5,7 @@ import { CreatePostDto } from './dto/createPost.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from './dto/updatePost.dto';
 
-@ApiTags('Post')
-@ApiBearerAuth()
+
 @Controller('posts')
 export class PostsController {
     constructor( private readonly postService: PostService){}

@@ -16,8 +16,6 @@ import { CreateCollectionDto } from '@/Market/collection/dto/CreateCollection.dt
 import { UpdateCollectionDto } from '@/Market/collection/dto/UpdateCollection.dto';
 import { Request } from 'express';
 
-@ApiTags('Collection')
-@ApiBearerAuth()
 @Controller('collection')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}

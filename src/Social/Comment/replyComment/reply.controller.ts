@@ -15,8 +15,7 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, 
 import { Request } from 'express';
 import { Roles } from '@/common/decorators/roles.decorator';
 
-@ApiTags('Reply')
-@ApiBearerAuth()
+
 @Controller('reply')
 export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}

@@ -25,8 +25,7 @@ import { PaginationResult } from '@/common/paginate/pagitnate.service';
 import { Upload } from './entity/uplaod.entity';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Upload')
-@ApiBearerAuth()
+
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}

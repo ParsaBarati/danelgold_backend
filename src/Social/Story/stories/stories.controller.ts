@@ -5,8 +5,6 @@ import { CreateStoryDto } from './entity/dto/createStory.dto';
 import { UpdateStoryDto } from './entity/dto/updateStory.dto';
 import { ApiBasicAuth, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('story')
-@ApiBasicAuth()
 @Controller('story')
 export class StoriesController {
     constructor(private readonly storyService: StoriesService){}

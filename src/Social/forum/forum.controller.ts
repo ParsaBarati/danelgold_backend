@@ -5,8 +5,6 @@ import { Request } from 'express';
 import { CreateTopicDto } from './dto/createTopic.dto';
 import { UpdateTopicDto } from './dto/updateTopic.dto';
 
-@ApiTags('Forum')
-@ApiBearerAuth()
 @Controller('forum')
 export class ForumController {
   constructor(private readonly forumService: ForumService) {}

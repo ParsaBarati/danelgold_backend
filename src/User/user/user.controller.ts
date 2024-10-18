@@ -21,8 +21,6 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express';
 import { editDateUser } from './dto/edit-user-date.dto';
 
-@ApiTags('User')
-@ApiBearerAuth()
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}

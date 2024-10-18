@@ -9,8 +9,6 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserDetailService } from '@/User/user-detail/userDetail.service';
 
-@ApiTags('User Detail')
-@ApiBearerAuth()
 @Controller('user-detail')
 export class UserDetailController {
   constructor(private readonly userDetailService: UserDetailService) {}

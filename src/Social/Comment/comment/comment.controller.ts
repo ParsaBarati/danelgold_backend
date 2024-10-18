@@ -30,8 +30,7 @@ import { CreateCommentDTO } from './dto/CreateComment';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';
 
-@ApiTags('Comment')
-@ApiBearerAuth()
+
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentsService: CommentService) {}

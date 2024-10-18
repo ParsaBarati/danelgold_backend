@@ -367,7 +367,7 @@ export class UserService {
         'user.firstName',
         'user.lastName',
         'user.profilePic',
-        'user.username',
+        'user.userName',
       ])
       .where('story.expiresAt > :now', { now: new Date() }) 
       .orderBy('story.createdAt', 'DESC')
@@ -389,7 +389,7 @@ export class UserService {
         'user.firstName',
         'user.lastName',
         'user.profilePic',
-        'user.username',
+        'user.userName',
         'COUNT(comments.id) as commentCount',
         'COUNT(postLikes.id) as likeCount',
       ])
@@ -518,7 +518,7 @@ export class UserService {
     return {
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
-      username: user.username,
+      username: user.userName,
       profilePic: user.profilePic,
       followers: followersCount,
       following: followingCount,

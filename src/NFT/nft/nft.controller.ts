@@ -20,8 +20,6 @@ import { IPFSService } from '@/services/IPFS.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
-@ApiTags('NFT')
-@ApiBearerAuth()
 @Controller('nft')
 export class NFTsController {
   constructor(

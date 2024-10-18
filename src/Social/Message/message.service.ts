@@ -23,12 +23,12 @@ export class MessageService{
             'sender.firstName',
             'sender.lastName',
             'sender.profilePic',
-            'sender.username',
+            'sender.userName',
             'receiver.id',
             'receiver.firstName',
             'receiver.lastName',
             'receiver.profilePic',
-            'receiver.username',
+            'receiver.userName',
             'message.createdAt',
           ])
           .where('message.senderId = :userPhone OR message.receiverId = :userPhone', { userPhone }) 

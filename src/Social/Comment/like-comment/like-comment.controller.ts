@@ -9,8 +9,6 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { LikeCommentService } from './like-comment.service';
 import { Request } from 'express';
 
-@ApiTags('LikeCommnet')
-@ApiBearerAuth()
 @Controller('like-comment')
 export class LikeCommentController {
   constructor(private readonly likeCommentService: LikeCommentService) {}

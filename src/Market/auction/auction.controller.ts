@@ -8,8 +8,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';
 
-@ApiTags('Auction')
-@ApiBearerAuth()
+
 @Controller('auction')
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}

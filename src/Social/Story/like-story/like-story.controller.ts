@@ -3,8 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { Request } from 'express';
 import { LikeStoryService } from './like-story.service';
 
-@ApiTags('LikeStory')
-@ApiBearerAuth()
+
 @Controller('like-story')
 export class LikeStoryController {
     constructor(private readonly likeStoryService: LikeStoryService) {}

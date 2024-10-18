@@ -2,8 +2,7 @@ import { Body, Controller, Param, ParseIntPipe, Post, Put } from "@nestjs/common
 import { RSTService } from "./RST.service";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
-@ApiTags('RST')
-@ApiBearerAuth()
+
 @Controller('RST')
 export class RSTController{
     constructor(private readonly rstService: RSTService){}

@@ -26,7 +26,7 @@ export class NotificationService {
         'user.firstName',
         'user.lastName',
         'user.profilePic',
-        'user.username',
+        'user.userName',
       ])
       .where('notification.recipientId = :userPhone', { userPhone }) 
       .orderBy('notification.createdAt', 'DESC') 
@@ -41,7 +41,7 @@ export class NotificationService {
         id: notification.user.id,
         name: `${notification.user.firstName} ${notification.user.lastName}`,
         pic: notification.user.profilePic,
-        username: notification.user.username,
+        username: notification.user.userName,
       },
     }));
 

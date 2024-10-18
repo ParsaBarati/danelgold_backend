@@ -7,8 +7,6 @@ import { UpdateSTDto } from './dto/updateST.dto';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/User/user/entity/user.entity';
 
-@ApiTags('Support_Ticket')
-@ApiBearerAuth()
 @Controller('ST')
 export class SupportTicketsController {
   constructor(private readonly supportTicketsService: SupportTicketsService) {}

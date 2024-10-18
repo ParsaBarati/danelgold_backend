@@ -3,8 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { IPFSService } from '@/services/IPFS.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('pinata')
-@ApiBearerAuth()
+
 @Controller('pinata')
 export class PinataController {
   constructor(private readonly ipfsService: IPFSService) {}
