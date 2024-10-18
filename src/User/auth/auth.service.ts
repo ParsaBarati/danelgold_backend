@@ -105,7 +105,7 @@ export class AuthService {
     const { phone } = phoneDto;
     const otp = await this.otpService.sendOTP(phone);
 
-    return createResponse(200);
+    return createResponse(200,otp);
   }
 
   async verifyWithOTP(verifyOtpDto: VerifyOtpDto, req: Request) {
