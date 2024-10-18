@@ -1,33 +1,21 @@
-import { UserDetailService } from '@/User/user-detail/userDetail.service';
-import {
-  Injectable,
-  NotFoundException,
-  HttpStatus,
-  NotAcceptableException,
-  BadRequestException,
-} from '@nestjs/common';
-import { VerifyOtpDto } from './dto/verify-otp.dto';
-import * as bcrypt from 'bcryptjs';
-import { ApiResponses, createResponse } from '@/utils/response.util';
-import { OtpService } from './otp/otp.service';
-import { SignupDto } from './dto/signup-dto';
-import { LoginDto } from './dto/login-with-password.dto';
+import { Injectable, NotFoundException, NotAcceptableException, BadRequestException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import * as bcrypt from 'bcryptjs';
 import { Request } from 'express';
+import { ApiResponses, createResponse } from '@/utils/response.util';
+import { UserService } from '@/User/user/user.service';
+import { UserDetailService } from '@/User/user-detail/userDetail.service';
+import { OtpService } from './otp/otp.service';
 import { TokenService } from './token/token.service';
 import { User } from '@/User/user/entity/user.entity';
-import { UserService } from '@/User/user/user.service';
 import { UserDetail } from '@/User/user-detail/entity/userDetail.entity';
-import { 
-  getBrowserVersion, 
-  getUserBrowser, 
-  getUserIP, 
-  getUserOS, 
-  getVersionPlatform 
-} from '@/common/utils/user-agent.util';
+import { SignupDto } from './dto/signup-dto';
+import { LoginDto } from './dto/login-with-password.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { getUserBrowser, getUserIP, getUserOS, getBrowserVersion, getVersionPlatform } from '@/common/utils/user-agent.util';
 
 @Injectable()
 export class AuthService {
@@ -42,14 +30,14 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async checkUserNameAvailability(userName: string): Promise<void> {
+  async checkUserNameAvailability(userName: string): Promise<any> {
     const existingUserName = await this.userRepository.findOne({ where: { userName } });
     if (existingUserName) {
       throw new BadRequestException('Username is already taken');
     }
   }
 
-  checkPasswordMatch(password: string, confirmPassword: string): void {
+  checkPasswordMatch(password: string, confirmPassword: string){
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
@@ -64,15 +52,47 @@ export class AuthService {
     }
   }
 
+  async setPassword(password: string, email_or_phone: string): Promise<void> {
+
+    if (password.length < 6) {
+      throw new BadRequestException('Password must be at least 6 characters long');
+    }
+  
+    const hashedPassword = await this.hashPassword(password);
+  
+    const isPhone = /^[0-9]+$/.test(email_or_phone); 
+    const isEmail = /\S+@\S+\.\S+/.test(email_or_phone); 
+  
+    let user;
+    if (isPhone) {
+      user = await this.userRepository.findOne({ where: { phone: email_or_phone } });
+    } else if (isEmail) {
+      user = await this.userRepository.findOne({ where: { email: email_or_phone } });
+    } else {
+      throw new BadRequestException('Invalid phone number or email');
+    }
+  
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    user.password = hashedPassword;
+  
+    await this.userRepository.save(user);
+  
+    return;
+  }
+  
+
   async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }
 
   async sendOTPToPhoneOrEmail(phone: string, email: string): Promise<void> {
     if (phone) {
-      await this.otpService.sendOTP(phone); // Send OTP for phone verification
+      await this.otpService.sendOTP(phone); 
     } else if (email) {
-      await this.otpService.sendOTPToEmail(email); // Send OTP for email verification
+      await this.otpService.sendOTPToEmail(email); 
     } else {
       throw new BadRequestException('No phone or email provided');
     }
@@ -81,97 +101,80 @@ export class AuthService {
   async signUpUsers(signupDto: SignupDto, userAgent: any, req: Request) {
     const { userName, password, confirmPassword, phone, email } = signupDto;
   
-    await this.checkUserNameAvailability(userName);
-  
-    this.checkPasswordMatch(password, confirmPassword);
-  
+    await this.checkUserNameAvailability(userName);  
+    this.checkPasswordMatch(password, confirmPassword); 
     await this.checkUserExists(phone, email);
-  
-    const hashedPassword = await this.hashPassword(password);
-  
+
+    const hashedPassword = await this.hashPassword(password); 
+
     const newUser = await this.userService.signupUser({
       userName,
       phone,
       email,
       password: hashedPassword,
-      confirmPassword
+      confirmPassword,
     });
-  
+
     await this.sendOTPToPhoneOrEmail(phone, email);
-  
+
     return createResponse(HttpStatus.OK, {
       message: 'OTP sent to verify your phone or email',
-      register: false, 
+      register: false,
     });
   }
-  
-  
-  async verifyWithOTP(
-    verifyOtpDto: VerifyOtpDto,
-    verifyEmailDto: VerifyEmailDto, 
-    req: Request
-  ) {
+
+  async verifyWithOTP(verifyOtpDto: VerifyOtpDto, verifyEmailDto: VerifyEmailDto, req: Request) {
     const { phone, email, otp } = { ...verifyOtpDto, ...verifyEmailDto };
-  
-    // Step 1: Validate OTP (either for phone or email)
+
     const isValidOTP = phone
-      ? await this.otpService.verifyOTP(phone, otp) // Verify OTP for phone
-      : await this.otpService.verifyOTPToEmail(email, otp); // Verify OTP for email
-  
+      ? await this.otpService.verifyOTP(phone, otp) 
+      : await this.otpService.verifyOTPToEmail(email, otp);
+
     if (!isValidOTP) {
       throw new NotAcceptableException('Invalid OTP');
     }
-  
-    // Step 2: Find the user based on phone or email
+
     const user = await this.userRepository.findOne({
       where: [{ phone }, { email }],
     });
-  
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-  
-    // Step 3: Mark the user as verified
+
     user.isVerified = true;
     await this.userRepository.save(user);
-  
-    // Step 4: Generate a JWT token
+
     const token = await this.tokenService.createToken(user);
-  
-    // Step 5: Return response with success message and token
+
     return createResponse(HttpStatus.OK, {
       message: 'Signup completed successfully',
       token,
       register: true,
     });
   }
-  
-  
-  async loginUserWithPassword(
-    loginDto: LoginDto,
-    req: Request,
-  ): Promise<ApiResponses<{ token: string; username: string }>> {
+
+  // Step 8: Login user with password
+  async loginUserWithPassword(loginDto: LoginDto, req: Request): Promise<ApiResponses<{ token: string; username: string }>> {
     const { phone, password } = loginDto;
-    const user = await this.userRepository.findOneBy({ phone });
+    const user = await this.userRepository.findOne({ where: { phone } });
 
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordMatch) {
       throw new NotAcceptableException('رمز عبور اشتباه است');
     }
 
     user.lastLogin = new Date();
-    const updateUserDTO = {
+    await this.userService.updateUser(user.phone, {
       phone: user.phone,
       profilePic: user.profilePic,
-      lastLogin: user.lastLogin,
-    };
-    await this.userService.updateUser(user.phone, updateUserDTO);
+    });
 
+    // Capture user agent details
     const userAgent = {
       platform: await getUserOS(req),
       browser: await getUserBrowser(req),
@@ -180,55 +183,53 @@ export class AuthService {
       ip: await getUserIP(req),
     };
 
+    // Store user agent details
     await this.userDetailService.createUserDetail(user.phone, userAgent);
 
+    // Generate JWT token
     const token = await this.tokenService.createToken(user);
+
     return createResponse(200, {
       token,
       username: user.userName,
     });
   }
 
-  async forgetPasswordWithOTP(phone?: string,email?: string) {
-    const existingUser = await this.userRepository.findOne({ 
-      where: [{phone},{email}] 
+  // Step 9: Forget password with OTP
+  async forgetPasswordWithOTP(phone?: string, email?: string) {
+    const existingUser = await this.userRepository.findOne({
+      where: [{ phone }, { email }],
     });
+
     if (!existingUser) {
       throw new NotFoundException('کاربری یافت نشد');
     }
-    await this.otpService.sendOTP(phone);
-    return createResponse(
-      200,
-      { registred: true, login: false },
-      'رمز یکبار مصرف ارسال شد',
-    );
+
+    await this.otpService.sendOTP(phone || email);  // Send OTP to the phone or email
+    return createResponse(200, { registered: true, login: false }, 'رمز یکبار مصرف ارسال شد');
   }
 
-  async resetPasswordWithOTP(
-    resetPasswordDto: ResetPasswordDto,
-  ): Promise<ApiResponses<{ login: boolean }>> {
+  // Step 10: Reset password with OTP
+  async resetPasswordWithOTP(resetPasswordDto: ResetPasswordDto): Promise<ApiResponses<{ login: boolean }>> {
     const { phone, password, otp } = resetPasswordDto;
 
     const isValidOTP = await this.otpService.verifyOTP(phone, otp);
-
     if (!isValidOTP) {
       throw new NotAcceptableException('رمز یکبار مصرف اشتباه است');
     }
 
-    const existingUser = await this.userRepository.findOneBy({ phone });
-
+    const existingUser = await this.userRepository.findOne({ where: { phone } });
     if (!existingUser) {
       throw new NotFoundException('کاربر یافت نشد');
     }
 
+    // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
     existingUser.password = hashedPassword;
 
+    // Save the updated user
     await this.userRepository.save(existingUser);
-    return createResponse(
-      200,
-      { login: false },
-      'رمز عبور با موفقیت تغییر یافت',
-    );
+
+    return createResponse(200, { login: false }, 'رمز عبور با موفقیت تغییر یافت');
   }
 }

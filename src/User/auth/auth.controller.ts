@@ -1,13 +1,11 @@
 import { SignupDto } from './dto/signup-dto';
-import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { Public } from '@/common/decorators/public.decorator';
 import { LoginDto } from './dto/login-with-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ApiResponses } from '@/utils/response.util';
-import { User } from '@/User/user/entity/user.entity';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -17,9 +15,8 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-
 import { TokenService } from './token/token.service';
-import { VerifyEmailDto } from './dto/verify-email.dto';
+import { OtpService } from './otp/otp.service';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -27,28 +24,61 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly otpService: OtpService,
     private readonly tokenService: TokenService,
   ) {}
 
-  @ApiCreatedResponse({ description: 'با موفقیت ساخته شد' })
-@ApiNotAcceptableResponse({ description: 'رمز یکبار مصرف اشتباه است' })
-@Public()
-@Post('verify/otp')
-async verifyOtp(
-  @Body() verifyOtpDto: VerifyOtpDto,
-  @Body() verifyEmailDto: VerifyEmailDto,    
-  @Req() req: Request
-) {
-  // Either phone or email will be available, not both.
-  return this.authService.verifyWithOTP( verifyOtpDto, verifyEmailDto, req);
-}
+  @ApiCreatedResponse({ description: 'Verification code sent' })
+  @ApiConflictResponse({ description: 'Invalid email or phone number' })
+  @Public()
+  @Post('request-code')
+  async requestVerificationCode(
+    @Body() { email_or_phone }: { email_or_phone: string }
+  ) {
+    const isPhone = /^[0-9]+$/.test(email_or_phone); 
+    const isEmail = /\S+@\S+\.\S+/.test(email_or_phone); 
+  
+    if (isPhone) {
+      await this.authService.sendOTPToPhoneOrEmail(email_or_phone, ''); // Pass empty string for email
+    } else if (isEmail) {
+      await this.authService.sendOTPToPhoneOrEmail('', email_or_phone); // Pass empty string for phone
+    } else {
+      throw new BadRequestException('Invalid email or phone number');
+    }
+  }  
 
-@ApiCreatedResponse({ description: 'ثبت نام با موفقیت انجام شد' })
-@ApiConflictResponse({ description: 'کاربر از قبل وجود دارد' })
+  async verifyOtp(email_or_phone: string, verification_code: string): Promise<boolean> {
+    const isPhone = /^[0-9]+$/.test(email_or_phone);
+    const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
+  
+    if (isPhone) {
+      return await this.otpService.verifyOTP(email_or_phone, verification_code);
+    } else if (isEmail) {
+      return await this.otpService.verifyOTPToEmail(email_or_phone, verification_code);
+    } else {
+      throw new BadRequestException('Invalid email or phone number');
+    }
+  }
+  
+
+  @ApiCreatedResponse({ description: 'Password set successfully' })
+@ApiConflictResponse({ description: 'Passwords do not match' })
 @Public()
-@Post('signup')
-async signUp(@Req() req: Request, @Body() signupDto: SignupDto) {
-  return this.authService.signUpUsers(signupDto, req['userAgent'], req);
+@Post('set-password')
+async setPassword(
+  @Body() { password, confirm_password, email_or_phone }: { password: string; confirm_password: string; email_or_phone: string }
+) {
+  if (password !== confirm_password) {
+    throw new BadRequestException('Passwords do not match');
+  }
+
+  // Call the setPassword service function
+  await this.authService.setPassword(password, email_or_phone);
+
+  return {
+    status: 'success',
+    message: 'Password set successfully',
+  };
 }
 
 
