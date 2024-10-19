@@ -43,7 +43,7 @@ export class TokenService {
     const payload = {
       sub: user.phone,
       phone: user.phone,
-      userName: user.userName,
+      username: user.username,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,

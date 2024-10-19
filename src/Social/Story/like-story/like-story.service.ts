@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Story } from '../stories/entity/stories.entity';
 import { likeStory } from './entity/like-story.entity';
+import { User } from '@/User/user/entity/user.entity';
+import { use } from 'passport';
 
 @Injectable()
 export class LikeStoryService {
@@ -10,12 +12,15 @@ export class LikeStoryService {
         @InjectRepository(Story)
         private readonly storyRepository: Repository<Story>,
         @InjectRepository(likeStory)
-        private readonly likeStoryRepository: Repository<likeStory>
+        private readonly likeStoryRepository: Repository<likeStory>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+
     ){}
 
     async likeStory(
         storyId: number, 
-        userPhone: string, 
+        userIdentifier: string, 
       ): Promise<{ isLike: number }> {
         
         const likableStory = await this.storyRepository.findOneBy(
@@ -25,15 +30,23 @@ export class LikeStoryService {
         if (!likableStory) {
             throw new NotFoundException('استوری پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier }, { email: userIdentifier }]
+        });
+    
+        if (!user) {
+            throw new NotFoundException('کاربر یافت نشد');
+        }
     
         let existingLike = await this.likeStoryRepository.findOne({
-            where: { story: { id: storyId }, userPhone },
+            where: { story: { id: storyId }, user : { id: user.id } },
         });
     
         if (!existingLike) {
             existingLike = this.likeStoryRepository.create({
                 story: likableStory,
-                userPhone,
+                user,
                 isLike: 1,
             });
             likableStory.likes++;
@@ -59,7 +72,7 @@ export class LikeStoryService {
     
     async dislikeStory(
       storyId: number, 
-      userPhone: string, 
+      userIdentifier: string, 
     ): Promise<{ isDislike: number }> {
         
         const dislikableStory = await this.storyRepository.findOneBy(
@@ -69,15 +82,23 @@ export class LikeStoryService {
         if (!dislikableStory) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier }, { email: userIdentifier }]
+        })
+
+        if(!user){
+            throw new NotFoundException('کاربر یافت نشد')
+        }
     
         let existingDislike = await this.likeStoryRepository.findOne({
-            where: { story: { id: storyId }, userPhone },
+            where: { story: { id: storyId }, user: { id: user.id } },
         });
     
         if (!existingDislike) {
             existingDislike = this.likeStoryRepository.create({
                 story: dislikableStory,
-                userPhone,
+                user,
                 isLike: -1,
             });
             dislikableStory.dislikes++;

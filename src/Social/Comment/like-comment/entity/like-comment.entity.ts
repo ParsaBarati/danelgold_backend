@@ -17,7 +17,7 @@ export class likeComment {
   id: number;
 
   @Column({ type: 'varchar' })
-  userPhone: string;
+  userIdentifier: string;
 
   @Column({ type: 'int', nullable: true, default: 0 })
   isLike: number;
@@ -34,7 +34,6 @@ export class likeComment {
   comment: Relation<Comment>;
 
   @ManyToOne(() => User, (user) => user.commentLikes)
-  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

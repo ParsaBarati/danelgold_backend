@@ -41,7 +41,7 @@ export class User {
   email: string | null;
 
   @Column({ type: 'varchar', unique: true })
-  userName: string;
+  username: string;
 
   @Column({ type: 'text' })
   password: string;

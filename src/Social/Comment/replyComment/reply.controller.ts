@@ -28,8 +28,8 @@ export class ReplyController {
     @Req() req: Request, 
     @Body() addReplyDto: CreateReplyDTO
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.replyService.createReply(userPhone, addReplyDto);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.replyService.createReply(userIdentifier, addReplyDto);
   }
 
   @ApiOperation({summary:'Update Reply'})
@@ -41,8 +41,8 @@ export class ReplyController {
     @Req() req: Request,
     @Body() updateReplyDto: UpdateReplyDTO,
   ){
-    const currentUserPhone = (req.user as any).result.phone;
-    return await this.replyService.updateReply(replyId,currentUserPhone,updateReplyDto);
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.replyService.updateReply(replyId,currentUserIdentifier,updateReplyDto);
   }
 
   @ApiOperation({summary:'Delete Reply'})
@@ -53,8 +53,8 @@ export class ReplyController {
     @Param('replyId') replyId: number,
     @Req() req: Request,
   ){
-    const currentUserPhone = (req.user as any).result.phone;
-    return await this.replyService.deleteReply(replyId,currentUserPhone);
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.replyService.deleteReply(replyId,currentUserIdentifier);
   }
 
   @Roles('admin')

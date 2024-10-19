@@ -16,25 +16,27 @@ export class WalletService {
     private readonly nftRepository: Repository<NFT>,
   ) {}
 
-  async getWallet(userPhone: number): Promise<any> {
+  async getWallet(
+    userIdentifier: number
+  ): Promise<any> {
 
     const wallets = await this.walletRepository
       .createQueryBuilder('wallet')
       .leftJoinAndSelect('wallet.user', 'user')
-      .where('wallet.userPhone = :userPhone', { userPhone })
+      .where('wallet.userIdentifier = :userIdentifier', { userIdentifier })
       .getMany();
 
     const cryptos = await this.cryptoRepository
       .createQueryBuilder('cryptos')
       .leftJoinAndSelect('cryptos.user', 'user')
-      .where('crypto.userPhone = :userPhone', { userPhone })
+      .where('crypto.userIdentifier = :userIdentifier', { userIdentifier })
       .getMany();
 
     const nfts = await this.nftRepository
       .createQueryBuilder('nft')
       .leftJoinAndSelect('nft.owner', 'owner')
       .leftJoinAndSelect('nft.creator', 'creator')
-      .where('nft.ownerPhone = :userPhone', { userPhone })
+      .where('nft.ownerIdentifier = :userIdentifier', { userIdentifier })
       .getMany();
 
     const transformedWallets = wallets.map((wallet) => ({
@@ -58,8 +60,8 @@ export class WalletService {
       imgUrl: nft.image,
       creator: {
         id: nft.creator.id,
-        name: `${nft.creator.userName} ${nft.creator.userName}`,
-        username: nft.creator.userName,
+        name: `${nft.creator.username} ${nft.creator.username}`,
+        username: nft.creator.username,
         pic: nft.creator.profilePic,
       },
     }));

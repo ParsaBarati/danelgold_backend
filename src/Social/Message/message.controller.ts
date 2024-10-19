@@ -12,7 +12,7 @@ export class MessageController{
     async getMessage(
         @Req() req:Request
     ){
-        const userPhone = (req.user as any).result.phone;
-        return await this.messageService.getMessage(userPhone)
+        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        return await this.messageService.getMessage(userIdentifier)
     }
 }

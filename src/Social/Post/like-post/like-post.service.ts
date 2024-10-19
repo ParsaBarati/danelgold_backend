@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
+import { User } from '@/User/user/entity/user.entity';
 
 @Injectable()
 export class LikePostService {
@@ -10,12 +11,14 @@ export class LikePostService {
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
         @InjectRepository(likePost)
-        private readonly likePostRepository: Repository<likePost>
+        private readonly likePostRepository: Repository<likePost>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
     ){}
 
     async likePost(
         postId: number, 
-        userPhone: string, 
+        userIdentifier: string, 
       ): Promise<{ isLike: number }> {
         
         const likablePost = await this.postRepository.findOneBy(
@@ -25,15 +28,23 @@ export class LikePostService {
         if (!likablePost) {
             throw new NotFoundException('پستی پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier }, { email: userIdentifier }]
+        });
+    
+        if (!user) {
+            throw new NotFoundException('کاربر یافت نشد');
+        }
     
         let existingLike = await this.likePostRepository.findOne({
-            where: { post: { id: postId }, userPhone },
+            where: { post: { id: postId }, user: { id: user.id } },
         });
     
         if (!existingLike) {
             existingLike = this.likePostRepository.create({
                 post: likablePost,
-                userPhone,
+                user,
                 isLike: 1,
             });
             likablePost.likes++;
@@ -59,7 +70,7 @@ export class LikePostService {
     
     async dislikePost(
       postId: number, 
-      userPhone: string, 
+      userIdentifier: string, 
     ): Promise<{ isDislike: number }> {
         
         const dislikablePost = await this.postRepository.findOneBy(
@@ -69,15 +80,23 @@ export class LikePostService {
         if (!dislikablePost) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier }, { email: userIdentifier }]
+        });
+    
+        if (!user) {
+            throw new NotFoundException('کاربر یافت نشد');
+        }
     
         let existingDislike = await this.likePostRepository.findOne({
-            where: { post: { id: postId }, userPhone },
+            where: { post: { id: postId }, user: { id: user.id } },
         });
     
         if (!existingDislike) {
             existingDislike = this.likePostRepository.create({
                 post: dislikablePost,
-                userPhone,
+                user,
                 isLike: -1,
             });
             dislikablePost.dislikes++;

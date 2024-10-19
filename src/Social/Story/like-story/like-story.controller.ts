@@ -15,8 +15,8 @@ export class LikeStoryController {
     @Param('storyId', ParseIntPipe) storyId: number,
     @Req () req: Request,
     ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.likeStoryService.likeStory(storyId,userPhone);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.likeStoryService.likeStory(storyId,userIdentifier);
     }
 
     @Post('/:storyId/dislike')
@@ -24,7 +24,7 @@ export class LikeStoryController {
     @Param('storyId', ParseIntPipe) storyId: number,
     @Req () req: Request,
     ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.likeStoryService.dislikeStory(storyId,userPhone);
+        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        return await this.likeStoryService.dislikeStory(storyId,userIdentifier);
     }
 }

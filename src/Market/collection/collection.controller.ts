@@ -26,8 +26,8 @@ export class CollectionsController {
     @Req () req: Request,
     @Body() createCollectionDto:CreateCollectionDto
   ){
-    const creatorPhone = (req.user as any).result.phone;
-    return await this.collectionsService.createCollection(createCollectionDto,creatorPhone)
+    const creatorIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.collectionsService.createCollection(createCollectionDto,creatorIdentifier)
   }
 
   @Post(':/collectionId/add/nftId')
@@ -36,11 +36,11 @@ export class CollectionsController {
     @Param('nftId',ParseIntPipe) nftId:number,
     @Req () req:Request
   ){
-    const currentOwnerPhone = (req.user as any).result.phone;
+    const currentOwnerIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return await this.collectionsService.addNftToCollection(
       collectionId,
       nftId,
-      currentOwnerPhone
+      currentOwnerIdentifier
     )
   }
 
@@ -49,10 +49,10 @@ export class CollectionsController {
     @Param('nftId',ParseIntPipe) nftId:number,
     @Req () req:Request
   ){
-    const currentOwnerPhone = (req.user as any).result.phone;
+    const currentOwnerIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return await this.collectionsService.removeNftFromCollection(
       nftId,
-      currentOwnerPhone
+      currentOwnerIdentifier
     )
   }
 
@@ -62,13 +62,11 @@ export class CollectionsController {
     @Req () req: Request,
     @Body() updateCollectionDto: UpdateCollectionDto
   ){
-    const currentOwnerPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.role;
+    const currentOwnerIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return await this.collectionsService.updateCollection(
       collectionId,
       updateCollectionDto,
-      currentOwnerPhone,
-      currentUserRoles
+      currentOwnerIdentifier,
     )
   }
 

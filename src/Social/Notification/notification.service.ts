@@ -11,7 +11,7 @@ export class NotificationService {
     private readonly notificationRepository: Repository<Notification>,
   ) {}
 
-  async getNotifications(userPhone: string): Promise<any> {
+  async getNotifications(userIdentifier: string): Promise<any> {
 
     const notifications = await this.notificationRepository
       .createQueryBuilder('notification')
@@ -24,9 +24,9 @@ export class NotificationService {
         'notification.action',
         'user.id',
         'user.profilePic',
-        'user.userName',
+        'user.username',
       ])
-      .where('notification.recipientId = :userPhone', { userPhone }) 
+      .where('notification.recipientId = :userIdentifier', { userIdentifier }) 
       .orderBy('notification.createdAt', 'DESC') 
       .getMany();
 
@@ -37,9 +37,9 @@ export class NotificationService {
       action: notification.action,
       user: {
         id: notification.user.id,
-        name: `${notification.user.userName}`,
+        name: `${notification.user.username}`,
         pic: notification.user.profilePic,
-        username: notification.user.userName,
+        username: notification.user.username,
       },
     }));
 

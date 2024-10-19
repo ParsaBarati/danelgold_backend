@@ -29,11 +29,11 @@ export class AuctionsController {
     @Body() participateAuctionDto: ParticipateAuctionDto,
     @Req() req: Request
   ){
-    const userPhone = (req.user as any).result.phone;
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return this.auctionsService.participateAuction(
       auctionId, 
       participateAuctionDto, 
-      userPhone
+      userIdentifier
     );
   }
 

@@ -46,8 +46,8 @@ export class CommentController {
     @Req() req : Request,
     @Body() createCommentDTO: CreateCommentDTO,
   ) {
-    const userPhone = (req.user as any).result.phone;
-    return await this.commentsService.CommentPost(postId,userPhone,createCommentDTO);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.commentsService.CommentPost(postId,userIdentifier,createCommentDTO);
   }
 
   @ApiOperation({summary:'CommentStory'})
@@ -60,8 +60,8 @@ export class CommentController {
     @Req() req : Request,
     @Body() createCommentDTO: CreateCommentDTO,
   ) {
-    const userPhone = (req.user as any).result.phone;
-    return await this.commentsService.CommentStory(storyId,userPhone,createCommentDTO);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.commentsService.CommentStory(storyId,userIdentifier,createCommentDTO);
   }
 
   @ApiOperation({summary:'Update Comment'})
@@ -73,8 +73,8 @@ export class CommentController {
     @Req() req: Request,
     @Body() updateCommentDto: UpdateCommentDTO,
   ) {
-    const currentUserPhone = (req.user as any).result.phone;    
-    return await this.commentsService.updateComment(commentId,currentUserPhone,updateCommentDto);
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;    
+    return await this.commentsService.updateComment(commentId,currentUserIdentifier,updateCommentDto);
   }
 
   @ApiOperation({summary:'Delete Comment'})
@@ -86,8 +86,8 @@ export class CommentController {
     @Param('commentId',ParseIntPipe) commentId: number,
     @Req() req: Request,
   ) {
-  const currentUserPhone = (req.user as any).result.phone; 
-    return await this.commentsService.deleteComment(commentId,currentUserPhone);
+  const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email; 
+    return await this.commentsService.deleteComment(commentId,currentUserIdentifier);
   }
 
   @Roles(UserRole.ADMIN)
@@ -153,13 +153,11 @@ export class CommentController {
     @Query('sortBy') sort?: string,
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ) {
-    const currentUserPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.roles || []; 
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     const query = { page, limit, sort, sortOrder };   
       return await this.commentsService.getCommentsByPost(
         postId,
-        currentUserPhone,
-        currentUserRoles,
+        currentUserIdentifier,
         query
       );
   }
@@ -179,13 +177,11 @@ export class CommentController {
     @Query('sortBy') sort?: string,
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ) {
-    const currentUserPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.roles || []; 
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     const query = { page, limit, sort, sortOrder };   
       return await this.commentsService.getCommentsByStory(
         storyId,
-        currentUserPhone,
-        currentUserRoles,
+        currentUserIdentifier,
         query
       );
   }
@@ -199,10 +195,10 @@ export class CommentController {
   @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
   @Req() req: Request,
  ){
-  const phone = (req.user as any).result.phone;
-  const currentUserPhone = (req.user as any).result.phone;
+  const Identifier = (req.user as any).result.phone || (req.user as any).result.email;
+  const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
 
-  return await this.commentsService.getPostCommentsByUser(currentUserPhone, phone, postId);
+  return await this.commentsService.getPostCommentsByUser(currentUserIdentifier, Identifier, postId);
  }
 
  @ApiOperation({summary:'getStoryCommentsByUser'})
@@ -214,10 +210,10 @@ export class CommentController {
   @Query('storyId', new DefaultValuePipe(1), ParseIntPipe) storyId: number | undefined,
   @Req() req: Request,
  ){
-  const phone = (req.user as any).result.phone;
-  const currentUserPhone = (req.user as any).result.phone;
+  const Identifier = (req.user as any).result.phone || (req.user as any).result.email;
+  const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
   
-  return await this.commentsService.getStoryCommentsByUser(currentUserPhone, phone, storyId);
+  return await this.commentsService.getStoryCommentsByUser(currentUserIdentifier, Identifier, storyId);
  }
 }
  

@@ -73,8 +73,8 @@ let UploadController = class UploadController {
     createProfilePictureUpload(file, req) {
         var _this = this;
         return _async_to_generator(function*() {
-            const userPhone = req.user.result.phone;
-            return yield _this.uploadService.createProfilePictureUpload(file, userPhone);
+            const userIdentifier = req.user.result.phone || req.user.result.email;
+            return yield _this.uploadService.createProfilePictureUpload(file, userIdentifier);
         })();
     }
     getAllUploads(page, limit, search, sort, sortOrder) {

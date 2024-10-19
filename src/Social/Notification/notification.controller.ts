@@ -9,11 +9,11 @@ export class NotificationController{
         private readonly notificationService: NotificationService
     ){}
 
-    @Get(':/userPhone')
+    @Get(':/userIdentifier')
     async getNotifications(
-        @Param() userPhone: string
+        @Param() userIdentifier: string
     ){
-        return await this.notificationService.getNotifications(userPhone)
+        return await this.notificationService.getNotifications(userIdentifier)
     }
 
 }

@@ -21,7 +21,7 @@ export class ForumTopic {
   title: string;
 
   @Column({ type: 'varchar' })
-  userPhone: string;
+  userIdentifier: string;
 
   @Column('text')
   content: string;
@@ -33,7 +33,6 @@ export class ForumTopic {
   updatedAt: Date;
 
   @ManyToOne(() => User, user => user.forumTopics)
-  @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
   user: Relation<User>;
 
   @OneToMany(() => ForumPost, (posts) => posts.topic)

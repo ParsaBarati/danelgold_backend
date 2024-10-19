@@ -43,18 +43,18 @@ export class CommentService {
 
   async CommentPost(
     postId: number,
-    userPhone: string,
+    userIdentifier: string,
     createCommentDTO: CreateCommentDTO,
   ): Promise<ApiResponses<Comment>> {
 
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone },
-      select: ['userName',],
+      where: [{ phone: userIdentifier }, { email: userIdentifier }],
+      select: ['username',],
     });
 
-    if (userCommentCounts.has(`${userPhone}-${postId}`)) {
+    if (userCommentCounts.has(`${userIdentifier}-${postId}`)) {
       const commentCount =
-        userCommentCounts.get(`${userPhone}-${postId}`) || 0;
+        userCommentCounts.get(`${userIdentifier}-${postId}`) || 0;
 
       if (commentCount >= MAX_COMMENTS_PER_Post) {
         throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
@@ -71,8 +71,9 @@ export class CommentService {
 
     const newComment = {
       user: {
-        userName: user.userName,
-        phone: userPhone,
+        username: user.username,
+        phone: userIdentifier,
+        email: userIdentifier
       },
       postId,
       content: createCommentDTO.content,
@@ -85,18 +86,18 @@ export class CommentService {
 
   async CommentStory(
     storyId: number,
-    userPhone: string,
+    userIdentifier: string,
     createCommentDTO: CreateCommentDTO,
   ): Promise<ApiResponses<Comment>> {
 
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone },
-      select: ['userName'],
+      where: [{ phone: userIdentifier },{ email: userIdentifier }],
+      select: ['username'],
     });
 
-    if (userCommentCounts.has(`${userPhone}-${storyId}`)) {
+    if (userCommentCounts.has(`${userIdentifier}-${storyId}`)) {
       const commentCount =
-        userCommentCounts.get(`${userPhone}-${storyId}`) || 0;
+        userCommentCounts.get(`${userIdentifier}-${storyId}`) || 0;
 
       if (commentCount >= MAX_COMMENTS_PER_Story) {
         throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
@@ -113,8 +114,9 @@ export class CommentService {
 
     const newComment = {
       user: {
-        userName: user.userName,
-        phone: userPhone,
+        username: user.username,
+        phone: userIdentifier,
+        email: userIdentifier
       },
       storyId,
       content: createCommentDTO.content,
@@ -127,7 +129,7 @@ export class CommentService {
 
   async updateComment(
     commentId: number,
-    currentUserPhone: string,
+    currentUserIdentifier: string,
     updateCommentDTO: UpdateCommentDTO,
   ): Promise<ApiResponses<Comment>> {
     const comment = await this.commentRepository.findOneBy({ id: commentId });
@@ -136,7 +138,7 @@ export class CommentService {
       throw new NotFoundException('کامنتی پیدا نشد!');
     }
 
-    if (comment.userPhone !== currentUserPhone) {
+    if (comment.userIdentifier !== currentUserIdentifier) {
       throw new UnauthorizedException('شما مجاز به ویرایش دیدگاه نیستید');
     }
 
@@ -150,7 +152,7 @@ export class CommentService {
 
   async deleteComment(
     commentId: number,
-    currentUserPhone: string,
+    currentUserIdentifier: string,
   ): Promise<{ message: string }> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
@@ -161,7 +163,7 @@ export class CommentService {
       throw new NotFoundException('دیدگاه پیدا نشد');
     }
 
-    if (comment.userPhone !== currentUserPhone) {
+    if (comment.userIdentifier !== currentUserIdentifier) {
       throw new UnauthorizedException('شما مجاز به حذف دیدگاه نیستید');
     }
 
@@ -213,8 +215,7 @@ export class CommentService {
 
   async getCommentsByPost(
     postId: number,
-    currentUserPhone: string,
-    currentUserRoles: string[],
+    currentUserIdentifier: string,
     query: any,
   ): Promise<ApiResponses<PaginationResult<any>>> {
     const {
@@ -259,7 +260,7 @@ export class CommentService {
         'comment.postId',
         'comment.likes',
         'comment.dislikes',
-        'user.userName',
+        'user.username',
       ])
       .addSelect([
         'replies.id',
@@ -268,15 +269,15 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.userName',
+        'replyUser.username',
       ])
       .addSelect([
         'parentComment.id',
-        'parentCommentUser.userName',
+        'parentCommentUser.username',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.userName',
+        'parentReplyUser.username',
       ])
       .where('comment.postId = :postId', { postId })
       .orderBy(`comment.${sort}`, sortOrder)
@@ -286,16 +287,15 @@ export class CommentService {
     const rawComments = await queryBuilder.getMany();
 
     const processedComments = rawComments.map((comment) => {
-      const isOwner = comment.userPhone === currentUserPhone;
-      const isAdmin = currentUserRoles.includes('admin');
-      const canUpdateComment = isOwner || isAdmin;
+      const isOwner = comment.userIdentifier === currentUserIdentifier;
+      const canUpdateComment = isOwner
 
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.userPhone === currentUserPhone;
+        const isReplyOwner = reply.userIdentifier === currentUserIdentifier;
 
         return {
           ...reply,
-          canUpdate: isReplyOwner || isAdmin,
+          canUpdate: isReplyOwner,
         };
       });
 
@@ -321,8 +321,7 @@ export class CommentService {
 
   async getCommentsByStory(
     storyId: number,
-    currentUserPhone: string,
-    currentUserRoles: string[],
+    currentUserIdentifier: string,
     query: any,
   ): Promise<ApiResponses<PaginationResult<any>>> {
     const {
@@ -367,7 +366,7 @@ export class CommentService {
         'comment.storyId',
         'comment.likes',
         'comment.dislikes',
-        'user.userName',
+        'user.username',
       ])
       .addSelect([
         'replies.id',
@@ -376,15 +375,15 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.userName',
+        'replyUser.username',
       ])
       .addSelect([
         'parentComment.id',
-        'parentCommentUser.userName',
+        'parentCommentUser.username',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.userName',
+        'parentReplyUser.username',
       ])
       .where('comment.storyId = :storyId', { storyId })
       .orderBy(`comment.${sort}`, sortOrder)
@@ -394,16 +393,15 @@ export class CommentService {
     const rawComments = await queryBuilder.getMany();
 
     const processedComments = rawComments.map((comment) => {
-      const isOwner = comment.userPhone === currentUserPhone;
-      const isAdmin = currentUserRoles.includes('admin');
-      const canUpdateComment = isOwner || isAdmin;
+      const isOwner = comment.userIdentifier === currentUserIdentifier;
+      const canUpdateComment = isOwner
 
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.userPhone === currentUserPhone;
+        const isReplyOwner = reply.userIdentifier === currentUserIdentifier;
 
         return {
           ...reply,
-          canUpdate: isReplyOwner || isAdmin,
+          canUpdate: isReplyOwner
         };
       });
 
@@ -457,7 +455,7 @@ export class CommentService {
         'comment.likes',
         'comment.dislikes',
         'comment.userPhone',
-        'user.userName',
+        'user.username',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -465,7 +463,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.userName ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.username ILIKE :search OR comment.userPhone ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -531,7 +529,7 @@ export class CommentService {
         'comment.likes',
         'comment.dislikes',
         'comment.userPhone',
-        'user.userName',
+        'user.username',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -539,7 +537,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.userName ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.username ILIKE :search OR comment.userPhone ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -576,8 +574,8 @@ export class CommentService {
   }
 
   async getPostCommentsByUser(
-    currentUserPhone: string,
-    phone: string,
+    currentUserIdentifier: string,
+    Identifier: string,
     postId?: number,
   ): Promise<ApiResponses<any>> {
     const queryBuilder = this.commentRepository
@@ -606,14 +604,13 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.phone',
-        'replyUser.userName',
+        'replyUser.username',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.userName',
+        'parentReplyUser.username',
       ])
-      .where('comment.userPhone = :phone', { phone });
+      .where('comment.userIdentifier = :Identifier', { Identifier });
   
     if (postId) {
       queryBuilder.andWhere('comment.postId = :postId', { postId });
@@ -623,7 +620,7 @@ export class CommentService {
 
     const processedComments = rawComments.map((comment) => {
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.user?.phone === currentUserPhone;
+        const isReplyOwner = reply.user?.phone === currentUserIdentifier;
 
         return {
           ...reply,
@@ -641,8 +638,8 @@ export class CommentService {
   }
 
   async getStoryCommentsByUser(
-    currentUserPhone: string,
-    phone: string,
+    currentUserIdentifier: string,
+    Identifier: string,
     storyId?: number,
   ): Promise<ApiResponses<any>> {
     const queryBuilder = this.commentRepository
@@ -671,14 +668,13 @@ export class CommentService {
         'replies.updatedAt',
         'replies.parentCommentId',
         'replies.parentReplyId',
-        'replyUser.phone',
-        'replyUser.userName',
+        'replyUser.username',
       ])
       .addSelect([
         'parentReply.id',
-        'parentReplyUser.userName',
+        'parentReplyUser.username',
       ])
-      .where('comment.userPhone = :phone', { phone });
+      .where('comment.userIdentifier = :Identifier', { Identifier });
   
     if (storyId) {
       queryBuilder.andWhere('comment.storyId = :storyId', { storyId });
@@ -688,7 +684,7 @@ export class CommentService {
 
     const processedComments = rawComments.map((comment) => {
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.user?.phone === currentUserPhone;
+        const isReplyOwner = reply.user?.phone === currentUserIdentifier;
 
         return {
           ...reply,

@@ -34,7 +34,7 @@ export class NFT {
   metadataUrl: string;
 
   @Column({ type: 'varchar' })
-  ownerPhone: string;
+  ownerIdentifier: string;
 
   @Column({ type: 'varchar' })
   artist: string;
@@ -61,12 +61,10 @@ export class NFT {
   collectionEntity: Relation<CollectionEntity>;
 
   @ManyToOne(() => User, (creator) => creator.createdNfts)
-  @JoinColumn({ name: 'artist', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   creator: Relation<User>;
 
   @ManyToOne(() => User, (owner) => owner.ownedNfts)
-  @JoinColumn({ name: 'ownerPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   owner: Relation<User>;
 }

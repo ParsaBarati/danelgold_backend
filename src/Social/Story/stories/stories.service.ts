@@ -20,15 +20,15 @@ export class StoriesService {
     ){}
 
     async createStory(
-        userPhone: string,
+        userIdentifier: string,
         createStoryDto: CreateStoryDto
     ):Promise<ApiResponses<Story>>{
 
         const { mediaUrl, expiresAt } = createStoryDto;
 
         const user = await this.userRepository.findOne({
-            where: { phone: userPhone}
-        })
+            where: [{ phone: userIdentifier }, { email: userIdentifier }],
+        });
 
         if(!user){
             throw new NotFoundException('کاربر یافت نشد')
@@ -48,7 +48,7 @@ export class StoriesService {
 
     async updateStory(
         storyId: number,
-        currentUserPhone: string, 
+        currentUserIdentifier: string, 
         updateStoryDto: UpdateStoryDto
     ):Promise<ApiResponses<Story>>{
 
@@ -58,7 +58,15 @@ export class StoriesService {
             throw new NotFoundException('استوری یافت نشد')
         }
 
-        if(story.userPhone !== currentUserPhone){
+        const user = await this.userRepository.findOne({
+            where: [{ phone: currentUserIdentifier }, { email: currentUserIdentifier }]
+        });
+    
+        if (!user) {
+            throw new UnauthorizedException('کاربر یافت نشد');
+        }
+
+        if(story.user.id !== user.id){
             throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
         }
 
@@ -74,7 +82,7 @@ export class StoriesService {
 
     async removeStory(
         storyId: number,
-        currentUserPhone: string,
+        currentUserIdentifier: string,
     ):Promise<{message: string}>{
 
         const story = await this.storyRepository.findOneBy({ id: storyId})
@@ -83,7 +91,15 @@ export class StoriesService {
             throw new NotFoundException('استوری یافت نشد')
         }
 
-        if(story.userPhone !== currentUserPhone){
+        const user = await this.userRepository.findOne({
+            where: [{ phone: currentUserIdentifier }, { email: currentUserIdentifier }]
+        });
+    
+        if (!user) {
+            throw new UnauthorizedException('کاربر یافت نشد');
+        }
+
+        if(story.user.id !== user.id ){
             throw new UnauthorizedException('شما مجاز به حذف نیستید')
         }
 

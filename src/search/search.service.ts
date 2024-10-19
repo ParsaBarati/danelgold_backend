@@ -33,9 +33,9 @@ export class SearchService {
 
     const users = await this.userRepository.find({
       where: [
-        { userName: Like(searchQuery) },
+        { username: Like(searchQuery) },
       ],
-      select: ['id', 'userName', 'profilePic'], // Select relevant fields
+      select: ['id', 'username', 'profilePic'], // Select relevant fields
     });
 
     const nfts = await this.nftRepository.find({
@@ -68,7 +68,7 @@ export class SearchService {
         type: 'Users',
         data: users.map((user) => ({
           id: user.id,
-          username: user.userName,
+          username: user.username,
           pic: user.profilePic,
         })),
       },

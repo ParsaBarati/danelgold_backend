@@ -16,8 +16,8 @@ export class ForumController {
     @Req() req:Request,
     @Body() createTopicDto: CreateTopicDto
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.forumService.createTopic(userPhone,createTopicDto)
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.forumService.createTopic(userIdentifier,createTopicDto)
   }
 
   @Post('forumPost')
@@ -25,8 +25,8 @@ export class ForumController {
     @Req() req:Request,
     @Body() content: string
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.forumService.createPost(userPhone,content)
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.forumService.createPost(userIdentifier,content)
   }
 
   @Put('topic/:id')
@@ -35,10 +35,10 @@ export class ForumController {
     @Req() req:Request,
     @Body() updateTopicDto: UpdateTopicDto
   ){
-    const currentUserPhone = (req.user as any).result.phone;
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return await this.forumService.updateTopic(
       topicId,
-      currentUserPhone,
+      currentUserIdentifier,
       updateTopicDto
     )
   }
@@ -49,10 +49,10 @@ export class ForumController {
     @Req() req:Request,
     @Body() content?: string
   ){
-    const currentUserPhone = (req.user as any).result.phone;
+    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
     return await this.forumService.updatePost(
       postId,
-      currentUserPhone,
+      currentUserIdentifier,
       content
     )
   }

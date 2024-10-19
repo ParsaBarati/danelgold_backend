@@ -27,7 +27,7 @@ export class CollectionEntity {
   cover: string;
 
   @Column({ type: 'varchar' })
-  creatorPhone: string;
+  creatorIdentifier: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -39,6 +39,5 @@ export class CollectionEntity {
   nfts: Relation<NFT[]>;
 
   @ManyToOne(() => User, (creator) => creator.collectionEntities)
-  @JoinColumn({ name:'creatorPhone',referencedColumnName:'phone'})
   creator: Relation<User>;
 }

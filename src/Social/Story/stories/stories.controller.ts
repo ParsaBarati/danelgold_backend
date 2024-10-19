@@ -15,26 +15,26 @@ export class StoriesController {
         @Req() req: Request,
         @Body() createStoryDto: CreateStoryDto
     ){
-        const userPhone = (req.user as any).result.phone;
-        return await this.storyService.createStory(userPhone,createStoryDto)
+        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        return await this.storyService.createStory(userIdentifier,createStoryDto)
     }
 
     @Put('/:id')
     async updateStory(
-        @Param('storyId',ParseIntPipe) storyId: number,
+        @Param('id',ParseIntPipe) storyId: number,
         @Req() req: Request,
         @Body() updateStoryDto: UpdateStoryDto
     ){
-        const currentUserPhone = (req.user as any).result.phone;
-        return await this.storyService.updateStory(storyId,currentUserPhone,updateStoryDto)
+        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        return await this.storyService.updateStory(storyId,currentUserIdentifier,updateStoryDto)
     }
 
     @Delete(':/id')
     async removeStory(
-        @Param('storyId',ParseIntPipe) storyId: number,
+        @Param('id',ParseIntPipe) storyId: number,
         @Req() req: Request, 
     ){
-        const currentUserPhone = (req.user as any).result.phone;
-        return await this.storyService.removeStory(storyId,currentUserPhone)
+        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        return await this.storyService.removeStory(storyId,currentUserIdentifier)
     }
 }

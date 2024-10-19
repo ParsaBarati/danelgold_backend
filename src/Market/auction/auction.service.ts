@@ -26,7 +26,7 @@ export class AuctionsService {
   ) {}
 
   async createAuction(
-    creatorPhone: string,
+    creatorIdentifier: string,
     createAuctionDto:CreateAuctionDto
   ): Promise<ApiResponses<Auction>> {
 
@@ -39,7 +39,9 @@ export class AuctionsService {
       isSms
      } = createAuctionDto;
 
-     const creator = await this.userRepository.findOne({ where: { phone:creatorPhone } });
+    const creator = await this.userRepository.findOne({ 
+      where: [{ phone: creatorIdentifier },{ email: creatorIdentifier }] 
+    });
 
     if (!creator) {
       throw new NotFoundException('Creator not found');
@@ -48,7 +50,11 @@ export class AuctionsService {
     let highestBidder = null;
     
     if (highestBidder) {
-    highestBidder = await this.userRepository.findOne({ where: { phone: highestBidder} });
+
+    highestBidder = await this.userRepository.findOne({ 
+      where: [{ phone: highestBidder },{ email: highestBidder} ] 
+    });
+
     if (!highestBidder) {
       throw new NotFoundException('Highest bidder not found');
     }
@@ -65,8 +71,7 @@ export class AuctionsService {
       startTime,
       endTime,
       creator: creator,
-      creatorPhone: creator.phone ,
-      highestBidderPhone: highestBidder ? highestBidder.phone : null,
+      highestBidderIdentifier: highestBidder ? highestBidder : null,
       startingBid,
       currentBid,
       isSms: isSms,
@@ -216,14 +221,14 @@ export class AuctionsService {
         'nft.description',
         'nft.image',
         'nft.matadataUrl',
-        'nft.ownerPhone',
-        'nft.creatorPhone',
+        'nft.ownerIdentifier',
+        'nft.creatorIdentifier',
         'nft.price',
         'nft.createdAt',
         'nft.updatedAt'
       ])
       .addSelect([
-        'user.userName',
+        'user.username',
       ])
       .where('auctions.id = :auctionId', { auctionId })
 
@@ -233,7 +238,7 @@ export class AuctionsService {
   async participateAuction(
     auctionId: number,
     participateAuctionDto: ParticipateAuctionDto,
-    userPhone: string
+    userIdentifier : string
   ): Promise<{ message: string }> {
     const { bidAmount } = participateAuctionDto;
 
@@ -254,7 +259,10 @@ export class AuctionsService {
       throw new BadRequestException('مقدار پیشنهاد باید بیشتر از پیشنهاد فعلی باشد'); 
     }
 
-    const user = await this.userRepository.findOne({ where: { phone: userPhone } });
+    const user = await this.userRepository.findOne({ 
+      where: [{ phone: userIdentifier }, { email: userIdentifier }]
+     });
+
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');
     }

@@ -24,7 +24,7 @@ export class SignupDto {
   @ApiProperty()
   @IsString()
   @IsDefined({ message: 'First name is required' })
-  userName: string;
+  username: string;
 
   @ApiProperty()
   @Matches(/^(?=.*[A-Za-z])(?=.*\d).*$/, {message: 'Password must contain both letters and numbers'})

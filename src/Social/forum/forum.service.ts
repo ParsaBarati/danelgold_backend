@@ -23,14 +23,14 @@ export class ForumService {
   ) {}
 
   async createTopic(
-    userPhone: string,
+    userIdentifier: string,
     createTopicDto: CreateTopicDto
   ):Promise<ApiResponses<ForumTopic>>{
 
     const { title, content } = createTopicDto;
 
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone }
+      where: [{ phone: userIdentifier }, { email: userIdentifier}]
     })
 
     if(!user){
@@ -50,12 +50,12 @@ export class ForumService {
   }
 
   async createPost(
-    userPhone:string, 
+    userIdentifier:string, 
     content: string
   ):Promise<ApiResponses<ForumPost>>{
 
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone }
+      where: [{ phone: userIdentifier }, { email: userIdentifier }]
     })
 
     if(!user){
@@ -76,7 +76,7 @@ export class ForumService {
 
   async updateTopic(
     topicId: number,
-    currentUserPhone: string, 
+    currentUserIdentifier: string, 
     updateTopicDto: UpdateTopicDto
   ):Promise<ApiResponses<ForumTopic>> {
     
@@ -86,7 +86,7 @@ export class ForumService {
       throw new NotFoundException('تاپیک یافت نشد')
     }
 
-    if(topic.userPhone !== currentUserPhone){
+    if(topic.userIdentifier !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
     }
 
@@ -102,7 +102,7 @@ export class ForumService {
 
   async updatePost(
     postId: number,
-    currentUserPhone: string,
+    currentUserIdentifier: string,
     content?: string
   ):Promise<ApiResponses<ForumPost>>{
 
@@ -112,7 +112,7 @@ export class ForumService {
       throw new NotFoundException('پست در فروم یافت نشد')
     }
 
-    if(post.userPhone !== currentUserPhone){
+    if(post.userIdentifier !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
     }
 

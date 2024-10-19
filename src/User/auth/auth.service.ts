@@ -60,13 +60,13 @@ export class AuthService {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        username: user.userName,
+        username: user.username,
       },
     };
   }
 
-  async checkUserNameAvailability(userName: string): Promise<any> {
-    const existingUserName = await this.userRepository.findOne({ where: { userName } });
+  async checkUserNameAvailability(username: string): Promise<any> {
+    const existingUserName = await this.userRepository.findOne({ where: { username } });
     if (existingUserName) {
       throw new BadRequestException('Username already exists');
     }
@@ -140,7 +140,7 @@ export class AuthService {
       user = this.userRepository.create({
         phone: isPhone ? email_or_phone : null,
         email: isEmail ? email_or_phone : null,
-        userName: '', // Placeholder, prompt user to set this later
+        username: '', // Placeholder, prompt user to set this later
         password: '', // Placeholder, user will set their password later
         isVerified: true,
       });
@@ -206,7 +206,7 @@ export class AuthService {
     } else if (isEmail) {
       user = await this.userRepository.findOne({ where: { email: email_or_phone_or_username } });
     } else if (isUsername) {
-      user = await this.userRepository.findOne({ where: { userName: email_or_phone_or_username } });
+      user = await this.userRepository.findOne({ where: { username: email_or_phone_or_username } });
     } else {
       throw new BadRequestException('Invalid email, phone number, or username');
     }
@@ -236,7 +236,7 @@ export class AuthService {
     } else if (isEmail) {
       user = await this.userRepository.findOne({ where: { email: email_or_phone_or_username } });
     } else if (isUsername) {
-      user = await this.userRepository.findOne({ where: { userName: email_or_phone_or_username } });
+      user = await this.userRepository.findOne({ where: { username: email_or_phone_or_username } });
     } else {
       throw new BadRequestException('Invalid email, phone number, or username');
     }

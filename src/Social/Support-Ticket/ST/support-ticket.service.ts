@@ -17,14 +17,14 @@ export class SupportTicketsService {
   ) {}
 
   async createST(
-    userPhone: string,
+    userIdentifier: string,
     creatSTDto: CreateSTDto
   ):Promise<ApiResponses<SupportTicket>>{
 
     const { title, description } = creatSTDto;
 
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone }
+      where: [{ phone: userIdentifier }, { email: userIdentifier }]
     })
 
     if(!user){
@@ -45,7 +45,7 @@ export class SupportTicketsService {
 
   async updateST(
     stId: number,
-    currentUserPhone: string,
+    currentUserIdentifier: string,
     updateSTDto: UpdateSTDto
   ):Promise<ApiResponses<SupportTicket>>{
 
@@ -55,7 +55,7 @@ export class SupportTicketsService {
       throw new NotFoundException('تیکت پشتیبانی یافت نشد')
     }
 
-    if(ST.userPhone !== currentUserPhone){
+    if(ST.userIdentifier !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
     }
 
@@ -75,7 +75,7 @@ export class SupportTicketsService {
 
   async removeST(
     stId: number,
-    currentUserPhone: string
+    currentUserIdentifier: string
   ):Promise<{ message: string }>{
 
     const ST = await this.ticketsRepository.findOneBy({ id: stId });
@@ -84,7 +84,7 @@ export class SupportTicketsService {
       throw new NotFoundException('تیکت یافت نشد')
     }
 
-    if(ST.userPhone !== currentUserPhone){
+    if(ST.userIdentifier !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به حذف نیستید')
     }
 

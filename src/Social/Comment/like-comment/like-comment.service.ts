@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Comment } from "@/Social/Comment/comment/entity/comment.entity";
 import { Repository } from "typeorm";
 import { likeComment } from "./entity/like-comment.entity";
+import { User } from "@/User/user/entity/user.entity";
 
 @Injectable()
 export class LikeCommentService{
@@ -11,11 +12,14 @@ export class LikeCommentService{
         private readonly commentRepository: Repository<Comment>,
         @InjectRepository(likeComment)
         private readonly likeRepository: Repository<likeComment>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+
       ) {}
     
     async likeComment(
         commentId: number, 
-        userPhone: string, 
+        userIdentifier: string, 
       ): Promise<{ isLike: number }> {
         
         const likableComment = await this.commentRepository.findOneBy(
@@ -25,15 +29,19 @@ export class LikeCommentService{
         if (!likableComment) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier },{ email: userIdentifier }]
+        })
     
         let existingLike = await this.likeRepository.findOne({
-            where: { comment: { id: commentId }, userPhone },
+            where: { comment: { id: commentId }, user : { id: user.id } },
         });
     
         if (!existingLike) {
             existingLike = this.likeRepository.create({
                 comment: likableComment,
-                userPhone,
+                user,
                 isLike: 1,
             });
             likableComment.likes++;
@@ -59,7 +67,7 @@ export class LikeCommentService{
     
     async dislikeComment(
       commentId: number, 
-      userPhone: string, 
+      userIdentifier: string, 
     ): Promise<{ isDislike: number }> {
         
         const dislikableComment = await this.commentRepository.findOneBy(
@@ -69,15 +77,23 @@ export class LikeCommentService{
         if (!dislikableComment) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
+
+        const user = await this.userRepository.findOne({
+            where: [{ phone: userIdentifier },{ email: userIdentifier }]
+        })
+    
+        let existingLike = await this.likeRepository.findOne({
+            where: { comment: { id: commentId }, user : { id: user.id } },
+        });
     
         let existingDislike = await this.likeRepository.findOne({
-            where: { comment: { id: commentId }, userPhone },
+            where: { comment: { id: commentId }, user: { id: user.id } },
         });
     
         if (!existingDislike) {
             existingDislike = this.likeRepository.create({
                 comment: dislikableComment,
-                userPhone,
+                user,
                 isLike: -1,
             });
             dislikableComment.dislikes++;

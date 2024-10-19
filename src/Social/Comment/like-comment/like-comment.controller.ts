@@ -21,8 +21,8 @@ export class LikeCommentController {
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req () req: Request,
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.likeCommentService.likeComment(commentId,userPhone);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.likeCommentService.likeComment(commentId,userIdentifier);
   }
 
   @Post('/:commentId/dislike')
@@ -30,7 +30,7 @@ export class LikeCommentController {
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req () req: Request,
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.likeCommentService.dislikeComment(commentId,userPhone);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.likeCommentService.dislikeComment(commentId,userIdentifier);
   }
 }

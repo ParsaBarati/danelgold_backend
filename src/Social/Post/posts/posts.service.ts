@@ -135,7 +135,7 @@ export class PostService{
             'user.id',
             'user.name',
             'user.pic',
-            'user.userName',
+            'user.username',
             'user.email',
             'user.phone',
           ])
@@ -154,7 +154,7 @@ export class PostService{
           user: {
             id: post.user.id,
             pic: post.user.profilePic,
-            username: post.user.userName,
+            username: post.user.username,
             email: post.user.email,
             phone: post.user.phone,
           },

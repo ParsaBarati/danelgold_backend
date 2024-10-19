@@ -17,7 +17,7 @@ export class Reply {
   id: number;
 
   @Column({ type: 'varchar' })
-  userPhone: string;
+  userIdentifier: string;
 
   @Column({ type: 'text' })
   content: string;
@@ -39,7 +39,6 @@ export class Reply {
   parentReplyId: number | null;
 
   @ManyToOne(() => User, (user) => user.replies)
-  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 

@@ -11,7 +11,7 @@ export class MessageService{
         private messageRepository: Repository<Message>
     ){}
 
-    async getMessage(userPhone: string): Promise<any> {
+    async getMessage(userIdentifier: string): Promise<any> {
 
         const chats = await this.messageRepository
           .createQueryBuilder('message')
@@ -21,23 +21,23 @@ export class MessageService{
             'message.id',
             'sender.id',
             'sender.profilePic',
-            'sender.userName',
+            'sender.username',
             'receiver.id',
             'receiver.profilePic',
-            'receiver.userName',
+            'receiver.username',
             'message.createdAt',
           ])
-          .where('message.senderId = :userPhone OR message.receiverId = :userPhone', { userPhone }) 
+          .where('message.senderId = :userPhone OR message.receiverId = :userIdentifier', { userIdentifier }) 
           .orderBy('message.createdAt', 'DESC') 
           .getRawMany();
       
         const transformedChats = chats.map((chat) => {
-          const otherUser = chat.sender_id === userPhone ? chat.receiver : chat.sender; 
+          const otherUser = chat.sender_id === userIdentifier ? chat.receiver : chat.sender; 
           return {
             id: chat.message_id,
             user: {
               id: otherUser.id,
-              name: `${otherUser.userName}`,
+              name: `${otherUser.username}`,
               pic: otherUser.profilePic,
               username: otherUser.username,
             },

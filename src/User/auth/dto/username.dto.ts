@@ -6,5 +6,5 @@ export class UserNameDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    userName: string; 
+    username: string; 
 }

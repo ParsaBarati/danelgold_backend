@@ -17,7 +17,7 @@ export class Bid {
   id: number;
 
   @Column({ type: 'varchar' })
-  userPhone: string;
+  userIdentifier: string;
 
   @Column( { type: 'int' })
   auctionId: number;
@@ -34,7 +34,6 @@ export class Bid {
   auction: Relation<Auction>;
 
   @ManyToOne(() => User, (user) => user.bids)
-  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

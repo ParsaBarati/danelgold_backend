@@ -24,13 +24,13 @@ export class CollectionsService {
 
   async createCollection(
     createCollectionDto: CreateCollectionDto,
-    creatorPhone: string
+    creatorIdentifier: string
   ): Promise<ApiResponses<CollectionEntity>> {
 
     const { name, text, cover } = createCollectionDto
 
     const creator = await this.userRepository.findOne({
-      where:{ phone:creatorPhone}
+      where: [{ phone: creatorIdentifier }, { email: creatorIdentifier }]
     })
 
     if(!creator){
@@ -53,8 +53,7 @@ export class CollectionsService {
   async updateCollection(
     collectionId: number,
     updateCollectionDto: UpdateCollectionDto,
-    currentOwnerPhone: string,
-    currentUserRoles: string[]
+    currentOwnerIdentifier: string,
   ):Promise<ApiResponses<CollectionEntity>>{
 
     const collection = await this.collectionsRepository.findOne({
@@ -66,10 +65,9 @@ export class CollectionsService {
       throw new NotFoundException('مجموعه یافت نشد')
     }
 
-    const isOwner = collection.creatorPhone === currentOwnerPhone;
-    const isAdmin = currentUserRoles.includes(UserRole.ADMIN);
+    const isOwner = collection.creatorIdentifier === currentOwnerIdentifier;
 
-    if (!isOwner && !isAdmin) {
+    if (!isOwner) {
       throw new BadRequestException('شما مجاز به ویرایش نیستید'); 
     }
 
@@ -116,7 +114,7 @@ export class CollectionsService {
         'collections.updatedAt'
       ])
       .addSelect([
-        'user.userName',
+        'user.username',
       ])
       .orderBy(`collections.${sort}`, sortOrder)
       .skip((page - 1) * limit)
@@ -177,10 +175,10 @@ export class CollectionsService {
         'nft.updatedAt'
       ])
       .addSelect([
-        'collectionUser.userName',
+        'collectionUser.username',
       ])
       .addSelect([
-        'nftUser.userName',
+        'nftUser.username',
       ])
       .where('collections.id = :collectionId', { collectionId })
 
@@ -190,7 +188,7 @@ export class CollectionsService {
   async addNftToCollection(
     nftId: number,
     collectionId: number,
-    currentOwnerPhone: string,
+    currentOwnerIdentifier: string,
   ): Promise<{ message: string }> {
 
     const nft = await this.nftsRepository.findOne({
@@ -209,7 +207,7 @@ export class CollectionsService {
       throw new NotFoundException('مجموعه پیدا نشد');
     }
   
-    const isOwner = nft.ownerPhone === currentOwnerPhone;
+    const isOwner = nft.ownerIdentifier === currentOwnerIdentifier;
     if (!isOwner) {
       throw new ForbiddenException('فقط مالک می‌تواند این NFT را به مجموعه اضافه کند');
     }
@@ -222,7 +220,7 @@ export class CollectionsService {
 
   async removeNftFromCollection(
     nftId: number,
-    currentOwnerPhone: string,
+    currentOwnerIdentifier: string,
   ): Promise<{ message: string }> {
 
     const nft = await this.nftsRepository.findOne({
@@ -234,7 +232,7 @@ export class CollectionsService {
       throw new NotFoundException('NFT پیدا نشد');
     }
   
-    const isOwner = nft.ownerPhone === currentOwnerPhone;
+    const isOwner = nft.ownerIdentifier === currentOwnerIdentifier;
     if (!isOwner) {
       throw new ForbiddenException('فقط مالک می‌تواند این NFT را از مجموعه حذف کند');
     }

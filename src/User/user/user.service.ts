@@ -33,103 +33,10 @@ export class UserService {
     private readonly smsService: SmsService,
   ) {}
 
-  async signupUser(createUserDTO: SignupDto) {
-    const existingUser = await this.userRepository.findOne({
-      where: { phone: createUserDTO.phone },
+  async getUserByPhone(Identifier: string): Promise<ApiResponses<UserInformation>> {
+    const user = await this.userRepository.findOne({
+      where: [{ phone: Identifier}, { email: Identifier }]
     });
-
-    if (existingUser) {
-      throw new BadRequestException(
-        'کاربری با این شماره همراه قبلاً حساب کاربری ساخته است',
-      );
-    }
-
-    const NewUser = this.userRepository.create({
-      ...createUserDTO,
-    });
-
-    const result = await this.userRepository.save(NewUser);
-    return result;
-  }
-
-  async createUser(createUserDTO: CreateUserByAdminDTO) {
-    const existingUser = await this.userRepository.findOne({
-      where: { phone: createUserDTO.phone },
-    });
-
-    if (existingUser) {
-      throw new BadRequestException(
-        'کاربری با این شماره همراه قبلاً حساب کاربری ساخته است',
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(createUserDTO.password, 10);
-
-    const NewUser = this.userRepository.create({
-      ...createUserDTO,
-      password: hashedPassword,
-      createdAt: new Date(),
-    });
-
-    const result = await this.userRepository.save(NewUser);
-
-    if (createUserDTO.isSms) {
-      await this.smsService.sendSignUpSMS(
-        createUserDTO.phone,
-        createUserDTO.phone,
-        createUserDTO.password,
-      );
-    }
-
-    return createResponse(201, result, 'کاربر با موفقیت ایجاد گردید');
-  }
-
-  async updateUser(
-    phone: string,
-    updateUserDTO: UpdateUserDTO,
-  ): Promise<ApiResponses<User>> {
-    const existingUser = await this.userRepository.findOne({
-      where: { phone: phone },
-    });
-
-    if (!existingUser) {
-      throw new NotFoundException('کاربر یافت نشد');
-    }
-
-    const hashedPassword = updateUserDTO.password
-      ? await bcrypt.hash(updateUserDTO.password, 10)
-      : existingUser.password;
-
-    Object.assign(existingUser, {
-      ...updateUserDTO,
-      password: hashedPassword,
-      updatedAt: new Date(),
-    });
-
-    const updateUser = await this.userRepository.save(existingUser);
-    return createResponse(200, updateUser, 'آپدیت شد');
-  }
-
-  async deleteUsers(phone: string): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { phone } });
-    if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
-    }
-    
-    await this.userRepository.manager.transaction(
-      async (transactionalEntityManager) => {
-        await transactionalEntityManager.delete(Subscribe, {
-          userPhone: phone,
-        });
-        await transactionalEntityManager.delete(User, { phone });
-      },
-    );
-
-    return 'کاربر با موفقیت پاک شد';
-  }
-
-  async getUserByPhone(phone: string): Promise<ApiResponses<UserInformation>> {
-    const user = await this.userRepository.findOneBy({ phone });
 
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');
@@ -138,186 +45,13 @@ export class UserService {
     const userInformation: UserInformation = {
       id: user.id,
       phone: user.phone,
+      email: user.email,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
     const result = userInformation;
     return createResponse(200, result, null);
-  }
-
-  async getUsers(
-    page: number = 1,
-    limit: number = 10,
-    searchInput?: string,
-    role?: string,
-    all?: string,
-    sort: string = 'id',
-    sortOrder: 'ASC' | 'DESC' = 'DESC',
-  ): Promise<ApiResponses<PaginationResult<any>>> {
-    const allowedSortFields = [
-      'id',
-      'userName',
-      'phone',
-      'lastLogin',
-    ];
-
-    const validatedSortBy = allowedSortFields.includes(sort) ? sort : 'id';
-
-    let queryBuilder = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userDetail', 'userDetail')
-      .select([
-        'user.id as id',
-        'user.userName as userName',
-        'user.phone as phone',
-        'user.lastLogin as lastLogin',
-        'MAX(userDetail.ip) as ip',
-        'MAX(userDetail.platform) as platform',
-        'MAX(userDetail.browser) as browser',
-        'MAX(userDetail.versionBrowser) as versionBrowser',
-        'MAX(userDetail.versionPlatform) as versionPlatform',
-        'MAX(userDetail.loginDate) as lastLoginDate',
-      ])
-      .groupBy(
-        'user.id, user.userName, user.phone, user.lastLogin',
-      )
-      .orderBy(`user.${validatedSortBy}`, sortOrder);
-
-    if (searchInput) {
-      queryBuilder = queryBuilder.andWhere(
-        `(CONCAT(user.userName, ' ', ) ILIKE :searchInput OR user.phone ILIKE :searchInput)`,
-        { searchInput: `%${searchInput}%` },
-      );
-    }
-
-    if (role !== undefined && role !== '') {
-      queryBuilder = queryBuilder.andWhere('user.role = :role', { role });
-    }
-
-    if (all === 'true') {
-      const users = await queryBuilder.getRawMany();
-      const response = {
-        data: users,
-        total: users.length,
-        totalPages: 1,
-        page: 1,
-        limit: users.length,
-      };
-
-      return createResponse(200, response);
-    }
-
-    const offset = (page - 1) * limit;
-    queryBuilder = queryBuilder.skip(offset).take(limit);
-    const users = await queryBuilder.getRawMany();
-
-    const total = await this.userRepository.count();
-    const totalPages = Math.ceil(total / limit);
-    const response = {
-      data: users,
-      total,
-      totalPages,
-      page,
-      limit,
-    };
-
-    return createResponse(200, response);
-  }
-
-  async getUserDataWithToken(userPhone: string) {
-    const existingUser = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.subscribes', 'subscribe')
-      .leftJoin('user.userDetail', 'userDetail')
-      .where('user.phone = :phone', { phone: userPhone })
-      .orderBy('userDetail.loginDate', 'DESC')
-      .select([
-        'user.id',
-        'user.userName',
-        'user.phone',
-        'user.profilePic',
-        'user.createdAt',
-        'user.updatedAt',
-        'user.lastLogin',
-        'userDetail.ip',
-        'userDetail.platform',
-        'userDetail.browser',
-        'userDetail.versionBrowser',
-        'userDetail.versionPlatform',
-        'userDetail.loginDate',
-        'subscribe.isActive',
-      ])
-      .limit(1)
-      .getOne();
-
-    if (existingUser) {
-      return existingUser;
-    } else {
-      return { error: 'کاربری با این شماره پیدا نشد', status: 404 };
-    }
-  }
-
-  async editDataUser(authHeader: string, editData: editDateUser) {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('توکن وجود ندارد');
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    const tokenData = await this.tokenRepository
-      .createQueryBuilder('token')
-      .leftJoin('token.user', 'user')
-      .where('token.token = :token', { token })
-      .select(['token.token', 'user.phone'])
-      .getOne();
-
-    if (!tokenData) {
-      throw new UnauthorizedException('توکن اشتباه است');
-    }
-
-    const updateData: Partial<User> = {
-      updatedAt: new Date(),
-    };
-    if (editData.profilePic !== undefined) {
-      updateData.profilePic = editData.profilePic;
-    }
-
-    if (Object.keys(updateData).length > 1) {
-      const updatedUser = await this.userRepository
-        .createQueryBuilder()
-        .update(User)
-        .set(updateData)
-        .where('phone = :phone', { phone: tokenData.user.phone })
-        .returning([
-          'phone',
-          'userName',
-          'profilePic',
-          'updatedAt',
-        ])
-        .execute();
-
-      const updatedUserData = updatedUser.raw[0];
-      delete updatedUserData.password;
-
-      return {
-        message: 'با موفقیت بروز شد',
-        user: updatedUserData,
-        status: 200,
-      };
-    } else {
-      const currentUser = await this.userRepository.findOne({
-        where: { phone: tokenData.user.phone },
-      });
-
-      if (!currentUser) {
-        throw new NotFoundException('کاربری با این شناسه یافت نشد');
-      }
-
-      delete currentUser.password;
-
-      return { message: 'بدون تغییرات', user: currentUser, status: 200 };
-    }
   }
 
   async getHomepageData(): Promise<any> {
@@ -329,9 +63,9 @@ export class UserService {
         'story.id',
         'story.thumbnail',
         'user.id',
-        'user.userName',
+        'user.username',
         'user.profilePic',
-        'user.userName',
+        'user.username',
       ])
       .where('story.expiresAt > :now', { now: new Date() }) 
       .orderBy('story.createdAt', 'DESC')
@@ -350,9 +84,9 @@ export class UserService {
         'post.likes',
         'post.dislikes',
         'user.id',
-        'user.userName',
+        'user.username',
         'user.profilePic',
-        'user.userName',
+        'user.username',
         'COUNT(comments.id) as commentCount',
         'COUNT(postLikes.id) as likeCount',
       ])
@@ -379,7 +113,7 @@ export class UserService {
         thumb: story.story_thumbnail,
         user: {
           id: story.user_id,
-          name: `${story.user_userName}`,
+          name: `${story.user_username}`,
           pic: story.user_profilePic,
           username: story.user_username,
         },
@@ -389,7 +123,7 @@ export class UserService {
         thumb: post.post_mediaUrl,
         user: {
           id: post.user_id,
-          name: `${post.user_userName}`,
+          name: `${post.user_username}`,
           pic: post.user_profilePic,
           username: post.user_username,
         },
@@ -480,7 +214,7 @@ export class UserService {
   
     return {
       id: user.id,
-      username: user.userName,
+      username: user.username,
       profilePic: user.profilePic,
       followers: followersCount,
       following: followingCount,

@@ -188,13 +188,15 @@ export class UploadService {
 
   async createProfilePictureUpload(
     file: any,
-    phone: string,
+    Identifier: string,
   ): Promise<ApiResponses<any>> {
     if (!file) {
       throw new NotFoundException('پارامتر ارسالی صحیح نیست');
     }
 
-    const user = await this.userRepository.findOne({ where: { phone } });
+    const user = await this.userRepository.findOne({ 
+      where: [{ phone: Identifier },{ email: Identifier }] 
+    });
 
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');

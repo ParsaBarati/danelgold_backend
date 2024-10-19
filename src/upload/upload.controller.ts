@@ -62,8 +62,8 @@ export class UploadController {
     file: Express.Multer.File,
     @Req() req: Request,
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.uploadService.createProfilePictureUpload(file, userPhone);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.uploadService.createProfilePictureUpload(file, userIdentifier);
   }
 
   @ApiQuery({ name: 'page', required: false })

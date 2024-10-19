@@ -51,15 +51,13 @@ export class NFTsController {
       mintNFTDataDto.name,
       mintNFTDataDto.price,
       NFTImageURL, 
-      mintNFTDataDto.text,
     );
   }
 
   @Delete('/:nftId')
   async burnNFT(@Param('nftId') nftId: number, @Req() req: Request) {
-    const currentOwnerPhone = (req.user as any).result.phone;
-    const currentUserRoles = (req.user as any).result.role;
-    return await this.nftsService.burnNFT(nftId, currentOwnerPhone, currentUserRoles);
+    const currentOwnerIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.nftsService.burnNFT(nftId, currentOwnerIdentifier);
   }
 
   @Get('/:nftId')

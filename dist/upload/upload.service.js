@@ -263,16 +263,21 @@ let UploadService = class UploadService {
             return (0, _responseutil.createResponse)(200, filePath);
         })();
     }
-    createProfilePictureUpload(file, phone) {
+    createProfilePictureUpload(file, Identifier) {
         var _this = this;
         return _async_to_generator(function*() {
             if (!file) {
                 throw new _common.NotFoundException('پارامتر ارسالی صحیح نیست');
             }
             const user = yield _this.userRepository.findOne({
-                where: {
-                    phone
-                }
+                where: [
+                    {
+                        phone: Identifier
+                    },
+                    {
+                        email: Identifier
+                    }
+                ]
             });
             if (!user) {
                 throw new _common.NotFoundException('کاربر یافت نشد');

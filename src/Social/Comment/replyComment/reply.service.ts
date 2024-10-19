@@ -21,24 +21,24 @@ export class ReplyService{
       ) {}
     
       async createReply(
-        phone: string, 
+        Identifier: string, 
         addReplyDto: CreateReplyDTO
       ): Promise<Reply> {
         const { content, parentCommentId, parentReplyId } = addReplyDto;
     
-        console.log(`Fetching user with phone: ${phone}`);
+        console.log(`Fetching user with Identifier: ${Identifier}`);
         
         const user = await this.userRepository.findOne({
-          where: { phone: phone },
-          select: ['userName'],
+          where: [{ phone: Identifier },{ email: Identifier }],
+          select: ['username'],
         });
     
         if (!user) {
-          console.error(`User not found with phone: ${phone}`);
+          console.error(`User not found with Identifier: ${Identifier}`);
           throw new NotFoundException('User not found');
         }
     
-        console.log(`User found: ${user.userName}`);
+        console.log(`User found: ${user.username}`);
     
         const existingComment = await this.commentRepository.findOne({ where: { id: parentCommentId } });
     
@@ -49,8 +49,9 @@ export class ReplyService{
     
         const newReply = this.replyRepository.create({
           user: {
-            userName: user.userName,
-            phone: phone,
+            username: user.username,
+            phone: Identifier,
+            email: Identifier
           },
           content,
           parentCommentId,
@@ -63,7 +64,7 @@ export class ReplyService{
       
       async updateReply(
         replyId: number,
-        currentUserPhone: string, 
+        currentUserIdentifier: string, 
         updateReplyDTO: UpdateReplyDTO
       ): Promise<ApiResponses<Reply>> {
 
@@ -75,7 +76,7 @@ export class ReplyService{
           throw new NotFoundException('پاسخ پیدا نشد');
         }
 
-        if (reply.userPhone !== currentUserPhone) {
+        if (reply.userIdentifier !== currentUserIdentifier) {
           throw new UnauthorizedException('شما اجازه حذف این پاسخ را ندارید');
         }
     
@@ -87,7 +88,10 @@ export class ReplyService{
         return createResponse(200,savedReply,'با موفقیت ویرایش گردید')
       }
 
-      async deleteReply(replyId: number, currentUserPhone: string): Promise<string> {
+      async deleteReply(
+        replyId: number, 
+        currentUserIdentifier: string
+      ): Promise<string> {
         const reply = await this.replyRepository.findOneBy({id:replyId});
     
         if (!reply) {
@@ -95,10 +99,10 @@ export class ReplyService{
         }
 
         const currentUser = await this.userRepository.findOne({
-          where: { phone: currentUserPhone },
+          where: [{ phone: currentUserIdentifier }, { email: currentUserIdentifier }]
         });
 
-        if (reply.userPhone !== currentUserPhone) {
+        if (reply.userIdentifier !== currentUserIdentifier) {
           throw new UnauthorizedException('شما اجازه حذف این پاسخ را ندارید');
         }
     

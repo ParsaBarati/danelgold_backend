@@ -5,7 +5,7 @@ export class editDateUser {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  userName?: string;
+  username?: string;
 
   @ApiProperty()
   @Matches(/^09\d{9}$/, { message: 'فرمت شماره همراه صحیح نیست' })

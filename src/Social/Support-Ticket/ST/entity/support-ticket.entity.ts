@@ -15,7 +15,7 @@ export class SupportTicket {
   id: number;
   
   @Column({ type: 'varchar' })
-  userPhone: string;
+  userIdentifier: string;
 
   @Column()
   title: string;
@@ -41,6 +41,5 @@ export class SupportTicket {
   rsts: Relation<RST[]>
 
   @ManyToOne(() => User, (user) => user.supportTickets)
-  @JoinColumn({ name: 'userPhone',referencedColumnName: 'phone'})
   user: Relation<User>;
 }

@@ -21,7 +21,6 @@ export class NFTsService {
     name: string,
     price: number,
     image: string,
-    text: string 
   ): Promise<ApiResponses<NFT>> {
     const creator = await this.userRepository.findOne({ where: { phone: artist } });
   
@@ -46,17 +45,22 @@ export class NFTsService {
     return createResponse(201, newNFT);
   }
   
-  async burnNFT(nftId: number, currentOwnerPhone: string, currentUserRoles: string[]): Promise<{ message: string }> {
-    const nft = await this.nftsRepository.findOne({ where: { id: nftId }, relations: ['owner'] });
+  async burnNFT(
+    nftId: number, 
+    currentOwnerIdentifier: string
+  ): Promise<{ message: string }> {
+
+    const nft = await this.nftsRepository.findOne({ 
+      where: { id: nftId }, relations: ['owner'] 
+    });
   
     if (!nft) {
       throw new NotFoundException('NFT not found');
     }
   
-    const isOwner = nft.owner.phone === currentOwnerPhone;
-    const isAdmin = currentUserRoles.includes(UserRole.ADMIN);
+    const isOwner = nft.ownerIdentifier === currentOwnerIdentifier;
   
-    if (!isOwner && !isAdmin) {
+    if (!isOwner) {
       throw new ForbiddenException('Only the owner can burn this NFT'); 
     }
   
@@ -65,7 +69,11 @@ export class NFTsService {
   }
   
   async getNFTById(nftId: number): Promise<ApiResponses<any>> {
-    const nft = await this.nftsRepository.findOne({ where: { id: nftId }, relations: ['creator', 'owner', 'collections'] });
+
+    const nft = await this.nftsRepository.findOne({ 
+      where: { id: nftId }, 
+      relations: ['creator', 'owner', 'collections'] 
+    });
     
     if (!nft) {
       throw new NotFoundException('NFT not found');
@@ -85,8 +93,8 @@ export class NFTsService {
         'nft.price', 
         'nft.createdAt', 
         'nft.updatedAt',
-        'creator.userName', 
-        'owner.userName', 
+        'creator.username', 
+        'owner.username', 
         'collection.id', 
         'collection.name', 
         'collection.description',
