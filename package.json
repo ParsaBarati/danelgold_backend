@@ -4,6 +4,7 @@
   "description": "Denel-Gold",
   "main": "index.js",
   "scripts": {
+
     "build": "node node_modules/@nestjs/cli/bin/nest.js build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",

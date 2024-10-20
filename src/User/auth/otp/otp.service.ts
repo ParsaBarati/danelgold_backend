@@ -23,21 +23,21 @@ export class OtpService {
     },
   });
 
-  async sendOTPToEmail(email: string): Promise<void> {
+  async sendOTPToEmail(email: string): Promise<string> {
     let otp: string = this.generateOTP(); 
 
     const existingOTP = await this.otpRepository.findOne({
       where: { phone: email },
     });
 
-    const mailOptions = {
-      from: 'your-email@example.com',
-      to: email,
-      subject: 'Your OTP Code',
-      text: `Your OTP code is ${otp}`,
-    };
-
-    await this.transporter.sendMail(mailOptions);
+    // const mailOptions = {
+    //   from: 'your-email@example.com',
+    //   to: email,
+    //   subject: 'Your OTP Code',
+    //   text: `Your OTP code is ${otp}`,
+    // };
+    //
+    // await this.transporter.sendMail(mailOptions);
 
     if (existingOTP) {
       existingOTP.otp = await bcrypt.hash(otp, 10);
@@ -56,6 +56,7 @@ export class OtpService {
       });
       await this.otpRepository.save(newOTP);
     }
+    return otp;
     console.log(`OTP sent to email: ${email}`);
   }
 

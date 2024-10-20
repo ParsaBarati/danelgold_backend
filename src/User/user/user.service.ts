@@ -1,21 +1,14 @@
-import { Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm/index';
-import * as bcrypt from 'bcryptjs';
-import { User, UserRole } from '@/User/user/entity/user.entity';
-import { SignupDto } from '@/User/auth/dto/signup-dto';
-import { UpdateUserDTO } from '@/User/user/dto/update-user.dto';
-import { ApiResponses, createResponse } from '@/utils/response.util';
-import { UserInformation } from '@/User/user/interface/userInformation.interface';
-import { Subscribe } from '@/User/subscribe/entity/subscribe.entity';
-import { Token } from '@/User/auth/token/entity/token.entity';
-import { SmsService } from '@/services/sms.service';
-import { editDateUser } from '@/User/user/dto/edit-user-date.dto';
-import { CreateUserByAdminDTO } from './dto/create-user.dto';
-import { PaginationResult } from '@/common/paginate/pagitnate.service';
-import { Post } from '@/Social/Post/posts/entity/posts.entity';
-import { Story } from '@/Social/Story/stories/entity/stories.entity';
-import { Club } from '@/Social/Club/entity/club.entity';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm/index';
+import {User} from '@/User/user/entity/user.entity';
+import {ApiResponses, createResponse} from '@/utils/response.util';
+import {UserInformation} from '@/User/user/interface/userInformation.interface';
+import {Token} from '@/User/auth/token/entity/token.entity';
+import {SmsService} from '@/services/sms.service';
+import {Post} from '@/Social/Post/posts/entity/posts.entity';
+import {Story} from '@/Social/Story/stories/entity/stories.entity';
+import {Club} from '@/Social/Club/entity/club.entity';
 
 @Injectable()
 export class UserService {
@@ -67,11 +60,11 @@ export class UserService {
         'user.profilePic',
         'user.username',
       ])
-      .where('story.expiresAt > :now', { now: new Date() }) 
+      .where('story.expiresAt > :now', { now: new Date() })
       .orderBy('story.createdAt', 'DESC')
-      .limit(10) 
+      .limit(10)
       .getRawMany();
-  
+
     const posts = await this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
@@ -90,11 +83,11 @@ export class UserService {
         'COUNT(comments.id) as commentCount',
         'COUNT(postLikes.id) as likeCount',
       ])
-      .groupBy('post.id, user.id') 
+      .groupBy('post.id, user.id')
       .orderBy('post.createdAt', 'DESC')
-      .limit(10) 
+      .limit(10)
       .getRawMany();
-  
+
     const club = await this.clubRepository
       .createQueryBuilder('club')
       .select([
@@ -104,10 +97,10 @@ export class UserService {
         'club.cover',
         'club.link',
       ])
-      .where('club.id = :id', { id: 1 }) 
+      .where('club.id = :id', { id: 1 })
       .getRawOne();
-  
-    const transformedData = {
+
+  return {
       stories: stories.map((story) => ({
         id: story.story_id,
         thumb: story.story_thumbnail,
@@ -128,40 +121,38 @@ export class UserService {
           username: post.user_username,
         },
         actions: {
-          isSaved: false, 
+          isSaved: false,
           isLiked: post.likeCount > 0,
           isDisliked: false,
-          qr: null, 
+          qr: null,
           buy: null,
         },
         counts: {
           likes: post.likeCount,
           comments: post.commentCount,
-          shares: 0, 
+          shares: 0,
           disliked: post.post_dislikes,
         },
-        likedBy: '', 
+        likedBy: '',
         caption: post.post_caption,
       })),
       club: club
-        ? {
+          ? {
             id: club.club_id,
             name: club.club_name,
             memberCount: club.club_memberCount,
             cover: club.club_cover,
             link: club.club_link,
           }
-        : null,
+          : null,
     };
-  
-    return transformedData;
   }
 
   async getProfileById(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: [
-        'userDetail', 
+        'userDetail',
         'posts',
         'stories',
         'comments',
@@ -183,44 +174,44 @@ export class UserService {
         'club',
       ],
     });
-  
+
     if (!user) {
       throw new Error('User not found');
     }
-  
+
     // Correct the 'where' condition for follow counts
     const followersCount = await this.userRepository.count({
       where: { following: { id: userId } }, // Referencing the 'User' object here
     });
-  
+
     const followingCount = await this.userRepository.count({
       where: { followers: { id: userId } }, // Referencing the 'User' object here
     });
-  
+
     const posts = user.posts.map(post => ({
       id: post.id,
       thumb: post.mediaUrl,
     }));
-  
+
     const stories = user.stories.map(story => ({
       id: story.id,
-      thumb: story.thumbnail, 
+      thumb: story.thumbnail,
       createdAt: story.createdAt,
     }));
-  
+
     const notifications = user.sentNotifications;
-  
+
     const supportTickets = user.supportTickets;
-  
+
     return {
       id: user.id,
       username: user.username,
       profilePic: user.profilePic,
       followers: followersCount,
       following: followingCount,
-      bio: user.userDetail ? user.userDetail : null, 
+      bio: user.userDetail ? user.userDetail : null,
       stories,
-      notifications: user.sentNotifications, 
+      notifications: user.sentNotifications,
       supportTickets: supportTickets.map(ticket => ({
         id: ticket.id,
         title: ticket.title,
@@ -230,6 +221,6 @@ export class UserService {
       settings: notifications ? notifications : null,
     };
   }
-  
-  
+
+
 }
