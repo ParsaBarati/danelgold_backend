@@ -26,7 +26,7 @@ export class UserService {
     private readonly smsService: SmsService,
   ) {}
 
-  async getUserByPhone(Identifier: string): Promise<ApiResponses<UserInformation>> {
+  async getUser(Identifier: string): Promise<ApiResponses<UserInformation>> {
     const user = await this.userRepository.findOne({
       where: [{ phone: Identifier}, { email: Identifier }]
     });
@@ -39,6 +39,8 @@ export class UserService {
       id: user.id,
       phone: user.phone,
       email: user.email,
+      name:user.name,
+      username: user.username,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -48,20 +50,20 @@ export class UserService {
   }
 
   async getHomepageData(): Promise<any> {
-
     const stories = await this.storyRepository
-      .createQueryBuilder('story')
-      .leftJoinAndSelect('story.user', 'user')
+      .createQueryBuilder('stories')
+      .leftJoinAndSelect('stories.user', 'user')
       .select([
-        'story.id',
-        'story.thumbnail',
-        'user.id',
-        'user.username',
-        'user.profilePic',
-        'user.username',
+        'stories.id AS story_id',
+        'stories.thumbnail AS story_thumbnail',
+        'user.id AS user_id',
+        'user.name AS user_name',
+        'user.profilePic AS user_profilePic',
+        'user.username AS user_username',
+        'stories.mediaUrl AS story_media', // Assuming media is a JSON or array column
       ])
-      .where('story.expiresAt > :now', { now: new Date() })
-      .orderBy('story.createdAt', 'DESC')
+      .where('stories.expiresAt IS NULL OR stories.expiresAt > :now', { now: new Date() })
+      .orderBy('stories.createdAt', 'DESC')
       .limit(10)
       .getRawMany();
 
@@ -71,17 +73,18 @@ export class UserService {
       .leftJoinAndSelect('post.postLikes', 'postLikes')
       .leftJoinAndSelect('post.comments', 'comments')
       .select([
-        'post.id',
-        'post.mediaUrl',
-        'post.caption',
-        'post.likes',
-        'post.dislikes',
-        'user.id',
-        'user.username',
-        'user.profilePic',
-        'user.username',
-        'COUNT(comments.id) as commentCount',
-        'COUNT(postLikes.id) as likeCount',
+        'post.id AS post_id',
+        'post.mediaUrl AS post_mediaUrl',
+        'post.caption AS post_caption',
+        'post.likes AS post_likes',
+        'post.dislikes AS post_dislikes',
+        'user.id AS user_id',
+        'user.name AS user_name',
+        'user.profilePic AS user_profilePic',
+        'user.username AS user_username',
+        'COUNT(comments.id) AS comments_count',
+        'COUNT(postLikes.id) AS like_count',
+        'post.createdAt AS createdAt',
       ])
       .groupBy('post.id, user.id')
       .orderBy('post.createdAt', 'DESC')
@@ -91,60 +94,52 @@ export class UserService {
     const club = await this.clubRepository
       .createQueryBuilder('club')
       .select([
-        'club.id',
-        'club.name',
-        'club.memberCount',
-        'club.cover',
-        'club.link',
+        'club.id AS club_id',
+        'club.name AS club_name',
+        'club.memberCount AS club_memberCount',
+        'club.cover AS club_cover',
+        'club.link AS club_link',
       ])
       .where('club.id = :id', { id: 1 })
       .getRawOne();
 
-  return {
+    return {
       stories: stories.map((story) => ({
         id: story.story_id,
-        thumb: story.story_thumbnail,
         user: {
           id: story.user_id,
-          name: `${story.user_username}`,
+          name: story.user_name,
           pic: story.user_profilePic,
           username: story.user_username,
         },
+        thumb: story.story_thumbnail,
+        media: story.story_media, // Ensure this is an array of URLs
       })),
       posts: posts.map((post) => ({
         id: post.post_id,
-        thumb: post.post_mediaUrl,
         user: {
           id: post.user_id,
-          name: `${post.user_username}`,
+          name: post.user_name,
           pic: post.user_profilePic,
           username: post.user_username,
         },
-        actions: {
-          isSaved: false,
-          isLiked: post.likeCount > 0,
-          isDisliked: false,
-          qr: null,
-          buy: null,
-        },
-        counts: {
-          likes: post.likeCount,
-          comments: post.commentCount,
-          shares: 0,
-          disliked: post.post_dislikes,
-        },
-        likedBy: '',
         caption: post.post_caption,
+        img: post.post_mediaUrl,
+        likes: post.post_likes,
+        dislikes: post.post_dislikes,
+        commentsCount: post.comments_count,
+        sharesCount: 0, // If you have a share count, replace this
+        comments: [], // You'll need to fetch and structure comments separately if needed
+        createdAt: post.createdAt,
+        isLiked: false, // Set based on your logic
+        club: club ? {
+          id: club.club_id,
+          name: club.club_name,
+          image: club.club_cover,
+          memberCount: club.club_memberCount,
+        } : null,
+        content: [], // Structure for additional images if needed
       })),
-      club: club
-          ? {
-            id: club.club_id,
-            name: club.club_name,
-            memberCount: club.club_memberCount,
-            cover: club.club_cover,
-            link: club.club_link,
-          }
-          : null,
     };
   }
 
@@ -222,5 +217,14 @@ export class UserService {
     };
   }
 
+  async getAllUsers() {
+    const users = await this.userRepository.find({
+        select: ['username', 'name' ,'id', 'profilePic', 'createdAt'], // Adjust fields as necessary
+    });
 
+    return {
+        statusCode: 200,
+        result: users,
+    };
+}
 }

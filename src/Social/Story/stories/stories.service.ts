@@ -22,30 +22,49 @@ export class StoriesService {
     async createStory(
         userIdentifier: string,
         createStoryDto: CreateStoryDto
-    ):Promise<ApiResponses<Story>>{
+    ): Promise<ApiResponses<any>> {
 
         const { mediaUrl, expiresAt } = createStoryDto;
-
+    
         const user = await this.userRepository.findOne({
-            where: [{ phone: userIdentifier }, { email: userIdentifier }],
+            where: [
+                { phone: userIdentifier }, 
+                { email: userIdentifier }
+            ],
         });
-
-        if(!user){
-            throw new NotFoundException('کاربر یافت نشد')
+    
+        if (!user) {
+            throw new NotFoundException('کاربر یافت نشد');
         }
-
+    
         const story = {
             mediaUrl,
+            thumbnail: mediaUrl,
             expiresAt,
             user,
-            createdAt : new Date()
-        }
-
-        const savedStory = await this.storyRepository.save(story)
-
-        return createResponse(201,savedStory)
+            userIdentifier:userIdentifier,
+            createdAt: new Date(),
+        };
+    
+        const savedStory = await this.storyRepository.save(story);
+    
+        const response = {
+            id: savedStory.id,
+            mediaUrl: savedStory.mediaUrl,
+            thumbnail: savedStory.thumbnail,
+            expiresAt: savedStory.expiresAt,
+            createdAt: savedStory.createdAt,
+            updatedAt: savedStory.updatedAt,
+            likes: savedStory.likes,
+            dislikes: savedStory.dislikes,
+            user: {
+                username: user.username
+            }
+        };
+    
+        return createResponse(201, response);
     }
-
+    
     async updateStory(
         storyId: number,
         currentUserIdentifier: string, 

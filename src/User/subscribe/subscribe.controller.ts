@@ -23,16 +23,16 @@ export class SubscribeController {
     @Req() req: Request, 
     @Body() subscribeDto: SubscribeDto
   ){
-    const userPhone = (req.user as any).result.phone;
-    return await this.subscribeService.subscribeUser(userPhone, subscribeDto);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return await this.subscribeService.subscribeUser(userIdentifier, subscribeDto);
   }
 
   @Delete()
   async unsubscribeUser(
     @Req() req: Request
   ){
-    const userPhone = (req.user as any).result.phone;
-    return this.subscribeService.unsubscribeUser(userPhone);
+    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    return this.subscribeService.unsubscribeUser(userIdentifier);
   }
 
   @Get('send-notif')

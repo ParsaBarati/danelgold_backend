@@ -1,39 +1,49 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Headers,
   Param,
-  Put,
-  Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserByAdminDTO } from './dto/create-user.dto';
-import { UserRole } from './entity/user.entity';
-import { UpdateUserDTO } from './dto/update-user.dto';
-import { Roles } from '@/common/decorators/roles.decorator';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
-import { editDateUser } from './dto/edit-user-date.dto';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 
+ApiTags('User')
+@ApiBearerAuth()
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
 
+  
+  @ApiOperation({summary: 'HomePage'})
   @Get('home')
   async getHomepageData(){
     return await this.userService.getHomepageData()
   }
 
-
-  @Get('user/:phone')
-  async getUserByPhone(
-    @Param('phone') phone: string
+  @ApiOperation({ summary: 'Profile By ID'})
+  @Get('profile/:id')
+  async getProfileById(
+    @Param('id',ParseIntPipe) id: number
   ){
-    return await this.userService.getUserByPhone(phone);
+    return await this.userService.getProfileById(id)
   }
+
+  @ApiExcludeEndpoint()
+  @ApiOperation({ summary: 'Get User Data' })
+  @Get('user/:Identifier')
+  async getUser(
+    @Param('Identifier') Identifier: string
+  ){
+    return await this.userService.getUser(Identifier);
+  }
+
+  @ApiExcludeEndpoint()
+  @ApiOperation({ summary: 'Get All Users'})
+  @Get('all')
+    async getAllUsers(){
+        return this.userService.getAllUsers();
+    }
 
 }

@@ -1,5 +1,5 @@
 import { AuthController } from './auth.controller';
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '@/User/user/user.service';

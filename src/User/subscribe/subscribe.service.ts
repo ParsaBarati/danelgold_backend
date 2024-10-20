@@ -40,12 +40,17 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
   }
 
   async subscribeUser(
-    userPhone: string,
+    userIdentifier: string,
     subscribeDto: SubscribeDto,
   ): Promise<ApiResponses<Subscribe>> {
+
     const { subscription } = subscribeDto;
+
     const existingUser = await this.userRepository.findOne({
-      where: { phone: userPhone },
+      where: [
+        { phone: userIdentifier },
+        { email: userIdentifier }
+      ]
     });
 
     if (!existingUser) {
@@ -68,7 +73,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       endpoint: subscription.endpoint,
       auth: subscription.keys.auth,
       p256dh: subscription.keys.p256dh,
-      userPhone: existingUser.phone,
+      userIdentifier: existingUser.phone || existingUser.email,
       isActive: true,
       user: existingUser,
     });
@@ -78,10 +83,15 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
   }
 
   async unsubscribeUser(
-    userPhone: string,
+    userIdentifier: string,
   ): Promise<{ message: string; statusCode: number }> {
+
     const existingUser = await this.userRepository.findOne({
-      where: { phone: userPhone },
+
+      where: [
+        { phone: userIdentifier },
+        { email: userIdentifier}
+      ]
     });
 
     if (!existingUser) {
@@ -89,7 +99,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     }
 
     const userSubscription = await this.subscribeRepository.findOne({
-      where: { userPhone: userPhone },
+      where: { userIdentifier: userIdentifier },
     });
 
     if (!userSubscription || userSubscription.endpoint === '') {
@@ -126,15 +136,15 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     ]);
 
     if (auctions.length > 0 && users.length > 0) {
-      const userPhones: string[] = users.map((user: any) => user.phone);
+      const userIdentifiers: string[] = users.map((user: any) => user.phone);
 
       for (const acution of auctions) {
         const message = `${acution.title}`;
 
-        console.log('Sending SMS to:', userPhones.join(', '));
+        console.log('Sending SMS to:', userIdentifiers.join(', '));
         console.log('Message:', message);
 
-        await this.smsService.sendClassTimeSMS(userPhones, message);
+        await this.smsService.sendClassTimeSMS(userIdentifiers, message);
       }
 
       console.log('SMS sent successfully');

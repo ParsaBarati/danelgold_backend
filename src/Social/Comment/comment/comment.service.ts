@@ -454,7 +454,7 @@ export class CommentService {
         'comment.postId',
         'comment.likes',
         'comment.dislikes',
-        'comment.userPhone',
+        'comment.userIdentifier',
         'user.username',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
@@ -463,7 +463,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.username ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.username ILIKE :search OR comment.userIdentifier ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -528,7 +528,7 @@ export class CommentService {
         'comment.storyId',
         'comment.likes',
         'comment.dislikes',
-        'comment.userPhone',
+        'comment.userIdentifier',
         'user.username',
       ])
       .orderBy(`comment.${sort}`, sortOrder)
@@ -537,7 +537,7 @@ export class CommentService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(user.username ILIKE :search OR comment.userPhone ILIKE :search)',
+        '(user.username ILIKE :search)',
         { search: `%${search}%` },
       );
     }

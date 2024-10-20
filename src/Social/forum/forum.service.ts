@@ -144,7 +144,7 @@ export class ForumService {
       .select([
         'topics.id',
         'topics.title',
-        'topics.userPhone',
+        'topics.userIdentifier',
         'topics.content',
         'topics.createdAt',
         'topics.updatedAt'
@@ -184,7 +184,7 @@ export class ForumService {
       .createQueryBuilder('forumPosts')
       .select([
         'forumPosts.id',
-        'forumPosts.userPhone',
+        'forumPosts.userIdentifier',
         'forumPosts.content',
         'forumPosts.createdAt',
         'forumPosts.updatedAt'

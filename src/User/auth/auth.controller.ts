@@ -9,8 +9,7 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {TokenService} from './token/token.service';
-import {OtpService} from './otp/otp.service';
+
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -18,8 +17,6 @@ import {OtpService} from './otp/otp.service';
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
-        private readonly otpService: OtpService,
-        private readonly tokenService: TokenService,
     ) {
     }
 
@@ -41,7 +38,7 @@ export class AuthController {
     async checkUsername(
         @Body() {username}: { username: string }
     ) {
-        return await this.authService.chetckUserNameAvailability(username);
+        return await this.authService.checkUserNameAvailability(username);
     }
 
     @ApiCreatedResponse({description: 'Verification code sent'})

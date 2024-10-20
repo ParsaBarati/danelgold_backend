@@ -28,14 +28,14 @@ export class TokenService {
     if (user) {
       const activeTokenCount = await this.tokenRepository
         .createQueryBuilder('token')
-        .where('token.userPhone = :userPhone', { userPhone: user.phone })
+        .where('token.userIdentifier = :userIdentifier', { userIdentifier: user.phone || user.email })
         .getCount();
 
       if (activeTokenCount >= this.maxSessionsPerUser) {
         await this.tokenRepository
           .createQueryBuilder('token')
           .delete()
-          .where('userPhone = :userPhone', { userPhone: user.phone })
+          .where('userIdentifier = :userIdentifier', { userIdentifier: user.phone || user.email})
           .execute();
       }
     }
@@ -43,6 +43,7 @@ export class TokenService {
     const payload = {
       sub: user.phone,
       phone: user.phone,
+      email:user.email,
       username: user.username,
       profilePic: user.profilePic,
       createdAt: user.createdAt,
@@ -76,9 +77,10 @@ export class TokenService {
     return this.maxSessionsPerUser;
   }
 
-  async getTokensByPhone(phone: string): Promise<ApiResponses<Token[]>> {
+  async getTokensByPhone(Identifier: string): Promise<ApiResponses<Token[]>> {
     const user = await this.userRepository.findOneBy({
-      phone: phone,
+      phone: Identifier,
+      email: Identifier
     });
 
     if (!user) {

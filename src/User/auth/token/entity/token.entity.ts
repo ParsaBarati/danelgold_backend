@@ -15,7 +15,7 @@ export class Token {
   id: number;
 
   @Column({ nullable: true})
-  userPhone: string;
+  userIdentifier: string;
 
   @Column()
   token: string;

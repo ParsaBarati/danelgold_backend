@@ -60,7 +60,11 @@ export class AuthService {
     }
 
     async checkUserNameAvailability(username: string): Promise<any> {
-        const existingUserName = await this.userRepository.findOne({where: {username}});
+
+        const existingUserName = await this.userRepository.findOne(
+            {where: {username}
+        });
+
         if (existingUserName !== null) {
             throw new BadRequestException('Username already exists');
         }

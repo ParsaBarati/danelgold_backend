@@ -1,4 +1,4 @@
-import { IsDate, IsString } from "class-validator";
+import { IsDate, IsOptional, IsString } from "class-validator";
 
 
 export class CreateStoryDto{
@@ -8,6 +8,7 @@ export class CreateStoryDto{
     mediaUrl: string;
 
     @IsDate()
-    expiresAt: Date;
+    @IsOptional()
+    expiresAt?: Date;
 
 }

@@ -20,14 +20,17 @@ export class PostService{
     ){}
 
     async createPost(
-        userPhone: string,
+        userIdentifier: string,
         createPostDto:CreatePostDto
     ):Promise<ApiResponses<Post>>{
 
         const { mediaUrl, caption } = createPostDto;
 
         const user = await this.userRepository.findOne({
-            where: {phone: userPhone}
+            where: [
+                {phone: userIdentifier},
+                {email: userIdentifier }
+            ]
         })
 
         if(!user){
@@ -38,17 +41,30 @@ export class PostService{
             mediaUrl,
             caption,
             user,
+            userIdentifier: userIdentifier,
             createdAt : new Date()
         }
 
         const savedPost = await this.postRepository.save(post)
+
+        const response = {
+            id: savedPost.id,
+            mediaUrl: savedPost.mediaUrl,
+            createdAt: savedPost.createdAt,
+            updatedAt: savedPost.updatedAt,
+            likes: savedPost.likes,
+            dislikes: savedPost.dislikes,
+            user: {
+                username: user.username
+            }
+        };
 
         return createResponse(201,savedPost)
     }
 
     async updatePost(
         postId: number,
-        currentUserPhone: string, 
+        currentUserIdentifier: string, 
         updatePostDto: UpdatePostDto
     ):Promise<ApiResponses<Post>>{
 
@@ -58,7 +74,7 @@ export class PostService{
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.userPhone !== currentUserPhone){
+        if(post.userIdentifier !== currentUserIdentifier){
             throw new UnauthorizedException('شما مجاز به ویرایش پست نیستید')
         }
 
@@ -74,7 +90,7 @@ export class PostService{
 
     async deletePost(
         postId: number,
-        currentUserPhone: string
+        currentUserIdentifier: string
     ):Promise<{message: string}>{
 
         const post = await this.postRepository.findOneBy({ id: postId });
@@ -83,7 +99,7 @@ export class PostService{
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.userPhone !== currentUserPhone){
+        if(post.userIdentifier !== currentUserIdentifier){
             throw new UnauthorizedException('شما مجاز به حذف پست نیستید')
         }
 
@@ -93,7 +109,7 @@ export class PostService{
     }
 
     async getPostsByUser(
-        phone: string,
+        Identifier: string,
         postId?: number
     ):Promise<ApiResponses<any>>{
 
@@ -110,7 +126,7 @@ export class PostService{
             'posts.likes',
             'posts.dislikes',
           ])
-          .where('posts.userPhone = :phone', { phone });
+          .where('posts.userIdentifier = :Identifier', { Identifier });
 
           if (postId) {
             queryBuilder.andWhere('posts.id = :postId', { postId });

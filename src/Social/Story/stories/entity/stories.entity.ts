@@ -9,8 +9,8 @@ export class Story {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
-  userPhone: string;
+  @Column({ type: 'varchar', nullable: false })
+  userIdentifier: string;
 
   @Column({ type: 'text' })
   thumbnail: string;
@@ -30,7 +30,7 @@ export class Story {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamp', nullable: true })
   expiresAt: Date;
 
   @OneToMany(() => Comment, comments => comments.story)
@@ -42,7 +42,6 @@ export class Story {
   storyLikes: Relation<likeStory[]>;
 
   @ManyToOne(() => User, user => user.stories)
-  @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
   user: Relation<User>;
 
   @ManyToMany(() => User)

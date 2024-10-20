@@ -27,11 +27,15 @@ export class UserDetailService {
   ) {}
 
   async createUserDetail(
-    userPhone: string,
+    userIdentifier: string,
     userAgent: any,
   ): Promise<UserDetail[]> {
+
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone },
+      where: [
+        { phone: userIdentifier },
+        { email: userIdentifier }
+      ]
     });
 
     if (!user) {
@@ -48,7 +52,7 @@ export class UserDetailService {
   }
 
   async getUserDetail(
-    userPhone: string,
+    userIdentifier: string,
     query: any,
   ): Promise<ApiResponses<PaginationResult<UserDetail>>> {
     const { page, limit, sort, sortOrder } = query;
@@ -56,7 +60,7 @@ export class UserDetailService {
     const queryBuilder = this.userDetailRepository
       .createQueryBuilder('userDetail')
       .leftJoin('userDetail.user', 'user')
-      .where('user.phone = :userPhone', { userPhone });
+      .where('user.phone = :userIdentifier OR user.email = : userIdentifier', { userIdentifier });
 
     if (sort && sortOrder) {
       queryBuilder.orderBy(`userDetail.${sort}`, sortOrder);
@@ -78,11 +82,15 @@ export class UserDetailService {
   }
 
   async updateUserDetail(
-    userPhone: string,
+    userIdentifier: string,
     updateUserDetailDTO: UpdateUserDetailDTO,
   ): Promise<UserDetail> {
+
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone },
+      where: [
+        { phone: userIdentifier },
+        { email: userIdentifier }
+      ]
     });
 
     if (!user) {
@@ -90,7 +98,10 @@ export class UserDetailService {
     }
 
     let userDetail = await this.userDetailRepository.findOne({
-      where: { user: { phone: userPhone } },
+      where: [
+        { user: { phone: userIdentifier }},
+        { user: { email: userIdentifier }}
+      ],
     });
 
     if (!userDetail) {
@@ -105,16 +116,22 @@ export class UserDetailService {
     return await this.userDetailRepository.save(userDetail);
   }
 
-  async deleteUserDetail(userPhone: string): Promise<void> {
+  async deleteUserDetail(userIdentifier: string): Promise<void> {
     const user = await this.userRepository.findOne({
-      where: { phone: userPhone },
+      where: [
+        { phone: userIdentifier },
+        { email: userIdentifier }
+      ]
     });
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');
     }
 
     let userDetail = await this.userDetailRepository.findOne({
-      where: { user: { phone: userPhone } },
+      where: [
+        { user: { phone: userIdentifier }},
+        { user: { email: userIdentifier }}
+      ],
     });
 
     await this.userDetailRepository.remove(userDetail);

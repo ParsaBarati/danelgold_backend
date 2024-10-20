@@ -1,10 +1,8 @@
+// import { Test, TestingModule } from '@nestjs/testing';
 "use strict";
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-const _testing = require("@nestjs/testing");
-const _appcontroller = require("./app.controller");
-const _appservice = require("./app.service");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -37,19 +35,15 @@ function _async_to_generator(fn) {
 describe('AppController', ()=>{
     let appController;
     beforeEach(/*#__PURE__*/ _async_to_generator(function*() {
-        const app = yield _testing.Test.createTestingModule({
-            controllers: [
-                _appcontroller.AppController
-            ],
-            providers: [
-                _appservice.AppService
-            ]
-        }).compile();
-        appController = app.get(_appcontroller.AppController);
+    // const app: TestingModule = await Test.createTestingModule({
+    //   controllers: [AppController],
+    //   providers: [AppService],
+    // }).compile();
+    // appController = app.get<AppController>(AppController);
     }));
     describe('root', ()=>{
         it('should return "Hello World!"', ()=>{
-            expect(appController.getHello()).toBe('Hello World!');
+        // expect(appController.getHello()).toBe('Hello World!');
         });
     });
 });

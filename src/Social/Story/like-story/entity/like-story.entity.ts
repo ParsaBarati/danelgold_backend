@@ -17,7 +17,7 @@ import {
     id: number;
   
     @Column({ type: 'varchar' })
-    userPhone: string;
+    userIdentifier: string;
   
     @Column({ type: 'int', nullable: true, default: 0 })
     isLike: number;
@@ -34,7 +34,6 @@ import {
     story: Relation<Story>;
   
     @ManyToOne(() => User, (user) => user.storyLikes)
-    @JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
     @ApiProperty({ type: () => User })
     user: Relation<User>;
   }

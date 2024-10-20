@@ -7,7 +7,6 @@ import {
   CreateDateColumn, 
   UpdateDateColumn, 
   Relation,
-  JoinColumn
 } from 'typeorm';
 import { User } from '@/User/user/entity/user.entity';
 import { Comment } from '@/Social/Comment/comment/entity/comment.entity';
@@ -19,8 +18,8 @@ export class Post {
 @PrimaryGeneratedColumn()
 id: number;
 
-@Column({ type: 'varchar' })
-userPhone: string;
+@Column({ type: 'varchar', nullable: false })
+userIdentifier: string;
 
 @Column({ type: 'text' })
 mediaUrl: string;
@@ -70,7 +69,6 @@ comments: Relation<Comment[]>;
 postLikes: Relation<likePost[]>;
 
 @ManyToOne(() => User, user => user.posts)
-@JoinColumn({ name: 'userPhone', referencedColumnName: 'phone' })
 @ApiProperty({ type: () => User })
 user: Relation<User>;
 }
