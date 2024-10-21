@@ -196,7 +196,6 @@ export class AuthService {
         };
     }
 
-
     async forgotPassword(email_or_phone_or_username: string): Promise<any> {
         const isPhone = /^[0-9]+$/.test(email_or_phone_or_username);
         const isEmail = /\S+@\S+\.\S+/.test(email_or_phone_or_username);
@@ -277,5 +276,22 @@ export class AuthService {
         await this.userRepository.save(user);
     }
 
+    async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string) {
 
+        if (!token) {
+          throw new UnauthorizedException('No token provided');
+        }
+    
+        if (!appName || !packageName || !version || !buildNumber) {
+          throw new UnauthorizedException('Invalid app details');
+        }
+    
+        return {
+          message: 'Authentication successful',
+          appName,
+          packageName,
+          version,
+          buildNumber,
+        };
+      }
 }

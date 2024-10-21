@@ -1,4 +1,4 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, Post, Req, UseGuards} from '@nestjs/common';
 import {AuthService} from './auth.service';
 import {Public} from '@/common/decorators/public.decorator';
 import {
@@ -9,6 +9,8 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 
 @ApiTags('Auth')
@@ -116,5 +118,14 @@ export class AuthController {
         return await this.authService.resetPassword(password, confirm_password, userId);
     }
 
+    @Post('check')
+    @UseGuards(AuthGuard('jwt'))  
+    async checkAuth(@Req() req: Request) {
+
+      const { appName, packageName, version, buildNumber } = req.body;
+      const token = req.headers.authorization.split(' ')[1]; 
+
+      return await this.authService.checkAuthentication(token, appName, packageName, version, buildNumber);
+    }
 
 }
