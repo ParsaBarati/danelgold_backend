@@ -9,7 +9,7 @@ export class Story {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   userIdentifier: string;
 
   @Column({ type: 'text',nullable: true })
