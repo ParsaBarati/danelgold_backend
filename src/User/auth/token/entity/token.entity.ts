@@ -14,7 +14,7 @@ export class Token {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true})
+  @Column({type:'varchar', nullable: true})
   userIdentifier: string;
 
   @Column()

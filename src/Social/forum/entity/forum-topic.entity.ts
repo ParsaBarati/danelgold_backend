@@ -20,7 +20,7 @@ export class ForumTopic {
   @Column()
   title: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar',nullable: true })
   userIdentifier: string;
 
   @Column('text')

@@ -21,7 +21,7 @@ id: number;
 @Column({ type: 'varchar', nullable: false })
 userIdentifier: string;
 
-@Column({ type: 'text' })
+@Column({ type: 'text',nullable: true })
 mediaUrl: string;
 
 @Column({ type: 'text', nullable: true })

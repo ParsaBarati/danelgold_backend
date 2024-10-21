@@ -26,7 +26,7 @@ export class Subscribe {
   @Column({ type: 'boolean', default: false })
   isActive: boolean;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar',nullable: true })
   userIdentifier: string;
 
   @ManyToOne(() => User, (user) => user.subscribes, { cascade: true })

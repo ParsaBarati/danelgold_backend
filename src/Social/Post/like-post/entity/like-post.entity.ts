@@ -16,7 +16,7 @@ import {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar',nullable: true })
     userIdentifier: string;
   
     @Column({ type: 'int', nullable: true, default: 0 })

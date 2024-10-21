@@ -14,7 +14,7 @@ export class SupportTicket {
   @PrimaryGeneratedColumn()
   id: number;
   
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar',nullable: true })
   userIdentifier: string;
 
   @Column()

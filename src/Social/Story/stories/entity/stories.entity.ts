@@ -12,7 +12,7 @@ export class Story {
   @Column({ type: 'varchar', nullable: false })
   userIdentifier: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text',nullable: true })
   thumbnail: string;
 
   @Column({ type: 'text' })
