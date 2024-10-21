@@ -62,8 +62,9 @@ export class AuthService {
     async checkUserNameAvailability(username: string): Promise<any> {
 
         const existingUserName = await this.userRepository.findOne(
-            {where: {username}
-        });
+            {
+                where: {username}
+            });
 
         if (existingUserName !== null) {
             throw new BadRequestException('Username already exists');
@@ -278,20 +279,25 @@ export class AuthService {
 
     async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string) {
 
+
         if (!token) {
-          throw new UnauthorizedException('No token provided');
+            throw new UnauthorizedException('No token provided');
         }
-    
+
         if (!appName || !packageName || !version || !buildNumber) {
-          throw new UnauthorizedException('Invalid app details');
+            throw new UnauthorizedException('Invalid app details');
         }
-    
+        const user = await this.tokenService.getByToken(token);
+        if (!user){
+            throw new UnauthorizedException('User not found');
+        }
         return {
-          message: 'Authentication successful',
-          appName,
-          packageName,
-          version,
-          buildNumber,
+            message: 'Authentication successful',
+            user: user,
+            appName,
+            packageName,
+            version,
+            buildNumber,
         };
-      }
+    }
 }
