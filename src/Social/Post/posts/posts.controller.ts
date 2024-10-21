@@ -55,7 +55,13 @@ export class PostsController {
       return await this.postService.getPostsByUser(phone, postId);
     }
 
-    @ApiOperation({ summary: 'Explorer' })
+    @ApiOperation({ summary: 'getExplorerWithoutPaginate' })
+    @Get('explorer')
+    async getAllPosts() {
+        return await this.postService.getAllPosts();
+    }
+
+    @ApiOperation({ summary: 'getExplorerWithPaginate' })
     @ApiQuery({ name: 'page', required: false })
     @ApiQuery({ name: 'limit', required: false })
     @Get()

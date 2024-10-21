@@ -26,9 +26,9 @@ export class SearchService {
     const collections = await this.collectionRepository.find({
       where: [
         { name: Like(searchQuery) },
-        // You can add more fields to search in the Collection entity if needed
+
       ],
-      select: ['id', 'name', 'cover'], // Only select the relevant fields
+      select: ['id', 'name', 'cover'],
     });
 
     const users = await this.userRepository.find({

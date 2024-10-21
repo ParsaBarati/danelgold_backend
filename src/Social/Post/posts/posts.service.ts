@@ -137,51 +137,88 @@ export class PostService{
           return createResponse(200,posts)
     }
 
-    async getExplorer(query: any): Promise<any> {
-
-        const { page, limit } = query
-
+    async getAllPosts(): Promise<any> {
         const queryBuilder = this.postRepository
-          .createQueryBuilder('post')
-          .leftJoinAndSelect('post.user', 'user') 
-          .select([
-            'post.id',
-            'post.mediaUrl',
-            'post.caption',
-            'user.id',
-            'user.name',
-            'user.pic',
-            'user.username',
-            'user.email',
-            'user.phone',
-          ])
-          .orderBy('post.createdAt', 'DESC'); 
+            .createQueryBuilder('post')
+            .leftJoinAndSelect('post.user', 'user')
+            .select([
+                'post.id',
+                'post.mediaUrl',
+                'post.caption',
+                'user.id',
+                'user.name',
+                'user.pic',
+                'user.username',
+                'user.email',
+                'user.phone',
+            ])
+            .orderBy('post.createdAt', 'DESC');
+    
+        const posts = await queryBuilder.getMany();
+    
+        const transformedPosts = posts.map((post) => ({
+            id: post.id,
+            img: post.mediaUrl,
+            caption: post.caption,
+            user: {
+                id: post.user.id,
+                name: post.user.name,
+                pic: post.user.profilePic,
+                username: post.user.username,
+                email: post.user.email,
+                phone: post.user.phone,
+            },
+        }));
+    
+        return { posts: transformedPosts };
+    }
+    
+
+    async getExplorer(query: any): Promise<any> {
+        const { page, limit } = query;
+    
+        const queryBuilder = this.postRepository
+            .createQueryBuilder('post')
+            .leftJoinAndSelect('post.user', 'user')
+            .select([
+                'post.id',
+                'post.mediaUrl',
+                'post.caption',
+                'user.id',
+                'user.name',
+                'user.pic',
+                'user.username',
+                'user.email',
+                'user.phone',
+            ])
+            .orderBy('post.createdAt', 'DESC');
     
         const paginationResult = await this.paginationService.paginate(
-          queryBuilder,
-          page,
-          limit,
+            queryBuilder,
+            page,
+            limit,
         );
     
         const transformedPosts = paginationResult.data.map((post) => ({
-          id: post.id,
-          img: post.mediaUrl,
-          caption: post.caption,
-          user: {
-            id: post.user.id,
-            pic: post.user.profilePic,
-            username: post.user.username,
-            email: post.user.email,
-            phone: post.user.phone,
-          },
+            id: post.id,
+            img: post.mediaUrl,
+            caption: post.caption,
+            user: {
+                id: post.user.id,
+                name: post.user.name,  // Ensure 'name' is included
+                pic: post.user.profilePic,     // Fix: use 'pic' instead of 'profilePic'
+                username: post.user.username,
+                email: post.user.email,
+                phone: post.user.phone,
+            },
         }));
     
         return {
-          posts: transformedPosts,
-          total: paginationResult.total,
-          page: paginationResult.page,
-          limit: paginationResult.limit,
-          totalPages: paginationResult.totalPages,
+            currentPage: paginationResult.page,
+            totalPages: paginationResult.totalPages,
+            totalPosts: paginationResult.total,  // Fix: change to 'totalPosts' as in the example response
+            posts: transformedPosts,
         };
     }
+    
 }

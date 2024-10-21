@@ -1,14 +1,15 @@
 import { Controller, Get, Req } from "@nestjs/common";
 import { WalletService } from "./wallet.service";
 import { Request } from "express";
-import { ApiExcludeController } from "@nestjs/swagger";
+import { ApiExcludeController, ApiOperation, ApiTags } from "@nestjs/swagger";
 
-@ApiExcludeController()
+@ApiTags('Wallet')
 @Controller('wallet')
 export class WalletController{
     constructor( private readonly walletService: WalletService){}
 
-    @Get('')
+    @ApiOperation({ summary: 'GetWallet' })
+    @Get()
     async getWallet(
         @Req() req:Request
     ){

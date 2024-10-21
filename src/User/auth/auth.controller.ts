@@ -6,6 +6,7 @@ import {
     ApiBearerAuth,
     ApiConflictResponse,
     ApiCreatedResponse,
+    ApiOperation,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -118,6 +119,7 @@ export class AuthController {
         return await this.authService.resetPassword(password, confirm_password, userId);
     }
 
+    @ApiOperation({ summary: 'Check User Authentication'})
     @Post('check')
     @UseGuards(AuthGuard('jwt'))  
     async checkAuth(@Req() req: Request) {
