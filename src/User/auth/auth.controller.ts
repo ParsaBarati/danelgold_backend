@@ -119,7 +119,8 @@ export class AuthController {
         return await this.authService.resetPassword(password, confirm_password, userId);
     }
 
-    @ApiOperation({ summary: 'Check User Authentication'})
+    @ApiCreatedResponse({ description: 'Check User Authentication'})
+    @Public()
     @Post('check')
     @UseGuards(AuthGuard('jwt'))  
     async checkAuth(@Req() req: Request) {
