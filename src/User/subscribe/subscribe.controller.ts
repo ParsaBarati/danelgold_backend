@@ -23,7 +23,7 @@ export class SubscribeController {
     @Req() req: Request, 
     @Body() subscribeDto: SubscribeDto
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.subscribeService.subscribeUser(userIdentifier, subscribeDto);
   }
 
@@ -31,7 +31,7 @@ export class SubscribeController {
   async unsubscribeUser(
     @Req() req: Request
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return this.subscribeService.unsubscribeUser(userIdentifier);
   }
 

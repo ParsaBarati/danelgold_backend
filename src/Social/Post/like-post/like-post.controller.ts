@@ -20,7 +20,7 @@ export class LikePostController {
     @Req () req: Request,
     ){
 
-    return await this.likePostService.likePost(postId,(req.user as any).result);
+    return await this.likePostService.likePost(postId,(req.user as any));
     }
 
     @Post('/:postId/dislike')
@@ -29,6 +29,6 @@ export class LikePostController {
     @Req () req: Request,
     ){
 
-    return await this.likePostService.dislikePost(postId,(req.user as any).result);
+    return await this.likePostService.dislikePost(postId,(req.user as any));
     }
 }

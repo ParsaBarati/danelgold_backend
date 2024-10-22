@@ -43,7 +43,7 @@ export class NFTsController {
     @Body() mintNFTDataDto: MintNFTDataDto,
     @Req() req: Request,
   ) {
-    const artist = (req.user as any).result.phone;
+    const artist = (req.user as any).phone;
     const NFTImageURL = await this.ipfsService.uploadFileToIPFS(imageURL);
   
     return await this.nftsService.mintNFT(
@@ -56,7 +56,7 @@ export class NFTsController {
 
   @Delete('/:nftId')
   async burnNFT(@Param('nftId') nftId: number, @Req() req: Request) {
-    const currentOwnerIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const currentOwnerIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.nftsService.burnNFT(nftId, currentOwnerIdentifier);
   }
 

@@ -62,7 +62,7 @@ export class UploadController {
     file: Express.Multer.File,
     @Req() req: Request,
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.uploadService.createProfilePictureUpload(file, userIdentifier);
   }
 

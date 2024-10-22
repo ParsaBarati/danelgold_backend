@@ -17,7 +17,7 @@ export class SupportTicketsController {
     @Req() req:Request,
     @Body() createSTDto:CreateSTDto
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.supportTicketsService.createST(userIdentifier,createSTDto)
   }
 
@@ -27,7 +27,7 @@ export class SupportTicketsController {
     @Req() req:Request,
     @Body() updateSTDto: UpdateSTDto
   ){
-    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.supportTicketsService.updateST(
       stId,
       currentUserIdentifier,
@@ -40,7 +40,7 @@ export class SupportTicketsController {
     @Param('stId',ParseIntPipe) stId:number,
     @Req() req:Request,
   ){
-    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.supportTicketsService.removeST(stId,currentUserIdentifier)
   }
 

@@ -28,7 +28,7 @@ export class ReplyController {
     @Req() req: Request, 
     @Body() addReplyDto: CreateReplyDTO
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.replyService.createReply(userIdentifier, addReplyDto);
   }
 
@@ -41,7 +41,7 @@ export class ReplyController {
     @Req() req: Request,
     @Body() updateReplyDto: UpdateReplyDTO,
   ){
-    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.replyService.updateReply(replyId,currentUserIdentifier,updateReplyDto);
   }
 
@@ -53,7 +53,7 @@ export class ReplyController {
     @Param('replyId') replyId: number,
     @Req() req: Request,
   ){
-    const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
     return await this.replyService.deleteReply(replyId,currentUserIdentifier);
   }
 

@@ -17,7 +17,7 @@ export class StoriesController {
         @Req() req: Request,
         @Body() createStoryDto: CreateStoryDto
     ){
-        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const userIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.storyService.createStory(userIdentifier,createStoryDto)
     }
 
@@ -28,7 +28,7 @@ export class StoriesController {
         @Req() req: Request,
         @Body() updateStoryDto: UpdateStoryDto
     ){
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.storyService.updateStory(storyId,currentUserIdentifier,updateStoryDto)
     }
 
@@ -38,7 +38,7 @@ export class StoriesController {
         @Param('id',ParseIntPipe) storyId: number,
         @Req() req: Request, 
     ){
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.storyService.removeStory(storyId,currentUserIdentifier)
     }
 }

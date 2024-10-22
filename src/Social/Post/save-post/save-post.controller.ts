@@ -20,7 +20,7 @@ export class SavePostController {
         @Req() req: Request,
     ) {
 
-        return await this.savePostService.savePost(postId, (req.user as any).result);
+        return await this.savePostService.savePost(postId, (req.user as any));
     }
 
 

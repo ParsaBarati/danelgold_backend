@@ -22,7 +22,7 @@ export class UserController {
     async getHomepageData(
         @Req() req: Request,
     ) {
-        return await this.userService.getHomepageData((req.user as any).result)
+        return await this.userService.getHomepageData((req.user as any))
     }
 
     @ApiOperation({summary: 'reels'})
@@ -31,7 +31,7 @@ export class UserController {
     async getReels(
         @Req() req: Request,
     ) {
-        return await this.userService.getHomepageData((req.user as any).result)
+        return await this.userService.getHomepageData((req.user as any))
     }
 
     @ApiOperation({summary: 'Profile By ID'})
@@ -40,7 +40,7 @@ export class UserController {
         @Param('id', ParseIntPipe) id: number,
         @Req() req: Request,
     ) {
-        return await this.userService.getProfileById(id, (req.user as any).result)
+        return await this.userService.getProfileById(id, (req.user as any))
     }
 
     @ApiOperation({summary: 'Follow'})
@@ -53,17 +53,9 @@ export class UserController {
         @Req() req: Request,
     ) {
 
-        return await this.userService.follow(userId, (req.user as any).result);
+        return await this.userService.follow(userId, (req.user as any));
     }
 
-    @ApiExcludeEndpoint()
-    @ApiOperation({summary: 'Get User Data'})
-    @Get('user/:Identifier')
-    async getUser(
-        @Param('Identifier') Identifier: string
-    ) {
-        return await this.userService.getUser(Identifier);
-    }
 
     @ApiExcludeEndpoint()
     @ApiOperation({summary: 'Get All Users'})
@@ -83,7 +75,7 @@ export class UserController {
         @Req() req: Request,
     ) {
         const {name, bio} = updateUserDTO;
-
-        return await this.userService.update((req.user as any).result, name, bio,);
+        console.log('User: ',req.user)
+        return await this.userService.update(req.user as any, name, bio,);
     }
 }

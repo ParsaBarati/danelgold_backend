@@ -32,7 +32,7 @@ export class PostsController {
         @Req() req: Request,
         @Body() createPostDto: CreatePostDto
     ) {
-        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const userIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.postService.createPost(userIdentifier, createPostDto)
     }
 
@@ -43,7 +43,7 @@ export class PostsController {
         @Req() req: Request,
         @Body() updatePostDto: UpdatePostDto
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.postService.updatePost(postId, currentUserIdentifier, updatePostDto)
     }
 
@@ -54,7 +54,7 @@ export class PostsController {
         @Param('postId', ParseIntPipe) postId: number,
         @Req() req: Request
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.postService.deletePost(postId, currentUserIdentifier)
     }
 
@@ -65,7 +65,7 @@ export class PostsController {
         @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
         @Req() req: Request,
     ) {
-        const phone = (req.user as any).result.phone;
+        const phone = (req.user as any).phone;
         return await this.postService.getPostsByUser(phone, postId);
     }
 
@@ -97,7 +97,7 @@ export class PostsController {
     ) {
         const query = {page, limit};
 
-        return this.commentsService.getCommentsByPost(postId, (req.user as any).result, query);
+        return this.commentsService.getCommentsByPost(postId, (req.user as any), query);
     }
 
     @ApiOperation({summary: 'comments post'})
@@ -107,7 +107,7 @@ export class PostsController {
         @Req() req: Request,
         @Body() createCommentDTO: CreateCommentDTO,
     ) {
-        return await this.commentsService.CommentPost(postId, (req.user as any).result, createCommentDTO);
+        return await this.commentsService.CommentPost(postId, (req.user as any), createCommentDTO);
     }
 } 
 

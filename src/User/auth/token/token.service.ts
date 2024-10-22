@@ -66,6 +66,7 @@ export class TokenService {
     const tokenEntity = await this.tokenRepository.findOne({
       where: { token },
     });
+    console.log('validate is here',tokenEntity);
     return !!tokenEntity;
   }
 

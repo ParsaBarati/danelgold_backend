@@ -13,7 +13,7 @@ export class WalletController{
     async getWallet(
         @Req() req:Request
     ){
-        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const userIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.walletService.getWallet(userIdentifier)
     }
 }

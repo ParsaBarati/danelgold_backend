@@ -44,7 +44,7 @@ export class CommentController {
         @Req() req: Request,
         @Body() createCommentDTO: CreateCommentDTO,
     ) {
-        // const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        // const userIdentifier = (req.user as any).phone || (req.user as any).email;
         // return await this.commentsService.CommentPost(postId, userIdentifier, createCommentDTO);
     }
 
@@ -58,7 +58,7 @@ export class CommentController {
         @Req() req: Request,
         @Body() createCommentDTO: CreateCommentDTO,
     ) {
-        const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const userIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.commentsService.CommentStory(storyId, userIdentifier, createCommentDTO);
     }
 
@@ -71,7 +71,7 @@ export class CommentController {
         @Req() req: Request,
         @Body() updateCommentDto: UpdateCommentDTO,
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.commentsService.updateComment(commentId, currentUserIdentifier, updateCommentDto);
     }
 
@@ -84,7 +84,7 @@ export class CommentController {
         @Param('commentId', ParseIntPipe) commentId: number,
         @Req() req: Request,
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         return await this.commentsService.deleteComment(commentId, currentUserIdentifier);
     }
 
@@ -151,7 +151,7 @@ export class CommentController {
         @Query('sortBy') sort?: string,
         @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         const query = {page, limit, sort, sortOrder};
         return await this.commentsService.getCommentsByPost(
             postId,
@@ -175,7 +175,7 @@ export class CommentController {
         @Query('sortBy') sort?: string,
         @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
     ) {
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
         const query = {page, limit, sort, sortOrder};
         return await this.commentsService.getCommentsByStory(
             storyId,
@@ -193,8 +193,8 @@ export class CommentController {
         @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
         @Req() req: Request,
     ) {
-        const Identifier = (req.user as any).result.phone || (req.user as any).result.email;
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const Identifier = (req.user as any).phone || (req.user as any).email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
 
         return await this.commentsService.getPostCommentsByUser(currentUserIdentifier, Identifier, postId);
     }
@@ -208,8 +208,8 @@ export class CommentController {
         @Query('storyId', new DefaultValuePipe(1), ParseIntPipe) storyId: number | undefined,
         @Req() req: Request,
     ) {
-        const Identifier = (req.user as any).result.phone || (req.user as any).result.email;
-        const currentUserIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+        const Identifier = (req.user as any).phone || (req.user as any).email;
+        const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
 
         return await this.commentsService.getStoryCommentsByUser(currentUserIdentifier, Identifier, storyId);
     }

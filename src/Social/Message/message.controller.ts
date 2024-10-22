@@ -17,7 +17,7 @@ export class MessageController {
         @Req() req: Request
     ) {
 
-        return await this.messageService.getMessage((req.user as any).result)
+        return await this.messageService.getMessage((req.user as any))
     }
 
 
@@ -27,7 +27,7 @@ export class MessageController {
         @Body('content') content: string,
         @Req() req: Request
     ) {
-        return await this.messageService.sendMessage((req.user as any).result, receiverId, content);
+        return await this.messageService.sendMessage((req.user as any), receiverId, content);
     }
 
     @ApiOperation({summary: 'fetchMessagesByOtherUser'})
@@ -36,7 +36,7 @@ export class MessageController {
         @Param('userId', ParseIntPipe) userId: number,
         @Req() req: Request
     ) {
-        return await this.messageService.getMessagesForChat((req.user as any).result.id, userId);
+        return await this.messageService.getMessagesForChat((req.user as any).id, userId);
     }
 
 

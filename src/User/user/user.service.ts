@@ -2,7 +2,6 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm/index';
 import {User} from '@/User/user/entity/user.entity';
-import {ApiResponses, createResponse} from '@/utils/response.util';
 import {UserInformation} from '@/User/user/interface/userInformation.interface';
 import {Token} from '@/User/auth/token/entity/token.entity';
 import {SmsService} from '@/services/sms.service';
@@ -33,17 +32,14 @@ export class UserService {
     ) {
     }
 
-    async getUser(Identifier: string): Promise<ApiResponses<UserInformation>> {
-        const user = await this.userRepository.findOne({
-            where: [{phone: Identifier}, {email: Identifier}]
-        });
+    async getUser(user: any): Promise<UserInformation> {
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        const userInformation: UserInformation = {
-            id: user.id,
+        return {
+            id: user.id ?? user.sub,
             phone: user.phone,
             email: user.email,
             name: user.name,
@@ -52,8 +48,6 @@ export class UserService {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         };
-        const result = userInformation;
-        return createResponse(200, result, null);
     }
 
     async getHomepageData(user: User): Promise<any> {
@@ -263,7 +257,7 @@ export class UserService {
             throw new Error('User not found');
         }
         if (!self) {
-            throw new Error('User not found');
+            throw new Error('Self User not found');
         }
 
         // Correct the 'where' condition for follow counts

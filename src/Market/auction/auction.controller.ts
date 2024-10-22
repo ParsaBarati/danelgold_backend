@@ -19,7 +19,7 @@ export class AuctionsController {
     @Req() req:Request,
     @Body() createAuctionDto: CreateAuctionDto
   ){
-    const creatorPhone = (req.user as any).result.phone;
+    const creatorPhone = (req.user as any).phone;
     return await this.auctionsService.createAuction(creatorPhone,createAuctionDto);
   }
 
@@ -29,7 +29,7 @@ export class AuctionsController {
     @Body() participateAuctionDto: ParticipateAuctionDto,
     @Req() req: Request
   ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
+    const userIdentifier = (req.user as any).phone || (req.user as any).email;
     return this.auctionsService.participateAuction(
       auctionId, 
       participateAuctionDto, 
