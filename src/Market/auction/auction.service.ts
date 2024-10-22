@@ -264,7 +264,7 @@ export class AuctionsService {
      });
 
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
 
     const newBid = this.bidRepository.create({

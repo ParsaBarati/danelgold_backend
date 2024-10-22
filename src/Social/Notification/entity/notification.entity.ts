@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export enum NotificationAction {
   FOLLOW = 'follow',
+  UNFOLLOW = 'unfollow',
   POST = 'post',
   COMMENT = 'comment',
   LIKE = 'like',

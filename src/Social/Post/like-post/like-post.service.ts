@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Post } from '@/Social/Post/posts/entity/posts.entity';
-import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
-import { User } from '@/User/user/entity/user.entity';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {Post} from '@/Social/Post/posts/entity/posts.entity';
+import {likePost} from '@/Social/Post/like-post/entity/like-post.entity';
+import {User} from '@/User/user/entity/user.entity';
 
 @Injectable()
 export class LikePostService {
@@ -14,33 +14,31 @@ export class LikePostService {
         private readonly likePostRepository: Repository<likePost>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-    ){}
+    ) {
+    }
 
     async likePost(
-        postId: number, 
-        userIdentifier: string, 
-      ): Promise<{ isLike: number }> {
-        
+        postId: number,
+        user: User,
+    ): Promise<{ isLike: number }> {
+
         const likablePost = await this.postRepository.findOneBy(
-          {id: postId}
+            {id: postId}
         );
-    
+
         if (!likablePost) {
-            throw new NotFoundException('پستی پیدا نشد!');
+            throw new NotFoundException('Post not found!');
         }
 
-        const user = await this.userRepository.findOne({
-            where: [{ phone: userIdentifier }, { email: userIdentifier }]
-        });
-    
+
         if (!user) {
-            throw new NotFoundException('کاربر یافت نشد');
+            throw new NotFoundException('User not found');
         }
-    
+
         let existingLike = await this.likePostRepository.findOne({
-            where: { post: { id: postId }, user: { id: user.id } },
+            where: {post: {id: postId}, user: {id: user.id}},
         });
-    
+
         if (!existingLike) {
             existingLike = this.likePostRepository.create({
                 post: likablePost,
@@ -61,38 +59,39 @@ export class LikePostService {
                 likablePost.likes++;
             }
         }
-    
-        await this.likePostRepository.save(existingLike);
-        await this.postRepository.save(likablePost);
-    
-        return { isLike: existingLike.isLike };
+
+        try {
+            await this.likePostRepository.save(existingLike);
+            await this.postRepository.save(likablePost);
+        } catch (e) {
+            console.info(e)
+        }
+
+        return {isLike: existingLike.isLike};
     }
-    
+
     async dislikePost(
-      postId: number, 
-      userIdentifier: string, 
+        postId: number,
+        user: User,
     ): Promise<{ isDislike: number }> {
-        
+
         const dislikablePost = await this.postRepository.findOneBy(
-          {id: postId}
+            {id: postId}
         );
-    
+
         if (!dislikablePost) {
             throw new NotFoundException('کامنتی پیدا نشد!');
         }
 
-        const user = await this.userRepository.findOne({
-            where: [{ phone: userIdentifier }, { email: userIdentifier }]
-        });
-    
+
         if (!user) {
-            throw new NotFoundException('کاربر یافت نشد');
+            throw new NotFoundException('User not found');
         }
-    
+
         let existingDislike = await this.likePostRepository.findOne({
-            where: { post: { id: postId }, user: { id: user.id } },
+            where: {post: {id: postId}, user: {id: user.id}},
         });
-    
+
         if (!existingDislike) {
             existingDislike = this.likePostRepository.create({
                 post: dislikablePost,
@@ -113,10 +112,15 @@ export class LikePostService {
                 dislikablePost.dislikes++;
             }
         }
-    
-        await this.likePostRepository.save(existingDislike);
-        await this.postRepository.save(dislikablePost);
-    
-        return { isDislike: existingDislike.isLike };
+
+        try {
+
+            await this.likePostRepository.save(existingDislike);
+            await this.postRepository.save(dislikablePost);
+        } catch (e) {
+
+        }
+
+        return {isDislike: existingDislike.isLike};
     }
 }

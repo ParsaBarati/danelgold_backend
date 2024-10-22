@@ -21,13 +21,16 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({type: 'int', nullable:true })
+  @Column({type: 'int', nullable: true})
   storyId: number;
 
-  @Column({type: 'int', nullable:true })
+  @Column({type: 'int' })
   postId: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({type: 'int' })
+  userId: number;
+
+  @Column({ type: 'text', })
   content: string;
 
   @Column({ type: 'int', default: 0 })

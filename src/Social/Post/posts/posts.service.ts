@@ -1,40 +1,44 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Post } from "./entity/posts.entity";
-import { Repository } from "typeorm";
-import { CreatePostDto } from "./dto/createPost.dto";
-import { ApiResponses, createResponse } from "@/utils/response.util";
-import { User } from "@/User/user/entity/user.entity";
-import { UpdatePostDto } from "./dto/updatePost.dto";
-import { PaginationService } from "@/common/paginate/pagitnate.service";
+import {Injectable, NotFoundException, UnauthorizedException} from "@nestjs/common";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Post} from "./entity/posts.entity";
+import {Repository} from "typeorm";
+import {CreatePostDto} from "./dto/createPost.dto";
+import {ApiResponses, createResponse} from "@/utils/response.util";
+import {User} from "@/User/user/entity/user.entity";
+import {UpdatePostDto} from "./dto/updatePost.dto";
+import {PaginationService} from "@/common/paginate/pagitnate.service";
+import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 
 
 @Injectable()
-export class PostService{
+export class PostService {
     constructor(
+        @InjectRepository(likePost)
+        private likePostRepository: Repository<likePost>,
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly paginationService: PaginationService
-    ){}
+    ) {
+    }
 
     async createPost(
         userIdentifier: string,
-        createPostDto:CreatePostDto
-    ):Promise<ApiResponses<Post>>{
+        createPostDto: CreatePostDto
+    ): Promise<ApiResponses<Post>> {
 
-        const { mediaUrl, caption } = createPostDto;
+        const {mediaUrl, caption} = createPostDto;
 
         const user = await this.userRepository.findOne({
             where: [
                 {phone: userIdentifier},
-                {email: userIdentifier }
+                {email: userIdentifier}
             ]
         })
 
-        if(!user){
-            throw new NotFoundException('کاربر یافت نشد')
+        if (!user) {
+            throw new NotFoundException('User not found')
         }
 
         const post = {
@@ -42,7 +46,7 @@ export class PostService{
             caption,
             user,
             userIdentifier: userIdentifier,
-            createdAt : new Date()
+            createdAt: new Date()
         }
 
         const savedPost = await this.postRepository.save(post)
@@ -59,22 +63,22 @@ export class PostService{
             }
         };
 
-        return createResponse(201,savedPost)
+        return createResponse(201, savedPost)
     }
 
     async updatePost(
         postId: number,
-        currentUserIdentifier: string, 
+        currentUserIdentifier: string,
         updatePostDto: UpdatePostDto
-    ):Promise<ApiResponses<Post>>{
+    ): Promise<ApiResponses<Post>> {
 
-        const post = await this.postRepository.findOneBy({ id: postId })
+        const post = await this.postRepository.findOneBy({id: postId})
 
-        if(!post){
+        if (!post) {
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier){
+        if (post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier) {
             throw new UnauthorizedException('شما مجاز به ویرایش پست نیستید')
         }
 
@@ -85,56 +89,56 @@ export class PostService{
 
         const updatedPost = await this.postRepository.save(post)
 
-        return createResponse(200,updatedPost)
+        return createResponse(200, updatedPost)
     }
 
     async deletePost(
         postId: number,
         currentUserIdentifier: string
-    ):Promise<{message: string}>{
+    ): Promise<{ message: string }> {
 
-        const post = await this.postRepository.findOneBy({ id: postId });
+        const post = await this.postRepository.findOneBy({id: postId});
 
-        if(!post){
+        if (!post) {
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier){
+        if (post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier) {
             throw new UnauthorizedException('شما مجاز به حذف پست نیستید')
         }
 
         await this.postRepository.remove(post)
 
-        return { message : 'با موفقیت حذف گردید'}
+        return {message: 'با موفقیت حذف گردید'}
     }
 
     async getPostsByUser(
         Identifier: string,
         postId?: number
-    ):Promise<ApiResponses<any>>{
+    ): Promise<ApiResponses<any>> {
 
         const queryBuilder = this.postRepository
-          .createQueryBuilder('posts')
-          .leftJoinAndSelect('posts.comment','comment')
-          .leftJoinAndSelect('posts.postLikes','postLikes')
-          .select([
-            'posts.id',
-            'posts.mediaUrl',
-            'posts.caption',
-            'posts.createdAt',
-            'posts.updatedAt',
-            'posts.likes',
-            'posts.dislikes',
-          ])
-          .where('posts.userIdentifier = :Identifier', { Identifier });
+            .createQueryBuilder('posts')
+            .leftJoinAndSelect('posts.comment', 'comment')
+            .leftJoinAndSelect('posts.postLikes', 'postLikes')
+            .select([
+                'posts.id',
+                'posts.mediaUrl',
+                'posts.caption',
+                'posts.createdAt',
+                'posts.updatedAt',
+                'posts.likes',
+                'posts.dislikes',
+            ])
+            .where('posts.userIdentifier = :Identifier', {Identifier});
 
-          if (postId) {
-            queryBuilder.andWhere('posts.id = :postId', { postId });
-          }
+        if (postId) {
+            queryBuilder.andWhere('posts.id = :postId', {postId});
+        }
 
-          const posts = await queryBuilder.getMany();
-          
-          return createResponse(200,posts)
+        const posts = await queryBuilder.getMany();
+
+        return createResponse(200, posts)
     }
 
     async getAllPosts(): Promise<any> {
@@ -153,9 +157,9 @@ export class PostService{
                 'user.phone',
             ])
             .orderBy('post.createdAt', 'DESC');
-    
+
         const posts = await queryBuilder.getMany();
-    
+
         const transformedPosts = posts.map((post) => ({
             id: post.id,
             img: post.mediaUrl,
@@ -169,14 +173,13 @@ export class PostService{
                 phone: post.user.phone,
             },
         }));
-    
-        return { posts: transformedPosts };
+
+        return {posts: transformedPosts};
     }
-    
 
     async getExplorer(query: any): Promise<any> {
-        const { page, limit } = query;
-    
+        const {page, limit} = query;
+
         const queryBuilder = this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
@@ -184,41 +187,64 @@ export class PostService{
                 'post.id',
                 'post.mediaUrl',
                 'post.caption',
+                'post.likes',
+                'post.dislikes',
+                'post.shares',
                 'user.id',
                 'user.name',
-                'user.pic',
+                'user.profilePic',
                 'user.username',
-                'user.email',
-                'user.phone',
+                'post.createdAt',
+                'post.media',
+                'post.content',
             ])
-            .orderBy('post.createdAt', 'DESC');
-    
+            .groupBy('post.id, user.id')
+            .orderBy('post.createdAt', 'DESC')
+
         const paginationResult = await this.paginationService.paginate(
             queryBuilder,
             page,
             limit,
         );
-    
-        const transformedPosts = paginationResult.data.map((post) => ({
-            id: post.id,
-            img: post.mediaUrl,
-            caption: post.caption,
-            user: {
-                id: post.user.id,
-                name: post.user.name,  // Ensure 'name' is included
-                pic: post.user.profilePic,     // Fix: use 'pic' instead of 'profilePic'
-                username: post.user.username,
-                email: post.user.email,
-                phone: post.user.phone,
-            },
-        }));
-    
+        const finalPosts = [];
+        for (const post of paginationResult.data) {
+            let existingLike = await this.likePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: post.id}},
+            });
+            let existingSave = await this.likePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: post.user.id}},
+            });
+            finalPosts.push({
+                content: post.content, // Structure for additional images if needed
+                media: post.media,
+                id: post.id,
+                user: {
+                    id: post.id,
+                    name: post.user.name,
+                    pic: post.user.profilePic,
+                    username: post.user.username,
+                },
+                caption: post.caption,
+                img: post.media,
+                likes: post.likes,
+                dislikes: post.dislikes,
+                commentsCount: 0,
+                sharesCount: post.shares, // If you have a share count, replace this
+                comments: [], // You'll need to fetch and structure comments separately if needed
+                createdAt: post.createdAt,
+                isLiked: (!!existingLike && existingLike.isLike == 1), // Set based on your logic
+                isDisliked: (!!existingLike && existingLike.isLike == -1), // Set based on your logic
+                isSaved: (!!existingSave), // Set based on your logic
+            });
+        }
+
+
         return {
             currentPage: paginationResult.page,
             totalPages: paginationResult.totalPages,
             totalPosts: paginationResult.total,  // Fix: change to 'totalPosts' as in the example response
-            posts: transformedPosts,
+            posts: finalPosts,
         };
     }
-    
+
 }

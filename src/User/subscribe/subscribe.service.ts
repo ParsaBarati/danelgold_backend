@@ -54,7 +54,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (!existingUser) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
 
     console.log(subscription);
@@ -93,7 +93,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
     });
   
     if (!existingUser) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
   
     const userSubscription = await this.subscribeRepository.findOne({

@@ -39,7 +39,7 @@ export class UserDetailService {
     });
 
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
 
     const newUserDetail = this.userDetailRepository.create({
@@ -75,7 +75,7 @@ export class UserDetailService {
     );
 
     if (paginationResult.total === 0) {
-      throw new NotFoundException('اطلاعات کاربر یافت نشد');
+      throw new NotFoundException('اطلاعات User not found');
     }
 
     return createResponse(200, paginationResult);
@@ -94,7 +94,7 @@ export class UserDetailService {
     });
 
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
 
     let userDetail = await this.userDetailRepository.findOne({
@@ -124,7 +124,7 @@ export class UserDetailService {
       ]
     });
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException('User not found');
     }
 
     let userDetail = await this.userDetailRepository.findOne({

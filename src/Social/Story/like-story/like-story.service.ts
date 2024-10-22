@@ -36,7 +36,7 @@ export class LikeStoryService {
         });
     
         if (!user) {
-            throw new NotFoundException('کاربر یافت نشد');
+            throw new NotFoundException('User not found');
         }
     
         let existingLike = await this.likeStoryRepository.findOne({
@@ -88,7 +88,7 @@ export class LikeStoryService {
         })
 
         if(!user){
-            throw new NotFoundException('کاربر یافت نشد')
+            throw new NotFoundException('User not found')
         }
     
         let existingDislike = await this.likeStoryRepository.findOne({

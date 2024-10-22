@@ -43,45 +43,39 @@ export class CommentService {
 
   async CommentPost(
     postId: number,
-    userIdentifier: string,
+    user: User,
     createCommentDTO: CreateCommentDTO,
   ): Promise<ApiResponses<Comment>> {
 
-    const user = await this.userRepository.findOne({
-      where: [{ phone: userIdentifier }, { email: userIdentifier }],
-      select: ['username',],
-    });
 
-    if (userCommentCounts.has(`${userIdentifier}-${postId}`)) {
-      const commentCount =
-        userCommentCounts.get(`${userIdentifier}-${postId}`) || 0;
 
-      if (commentCount >= MAX_COMMENTS_PER_Post) {
-        throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
-      }
-    }
+    // if (userCommentCounts.has(`${userIdentifier}-${postId}`)) {
+    //   const commentCount =
+    //     userCommentCounts.get(`${userIdentifier}-${postId}`) || 0;
+    //
+    //   if (commentCount >= MAX_COMMENTS_PER_Post) {
+    //     throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
+    //   }
+    // }
 
     const post = await this.postRepository.findOne({
       where: {id:postId}
     })
 
     if(!post){
-      throw new NotFoundException('پست یافت نشد')
+      throw new NotFoundException('Post not found')
     }
 
     const newComment = {
-      user: {
-        username: user.username,
-        phone: userIdentifier,
-        email: userIdentifier
-      },
+      userId: user.id,
       postId,
+      // storyId: 0,
       content: createCommentDTO.content,
     };
 
     const createdComment = await this.commentRepository.save(newComment);
 
-    return createResponse(201, createdComment, 'دیدگاه شما ثبت گردید ');
+    return createResponse(201, createdComment, 'Comment saved ');
   }
 
   async CommentStory(
@@ -215,7 +209,7 @@ export class CommentService {
 
   async getCommentsByPost(
     postId: number,
-    currentUserIdentifier: string,
+    user: User,
     query: any,
   ): Promise<ApiResponses<PaginationResult<any>>> {
     const {
@@ -287,11 +281,11 @@ export class CommentService {
     const rawComments = await queryBuilder.getMany();
 
     const processedComments = rawComments.map((comment) => {
-      const isOwner = comment.user.phone === currentUserIdentifier && comment.user.email === currentUserIdentifier;
+      const isOwner = comment.user.id == user.id;
       const canUpdateComment = isOwner
 
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.user.phone === currentUserIdentifier && reply.user.email === currentUserIdentifier;
+        const isReplyOwner = reply.user.id == user.id;
 
         return {
           ...reply,

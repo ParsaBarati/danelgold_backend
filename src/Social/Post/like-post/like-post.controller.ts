@@ -2,8 +2,12 @@ import { Controller, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeController, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikePostService } from '@/Social/Post/like-post/like-post.service';
 import { Request } from 'express';
+import {User} from "@/User/user/entity/user.entity";
 
-@ApiExcludeController()
+// @ApiExcludeController()
+@ApiBearerAuth()
+@ApiTags('Likes')
+
 @Controller('like-post')
 export class LikePostController {
     constructor(private readonly likePostService: LikePostService) {}
@@ -15,8 +19,8 @@ export class LikePostController {
     @Param('postId', ParseIntPipe) postId: number,
     @Req () req: Request,
     ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
-    return await this.likePostService.likePost(postId,userIdentifier);
+
+    return await this.likePostService.likePost(postId,(req.user as any).result);
     }
 
     @Post('/:postId/dislike')
@@ -24,7 +28,7 @@ export class LikePostController {
     @Param('postId', ParseIntPipe) postId: number,
     @Req () req: Request,
     ){
-    const userIdentifier = (req.user as any).result.phone || (req.user as any).result.email;
-    return await this.likePostService.dislikePost(postId,userIdentifier);
+
+    return await this.likePostService.dislikePost(postId,(req.user as any).result);
     }
 }

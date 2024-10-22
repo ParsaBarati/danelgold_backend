@@ -34,7 +34,7 @@ export class StoriesService {
         });
     
         if (!user) {
-            throw new NotFoundException('کاربر یافت نشد');
+            throw new NotFoundException('User not found');
         }
     
         const story = {
@@ -82,7 +82,7 @@ export class StoriesService {
         });
     
         if (!user) {
-            throw new UnauthorizedException('کاربر یافت نشد');
+            throw new UnauthorizedException('User not found');
         }
 
         if(story.user.id !== user.id){
@@ -115,7 +115,7 @@ export class StoriesService {
         });
     
         if (!user) {
-            throw new UnauthorizedException('کاربر یافت نشد');
+            throw new UnauthorizedException('User not found');
         }
 
         if(story.user.id !== user.id ){
