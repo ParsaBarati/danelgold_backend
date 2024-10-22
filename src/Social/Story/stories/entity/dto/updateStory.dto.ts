@@ -1,12 +1,13 @@
-import { IsDate, IsOptional, IsString } from "class-validator";
+import { IsArray, IsDate, IsOptional, IsString } from "class-validator";
 
 
 export class UpdateStoryDto{
 
 
     @IsOptional()
-    @IsString()
-    mediaUrl: string;
+    @IsArray()
+    @IsString({ each: true })
+    mediaUrl?: string[];
 
     @IsOptional()
     @IsDate()

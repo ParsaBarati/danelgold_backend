@@ -12,8 +12,8 @@ export class Story {
   @Column({ type: 'text',nullable: true })
   thumbnail: string;
 
-  @Column({ type: 'text' })
-  mediaUrl: string;
+  @Column({ type: 'simple-array' })
+  mediaUrl: string[];
 
   @Column({ type: 'int', default: 0 })
   likes: number;
@@ -39,6 +39,8 @@ export class Story {
   storyLikes: Relation<likeStory[]>;
 
   @ManyToOne(() => User, user => user.stories)
+  @JoinColumn({ name: 'userId' })
+  @ApiProperty({ type: () => User })
   user: Relation<User>;
 
   @ManyToMany(() => User)

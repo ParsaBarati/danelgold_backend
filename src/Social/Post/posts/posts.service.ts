@@ -74,7 +74,7 @@ export class PostService{
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.userIdentifier !== currentUserIdentifier){
+        if(post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier){
             throw new UnauthorizedException('شما مجاز به ویرایش پست نیستید')
         }
 
@@ -99,7 +99,7 @@ export class PostService{
             throw new NotFoundException('پست یافت نشد')
         }
 
-        if(post.userIdentifier !== currentUserIdentifier){
+        if(post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier){
             throw new UnauthorizedException('شما مجاز به حذف پست نیستید')
         }
 

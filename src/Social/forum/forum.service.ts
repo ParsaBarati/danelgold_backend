@@ -86,7 +86,7 @@ export class ForumService {
       throw new NotFoundException('تاپیک یافت نشد')
     }
 
-    if(topic.userIdentifier !== currentUserIdentifier){
+    if(topic.user.phone !== currentUserIdentifier && topic.user.email !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
     }
 
@@ -112,7 +112,7 @@ export class ForumService {
       throw new NotFoundException('پست در فروم یافت نشد')
     }
 
-    if(post.userIdentifier !== currentUserIdentifier){
+    if(post.user.phone !== currentUserIdentifier && post.user.email !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
     }
 

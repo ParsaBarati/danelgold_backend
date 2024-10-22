@@ -1,11 +1,13 @@
-import { IsDate, IsOptional, IsString } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsDate, IsOptional, IsString } from "class-validator";
 
 
 export class CreateStoryDto{
 
 
-    @IsString()
-    mediaUrl: string;
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsString({ each: true })
+    mediaUrl: string[];
 
     @IsDate()
     @IsOptional()

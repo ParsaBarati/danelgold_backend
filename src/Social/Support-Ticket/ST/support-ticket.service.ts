@@ -55,8 +55,8 @@ export class SupportTicketsService {
       throw new NotFoundException('تیکت پشتیبانی یافت نشد')
     }
 
-    if(ST.userIdentifier !== currentUserIdentifier){
-      throw new UnauthorizedException('شما مجاز به ویرایش نیستید')
+    if (ST.user.phone !== currentUserIdentifier && ST.user.email !== currentUserIdentifier) {
+      throw new UnauthorizedException('شما مجاز به ویرایش نیستید');
     }
 
     if(ST.status !== TicketStatus.OPEN){
@@ -84,7 +84,7 @@ export class SupportTicketsService {
       throw new NotFoundException('تیکت یافت نشد')
     }
 
-    if(ST.userIdentifier !== currentUserIdentifier){
+    if(ST.user.phone !== currentUserIdentifier && ST.user.email !== currentUserIdentifier){
       throw new UnauthorizedException('شما مجاز به حذف نیستید')
     }
 

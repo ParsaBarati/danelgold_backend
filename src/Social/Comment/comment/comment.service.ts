@@ -138,7 +138,7 @@ export class CommentService {
       throw new NotFoundException('کامنتی پیدا نشد!');
     }
 
-    if (comment.userIdentifier !== currentUserIdentifier) {
+    if (comment.user.phone !== currentUserIdentifier && comment.user.email !== currentUserIdentifier) {
       throw new UnauthorizedException('شما مجاز به ویرایش دیدگاه نیستید');
     }
 
@@ -163,7 +163,7 @@ export class CommentService {
       throw new NotFoundException('دیدگاه پیدا نشد');
     }
 
-    if (comment.userIdentifier !== currentUserIdentifier) {
+    if (comment.user.phone !== currentUserIdentifier && comment.user.email !== currentUserIdentifier) {
       throw new UnauthorizedException('شما مجاز به حذف دیدگاه نیستید');
     }
 
@@ -287,11 +287,11 @@ export class CommentService {
     const rawComments = await queryBuilder.getMany();
 
     const processedComments = rawComments.map((comment) => {
-      const isOwner = comment.userIdentifier === currentUserIdentifier;
+      const isOwner = comment.user.phone === currentUserIdentifier && comment.user.email === currentUserIdentifier;
       const canUpdateComment = isOwner
 
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.userIdentifier === currentUserIdentifier;
+        const isReplyOwner = reply.user.phone === currentUserIdentifier && reply.user.email === currentUserIdentifier;
 
         return {
           ...reply,
@@ -393,11 +393,11 @@ export class CommentService {
     const rawComments = await queryBuilder.getMany();
 
     const processedComments = rawComments.map((comment) => {
-      const isOwner = comment.userIdentifier === currentUserIdentifier;
+      const isOwner = comment.user.phone === currentUserIdentifier && comment.user.email === currentUserIdentifier;
       const canUpdateComment = isOwner
 
       const replies = comment.replies.map((reply) => {
-        const isReplyOwner = reply.userIdentifier === currentUserIdentifier;
+        const isReplyOwner = reply.user.phone === currentUserIdentifier && reply.user.email === currentUserIdentifier;
 
         return {
           ...reply,

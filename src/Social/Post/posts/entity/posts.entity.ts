@@ -42,6 +42,9 @@ isLiked: boolean; // New field for isLiked
 @Column({ type: 'boolean', default: false })
 isDisliked: boolean; // New field for isDisliked
 
+@Column({ type: 'boolean',default: false})
+isReel: boolean;
+
 @Column({ type: 'text', nullable: true })
 qrLink: string; // New field for QR link
 

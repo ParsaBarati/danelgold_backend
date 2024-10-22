@@ -39,7 +39,7 @@ export class StoriesService {
     
         const story = {
             mediaUrl,
-            thumbnail: mediaUrl,
+            thumbnail: mediaUrl[0],
             expiresAt,
             user,
             userIdentifier:userIdentifier,

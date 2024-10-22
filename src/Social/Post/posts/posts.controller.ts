@@ -11,7 +11,7 @@ import { UpdatePostDto } from './dto/updatePost.dto';
 export class PostsController {
     constructor( private readonly postService: PostService){}
 
-    @ApiExcludeEndpoint()
+    @ApiOperation({ summary: 'Create Post'})
     @Post()
     async createPost(
         @Req() req:Request,
@@ -21,7 +21,6 @@ export class PostsController {
         return await this.postService.createPost(userIdentifier,createPostDto)
     }
 
-    @ApiExcludeEndpoint()
     @ApiOperation({ summary: 'UpdatePost' })
     @Put()
     async updatePost(

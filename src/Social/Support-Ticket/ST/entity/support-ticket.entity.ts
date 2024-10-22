@@ -38,5 +38,6 @@ export class SupportTicket {
   rsts: Relation<RST[]>
 
   @ManyToOne(() => User, (user) => user.supportTickets)
+  @ApiProperty({ type: () => User })
   user: Relation<User>;
 }

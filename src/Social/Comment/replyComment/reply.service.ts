@@ -76,7 +76,7 @@ export class ReplyService{
           throw new NotFoundException('پاسخ پیدا نشد');
         }
 
-        if (reply.userIdentifier !== currentUserIdentifier) {
+        if (reply.user.phone !== currentUserIdentifier && reply.user.email !== currentUserIdentifier) {
           throw new UnauthorizedException('شما اجازه حذف این پاسخ را ندارید');
         }
     
@@ -102,7 +102,7 @@ export class ReplyService{
           where: [{ phone: currentUserIdentifier }, { email: currentUserIdentifier }]
         });
 
-        if (reply.userIdentifier !== currentUserIdentifier) {
+        if (reply.user.phone !== currentUserIdentifier && reply.user.email !== currentUserIdentifier) {
           throw new UnauthorizedException('شما اجازه حذف این پاسخ را ندارید');
         }
     
