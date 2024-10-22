@@ -1,124 +1,110 @@
-import {Injectable, NotFoundException,} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
-import {Token} from './entity/token.entity';
-import {JwtService} from '@nestjs/jwt';
-import {User} from '@/User/user/entity/user.entity';
-import {ApiResponses, createResponse} from '@/utils/response.util';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Token } from './entity/token.entity';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '@/User/user/entity/user.entity';
+import { ApiResponses, createResponse } from '@/utils/response.util';
 
 @Injectable()
 export class TokenService {
-    private readonly maxSessionsPerUser: number;
+  private readonly maxSessionsPerUser: number;
 
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
-        @InjectRepository(Token)
-        private readonly tokenRepository: Repository<Token>,
-        private readonly jwtService: JwtService,
-    ) {
-        this.maxSessionsPerUser = 1;
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Token)
+    private readonly tokenRepository: Repository<Token>,
+    private readonly jwtService: JwtService,
+  ) {
+    this.maxSessionsPerUser = 1;
+  }
+
+  async createToken(user: User): Promise<string> {
+    if (user) {
+      const activeTokenCount = await this.tokenRepository
+        .createQueryBuilder('token')
+        .where('token.user = :userId', { userId: user.id })
+        .getCount();
+
+      if (activeTokenCount >= this.maxSessionsPerUser) {
+        await this.tokenRepository
+          .createQueryBuilder('token')
+          .delete()
+          .where('user = :userId', { userId: user.id })
+          .execute();
+      }
     }
 
-    async createToken(user: User): Promise<string> {
+    const payload = {
+      sub: user.id,
+      phone: user.phone,
+      email: user.email,
+      username: user.username,
+      profilePic: user.profilePic,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
+    };
 
-        if (user) {
-            const activeTokenCount = await this.tokenRepository
-                .createQueryBuilder('token')
-                .where('token.userIdentifier = :userIdentifier', {userIdentifier: user.phone || user.email})
-                .getCount();
+    const token = this.jwtService.sign(payload);
 
-            if (activeTokenCount >= this.maxSessionsPerUser) {
-                await this.tokenRepository
-                    .createQueryBuilder('token')
-                    .delete()
-                    .where('userIdentifier = :userIdentifier', {userIdentifier: user.phone || user.email})
-                    .execute();
-            }
-        }
+    const tokenEntity = new Token();
+    tokenEntity.token = token;
+    tokenEntity.createdAt = new Date();
+    tokenEntity.user = user; // Correctly assign user relation
 
-        const payload = {
-            sub: user.phone,
-            phone: user.phone,
-            email: user.email,
-            username: user.username,
-            profilePic: user.profilePic,
-            createdAt: user.createdAt,
-            lastLogin: user.lastLogin,
-        };
+    await this.tokenRepository.save(tokenEntity);
 
-        const token = this.jwtService.sign(payload);
+    return token;
+  }
 
-        const tokenEntity = new Token();
-        tokenEntity.token = token;
-        tokenEntity.createdAt = new Date();
-        tokenEntity.userIdentifier = user.phone || user.email;
-        tokenEntity.user = user;
+  async deleteToken(token: string): Promise<void> {
+    await this.tokenRepository.delete({ token });
+  }
 
-        await this.tokenRepository.save(tokenEntity);
+  async validateToken(token: string): Promise<boolean> {
+    const tokenEntity = await this.tokenRepository.findOne({
+      where: { token },
+    });
+    return !!tokenEntity;
+  }
 
-        return token;
+  async getByToken(token: string): Promise<User | null> {
+    const tokenEntity = await this.tokenRepository.findOne({
+      where: { token },
+      relations: ['user'], // Include user relation
+    });
+
+    if (!tokenEntity || !tokenEntity.user) {
+      return null;
     }
 
-    async deleteToken(token: string): Promise<void> {
-        await this.tokenRepository.delete({token});
+    const user = tokenEntity.user;
+    if (!user) {
+      await this.tokenRepository.delete(tokenEntity);
+      return null;
     }
 
-    async validateToken(token: string): Promise<boolean> {
-        const tokenEntity = await this.tokenRepository.findOne({
-            where: {token},
-        });
-        return !!tokenEntity;
+    return user;
+  }
+
+  async getMaxSessionsPerUser(): Promise<number> {
+    return this.maxSessionsPerUser;
+  }
+
+  async getTokensByPhone(identifier: string): Promise<ApiResponses<Token[]>> {
+    const user = await this.userRepository.findOne({
+      where: [{ phone: identifier }, { email: identifier }], // Search by phone or email
+    });
+
+    if (!user) {
+      throw new NotFoundException('کاربر پیدا نشد!');
     }
 
-    async getByToken(token: string): Promise<User> {
-        console.log(token)
-        const tokenEntity = await this.tokenRepository.findOne({
-            where: {token},
-        });
-        if (tokenEntity.userIdentifier.toString().length > 0) {
-            const isPhone = /^[0-9]+$/.test(tokenEntity.userIdentifier);
-            const isEmail = /\S+@\S+\.\S+/.test(tokenEntity.userIdentifier);
-            let user;
-            if (isEmail) {
-                user = await this.userRepository.findOne({
-                    where: {
-                        email: tokenEntity.userIdentifier,
-                    },
-                });
-            } else {
-                user = await this.userRepository.findOne({
-                    where: {
-                        phone: tokenEntity.userIdentifier,
-                    },
-                });
-            }
-            if (!user) {
-                await this.tokenRepository.delete(tokenEntity);
-                return null;
-            }
-            return user;
-        } else {
-            await this.tokenRepository.delete(tokenEntity);
-            return null;
-        }
-    }
+    const tokens = await this.tokenRepository.find({
+      where: { user: user },
+    });
 
-    async getMaxSessionsPerUser(): Promise<number> {
-        return this.maxSessionsPerUser;
-    }
-
-    async getTokensByPhone(Identifier: string): Promise<ApiResponses<Token[]>> {
-        const user = await this.userRepository.findOneBy({
-            phone: Identifier,
-            email: Identifier
-        });
-
-        if (!user) {
-            throw new NotFoundException('کاربر پیدا نشد!');
-        }
-        const tokens = await this.tokenRepository.find();
-
-        return createResponse(200, tokens);
-    }
+    return createResponse(200, tokens);
+  }
 }

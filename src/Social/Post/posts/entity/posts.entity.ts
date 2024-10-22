@@ -18,9 +18,6 @@ export class Post {
 @PrimaryGeneratedColumn()
 id: number;
 
-@Column({ type: 'varchar', nullable: false })
-userIdentifier: string;
-
 @Column({ type: 'text',nullable: true })
 mediaUrl: string;
 

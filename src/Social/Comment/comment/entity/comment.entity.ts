@@ -21,9 +21,6 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  userIdentifier: string;
-
   @Column({type: 'int', nullable:true })
   storyId: number;
 

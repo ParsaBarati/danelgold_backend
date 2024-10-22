@@ -13,9 +13,6 @@ export enum TicketStatus {
 export class SupportTicket {
   @PrimaryGeneratedColumn()
   id: number;
-  
-  @Column({ type: 'varchar',nullable: true })
-  userIdentifier: string;
 
   @Column()
   title: string;

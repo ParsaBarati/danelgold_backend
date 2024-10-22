@@ -73,7 +73,6 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       endpoint: subscription.endpoint,
       auth: subscription.keys.auth,
       p256dh: subscription.keys.p256dh,
-      userIdentifier: existingUser.phone || existingUser.email,
       isActive: true,
       user: existingUser,
     });
@@ -85,31 +84,32 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
   async unsubscribeUser(
     userIdentifier: string,
   ): Promise<{ message: string; statusCode: number }> {
-
+  
     const existingUser = await this.userRepository.findOne({
-
       where: [
         { phone: userIdentifier },
-        { email: userIdentifier}
+        { email: userIdentifier }
       ]
     });
-
+  
     if (!existingUser) {
       throw new NotFoundException('کاربر یافت نشد');
     }
-
+  
     const userSubscription = await this.subscribeRepository.findOne({
-      where: { userIdentifier: userIdentifier },
+      where: { user: { id: existingUser.id } }, // Correct condition
     });
-
+    
+  
     if (!userSubscription || userSubscription.endpoint === '') {
       throw new BadRequestException('ساب اسکرایپ یافت نشد');
     }
-
+  
     await this.subscribeRepository.remove(userSubscription);
-
+  
     return { message: 'اشتراک با موفقیت حذف شد', statusCode: 200 };
   }
+  
 
   async SendSMSCron(): Promise<void> {
     const currentTimestamp = new Date();

@@ -16,9 +16,6 @@ export class Bid {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
-  userIdentifier: string;
-
   @Column( { type: 'int' })
   auctionId: number;
 

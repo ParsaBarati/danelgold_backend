@@ -48,12 +48,6 @@ export class Auction {
   @Column({ type: 'boolean', default: false, nullable: true })
   isSms: boolean | null;
 
-  @Column( { type: 'varchar'} )
-  creatorIdentifier: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  highestBidderIdentifier: string | null;
-
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 

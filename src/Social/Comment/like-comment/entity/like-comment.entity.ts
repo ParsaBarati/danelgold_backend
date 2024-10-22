@@ -16,9 +16,6 @@ export class likeComment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
-  userIdentifier: string;
-
   @Column({ type: 'int', nullable: true, default: 0 })
   isLike: number;
 

@@ -16,9 +16,6 @@ export class ForumPost {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar',nullable: true })
-  userIdentifier: string;
-
   @Column('text')
   content: string;
 

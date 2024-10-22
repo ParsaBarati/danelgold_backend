@@ -15,10 +15,7 @@ import {
 export class Reply {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'varchar',nullable: true })
-  userIdentifier: string;
-
+  
   @Column({ type: 'text' })
   content: string;
 

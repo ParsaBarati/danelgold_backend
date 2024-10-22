@@ -13,10 +13,7 @@ import { User } from '@/User/user/entity/user.entity';
 export class Token {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({type:'varchar', nullable: true})
-  userIdentifier: string;
-
+  
   @Column()
   token: string;
 

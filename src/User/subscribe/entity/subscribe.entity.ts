@@ -26,9 +26,6 @@ export class Subscribe {
   @Column({ type: 'boolean', default: false })
   isActive: boolean;
 
-  @Column({ type: 'varchar',nullable: true })
-  userIdentifier: string;
-
   @ManyToOne(() => User, (user) => user.subscribes, { cascade: true })
   @ApiProperty({ type: () => User })
   user: Relation<User>;
