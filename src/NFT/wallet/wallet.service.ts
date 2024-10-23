@@ -5,6 +5,7 @@ import {Wallet} from './entity/wallet.entity';
 import {NFT} from '@/NFT/nft/entity/nft.entity';
 import {CryptoEntity} from '../Crypto/entity/crypto.entity';
 import {User} from "@/User/user/entity/user.entity";
+import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 
 @Injectable()
 export class WalletService {
@@ -13,6 +14,8 @@ export class WalletService {
         private readonly walletRepository: Repository<Wallet>,
         @InjectRepository(CryptoEntity)
         private readonly cryptoRepository: Repository<CryptoEntity>,
+        @InjectRepository(CryptoBalanceEntity)
+        private readonly cryptoBalanceEntityRepository: Repository<CryptoBalanceEntity>,
         @InjectRepository(NFT)
         private readonly nftRepository: Repository<NFT>,
     ) {
@@ -30,10 +33,22 @@ export class WalletService {
             .getMany();
 
         const cryptos = await this.cryptoRepository
-            .createQueryBuilder('cryptos')
-            .leftJoinAndSelect('cryptos.user', 'user')
-            .where('crypto.userId = :userId', {userId})
-            .getMany();
+            .createQueryBuilder('crypto')
+            .leftJoinAndSelect('crypto.balances', 'balances')
+            .leftJoinAndSelect('balances.user', 'user')
+            .where('user.id = :userId', { userId })
+            .orWhere('balances.id IS NULL')
+            .select([
+                'crypto.id AS id',             // Select crypto.id
+                'crypto.logo AS logo',         // Select crypto.logo
+                'crypto.name AS name',         // Select crypto.name
+                'crypto.price AS price',       // Select crypto.price
+                'COALESCE(balances.balance, 0) AS balance'  // Select balance with default 0
+            ])
+            .getRawMany();  // Use getRawMany() to get raw results
+
+
+
 
         const nfts = await this.nftRepository
             .createQueryBuilder('nft')
@@ -49,6 +64,7 @@ export class WalletService {
             isSelected: wallet.isSelected,
         }));
 
+
         const transformedCryptos = cryptos.map((crypto) => ({
             id: crypto.id,
             logo: crypto.logo,
@@ -63,7 +79,7 @@ export class WalletService {
             imgUrl: nft.image,
             creator: {
                 id: nft.creator.id,
-                name: `${nft.creator.username} ${nft.creator.username}`,
+                name: `${nft.creator.name}`,
                 username: nft.creator.username,
                 pic: nft.creator.profilePic,
             },

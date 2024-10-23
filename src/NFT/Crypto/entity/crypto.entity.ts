@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Relation } from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Relation, OneToMany} from 'typeorm';
 import { User } from '@/User/user/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 
 @Entity('cryptos')
 export class CryptoEntity {
@@ -13,16 +14,13 @@ export class CryptoEntity {
   @Column({ type: 'varchar' })
   logo: string;
 
-  @Column({ type: 'decimal', precision: 18, scale: 8 })
-  balance: number;
-
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   price: number; 
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.cryptos)
-  @ApiProperty({ type: () => User })
-  user: Relation<User>;
+  @OneToMany(() => CryptoBalanceEntity, (crypto) => crypto.crypto)
+  @ApiProperty({ type: () => CryptoBalanceEntity })
+  balances: Relation<CryptoBalanceEntity>;
 }

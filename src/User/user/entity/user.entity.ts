@@ -34,6 +34,7 @@ import {Wallet} from '@/NFT/wallet/entity/wallet.entity';
 import {CryptoEntity} from '@/NFT/Crypto/entity/crypto.entity';
 import {FollowUser} from '@/Social/Follow/entity/follow.entity';
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -182,9 +183,9 @@ export class User {
     @ApiProperty({type: () => [Wallet]})
     wallets: Relation<Wallet[]>;
 
-    @OneToMany(() => CryptoEntity, (cryptos) => cryptos.user)
-    @ApiProperty({type: () => [CryptoEntity]})
-    cryptos: Relation<CryptoEntity[]>;
+    @OneToMany(() => CryptoBalanceEntity, (cryptos) => cryptos.user)
+    @ApiProperty({type: () => [CryptoBalanceEntity]})
+    cryptoBalances: Relation<CryptoBalanceEntity[]>;
 
     @ManyToOne(() => Club, (club) => club.members)
     @ApiProperty({type: () => Club})
