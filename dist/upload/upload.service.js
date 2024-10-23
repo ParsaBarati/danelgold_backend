@@ -263,24 +263,14 @@ let UploadService = class UploadService {
             return (0, _responseutil.createResponse)(200, filePath);
         })();
     }
-    createProfilePictureUpload(file, Identifier) {
+    createProfilePictureUpload(file, user) {
         var _this = this;
         return _async_to_generator(function*() {
             if (!file) {
-                throw new _common.NotFoundException('پارامتر ارسالی صحیح نیست');
+                throw new _common.NotFoundException('File not found');
             }
-            const user = yield _this.userRepository.findOne({
-                where: [
-                    {
-                        phone: Identifier
-                    },
-                    {
-                        email: Identifier
-                    }
-                ]
-            });
             if (!user) {
-                throw new _common.NotFoundException('کاربر یافت نشد');
+                throw new _common.NotFoundException('User not found');
             }
             const newUpload = _this.uploadRepository.create({
                 name: file.filename,
@@ -295,7 +285,7 @@ let UploadService = class UploadService {
                 link: user.profilePic,
                 profilePic: user.profilePic
             });
-            return (0, _responseutil.createResponse)(200, uploadWithLink, 'عکس پروفایل با موفقیت آپلود شد');
+            return (0, _responseutil.createResponse)(200, uploadWithLink, 'Profile picture uploaded successfully!');
         })();
     }
     constructor(uploadRepository, userRepository, paginationService){

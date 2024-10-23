@@ -73,8 +73,7 @@ let UploadController = class UploadController {
     createProfilePictureUpload(file, req) {
         var _this = this;
         return _async_to_generator(function*() {
-            const userIdentifier = req.user.result.phone || req.user.result.email;
-            return yield _this.uploadService.createProfilePictureUpload(file, userIdentifier);
+            return yield _this.uploadService.createProfilePictureUpload(file, req.user);
         })();
     }
     getAllUploads(page, limit, search, sort, sortOrder) {
@@ -141,7 +140,7 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createUpload", null);
 _ts_decorate([
-    (0, _common.Post)('picture'),
+    (0, _common.Post)('profile-pic'),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),
     _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
         maxSize: 5 * 1024 * 1024
@@ -235,7 +234,6 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "getUploadById", null);
 UploadController = _ts_decorate([
-    (0, _swagger.ApiExcludeController)(),
     (0, _common.Controller)('upload'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

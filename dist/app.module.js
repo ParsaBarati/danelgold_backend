@@ -59,6 +59,9 @@ const _notificationmodule = require("./Social/Notification/notification.module")
 const _walletmodule = require("./NFT/wallet/wallet.module");
 const _cryptoentity = require("./NFT/Crypto/entity/crypto.entity");
 const _followentity = require("./Social/Follow/entity/follow.entity");
+const _likepostmodule = require("./Social/Post/like-post/like-post.module");
+const _savepostmodule = require("./Social/Post/save-post/save-post.module");
+const _savepostentity = require("./Social/Post/save-post/entity/save-post.entity");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -172,7 +175,8 @@ AppModule = _ts_decorate([
                 _likepostentity.likePost,
                 _likestoryentity.likeStory,
                 _cryptoentity.CryptoEntity,
-                _followentity.FollowUser
+                _followentity.FollowUser,
+                _savepostentity.savePost
             ]),
             _auctionmodule.AuctionModule,
             _collectionmodule.CollectionEntityModule,
@@ -190,6 +194,8 @@ AppModule = _ts_decorate([
             _pintamodule.PinataModule,
             _storiesmodule.StoriesModule,
             _postsmodule.PostsModule,
+            _likepostmodule.LikePostModule,
+            _savepostmodule.SavePostModule,
             _RSTmodule.RSTModule,
             _messagemodule.MessageModule,
             _notificationmodule.NotificationModule,

@@ -25,9 +25,19 @@ export class MessageController {
     async sendMessage(
         @Body('receiverId') receiverId: number,
         @Body('content') content: string,
-        @Req() req: Request
+        @Req() req: Request,
+        @Body('storyId') storyId?: number,
+        @Body('postId') postId?: number,
+        @Body('replyId') replyId?: number,
     ) {
-        return await this.messageService.sendMessage((req.user as any), receiverId, content);
+        return await this.messageService.sendMessage(
+            (req.user as any), 
+            receiverId, 
+            content,
+            storyId,
+            postId,
+            replyId
+        );
     }
 
     @ApiOperation({summary: 'fetchMessagesByOtherUser'})

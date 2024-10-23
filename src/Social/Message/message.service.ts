@@ -113,11 +113,13 @@ export class MessageService {
         };
     }
 
-
     async sendMessage(
         user: User,
         receiverId: number,
-        content: string
+        content: string,
+        storyId?: number,
+        postId?: number,
+        replyId?: number
     ): Promise<any> {
         // Ensure sender and receiver are valid
         const sender = user;
@@ -126,13 +128,23 @@ export class MessageService {
         if (!sender || !receiver) {
             throw new NotFoundException('Sender or Receiver not found');
         }
-
+        
         // Create a new message
         const message = this.messageRepository.create();
         message.sender = sender;
         message.receiver = receiver;
         message.content = content;
 
+        if (storyId) {
+            message.storyId = storyId;
+        }
+        if (postId) {
+            message.postId = postId;
+        }
+        if (replyId) {
+            message.replyId = replyId;
+        }
+    
         // Save the message in the database
         await this.messageRepository.save(message);
 
@@ -143,6 +155,9 @@ export class MessageService {
                 content: message.content,
                 sender: message.sender,
                 receiver: message.receiver,
+                storyId: message.storyId,  // Include optional fields in the response
+                postId: message.postId,
+                replyId: message.replyId,
                 timestamp: message.createdAt
             }
         };
