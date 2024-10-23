@@ -104,17 +104,17 @@ export class UserService {
             .limit(10)
             .getRawMany();
     
-        const club = await this.clubRepository
-            .createQueryBuilder('club')
-            .select([
-                'club.id AS club_id',
-                'club.name AS club_name',
-                'club.memberCount AS club_memberCount',
-                'club.cover AS club_cover',
-                'club.link AS club_link',
-            ])
-            .where('club.id = :id', { id: 1 })
-            .getRawOne();
+        // const club = await this.clubRepository
+        //     .createQueryBuilder('club')
+        //     .select([
+        //         'club.id AS club_id',
+        //         'club.name AS club_name',
+        //         'club.memberCount AS club_memberCount',
+        //         'club.cover AS club_cover',
+        //         'club.link AS club_link',
+        //     ])
+        //     .where('club.id = :id', { id: 1 })
+        //     .getRawOne();
     
         const finalPosts = [];
         for (const post of posts) {
@@ -145,14 +145,14 @@ export class UserService {
                 isLiked: !!existingLike && existingLike.isLike == 1,
                 isDisliked: !!existingLike && existingLike.isLike == -1,
                 isSaved: !!existingSave,
-                club: club
-                    ? {
-                          id: club.club_id,
-                          name: club.club_name,
-                          image: club.club_cover,
-                          memberCount: club.club_memberCount,
-                      }
-                    : null,
+                // club: club
+                //     ? {
+                //           id: club.club_id,
+                //           name: club.club_name,
+                //           image: club.club_cover,
+                //           memberCount: club.club_memberCount,
+                //       }
+                //     : null,
             });
         }
     
@@ -171,6 +171,7 @@ export class UserService {
             })),
         };
     }
+    
     
     async getReels(user: User): Promise<any> {
 
