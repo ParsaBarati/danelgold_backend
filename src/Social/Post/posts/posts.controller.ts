@@ -71,8 +71,10 @@ export class PostsController {
 
     @ApiOperation({summary: 'getExplorerWithoutPaginate'})
     @Get('explorer')
-    async getAllPosts() {
-        return await this.postService.getAllPosts();
+    async getAllPosts(
+        @Req() req:Request
+    ) {
+        return await this.postService.getAllPosts((req.user as any));
     }
 
     @ApiOperation({summary: 'getExplorerWithPaginate'})
@@ -82,9 +84,10 @@ export class PostsController {
     async getExplorer(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+        @Req() req: Request
     ) {
         const query = {page, limit};
-        return this.postService.getExplorer(query);
+        return this.postService.getExplorer(query,(req.user as any));
     }
 
     @ApiOperation({summary: 'comments'})

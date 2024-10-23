@@ -8,6 +8,7 @@ import {User} from "@/User/user/entity/user.entity";
 import {UpdatePostDto} from "./dto/updatePost.dto";
 import {PaginationService} from "@/common/paginate/pagitnate.service";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
+import { FollowUser } from "@/Social/Follow/entity/follow.entity";
 
 
 @Injectable()
@@ -19,6 +20,8 @@ export class PostService {
         private readonly postRepository: Repository<Post>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @InjectRepository(FollowUser)
+        private readonly followUserRepository: Repository<FollowUser>,
         private readonly paginationService: PaginationService
     ) {
     }
@@ -141,7 +144,17 @@ export class PostService {
         return createResponse(200, posts)
     }
 
-    async getAllPosts(): Promise<any> {
+    async getAllPosts(user: User): Promise<any> {
+        // Fetch the list of user IDs that the current user follows
+        const followingIds = await this.followUserRepository
+            .createQueryBuilder('follow')
+            .select('follow.followingId')
+            .where('follow.followerId = :userId', { userId: user.id })
+            .getRawMany();
+    
+        const followingUserIds = followingIds.map(follow => follow.followingId);
+    
+        // Modify the query to fetch posts only from users the current user follows
         const queryBuilder = this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
@@ -151,15 +164,16 @@ export class PostService {
                 'post.caption',
                 'user.id',
                 'user.name',
-                'user.pic',
+                'user.profilePic',
                 'user.username',
                 'user.email',
                 'user.phone',
             ])
+            .where('user.id IN (:...followingUserIds)', { followingUserIds })
             .orderBy('post.createdAt', 'DESC');
-
+    
         const posts = await queryBuilder.getMany();
-
+    
         const transformedPosts = posts.map((post) => ({
             id: post.id,
             img: post.mediaUrl,
@@ -173,13 +187,23 @@ export class PostService {
                 phone: post.user.phone,
             },
         }));
-
-        return {posts: transformedPosts};
+    
+        return { posts: transformedPosts };
     }
-
-    async getExplorer(query: any): Promise<any> {
-        const {page, limit} = query;
-
+    
+    async getExplorer(query: any, user: User): Promise<any> {
+        const { page, limit } = query;
+    
+        // Fetch the list of user IDs that the current user follows
+        const followingIds = await this.followUserRepository
+            .createQueryBuilder('follow')
+            .select('follow.followingId')
+            .where('follow.followerId = :userId', { userId: user.id })
+            .getRawMany();
+    
+        const followingUserIds = followingIds.map(follow => follow.followingId);
+    
+        // Modify the query to fetch posts only from users the current user follows
         const queryBuilder = this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
@@ -198,24 +222,26 @@ export class PostService {
                 'post.media',
                 'post.content',
             ])
+            .where('user.id IN (:...followingUserIds)', { followingUserIds })
             .groupBy('post.id, user.id')
-            .orderBy('post.createdAt', 'DESC')
-
+            .orderBy('post.createdAt', 'DESC');
+    
         const paginationResult = await this.paginationService.paginate(
             queryBuilder,
             page,
             limit,
         );
+    
         const finalPosts = [];
         for (const post of paginationResult.data) {
             let existingLike = await this.likePostRepository.findOne({
-                where: {post: {id: post.id}, user: {id: post.id}},
+                where: { post: { id: post.id }, user: { id: post.id } },
             });
             let existingSave = await this.likePostRepository.findOne({
-                where: {post: {id: post.id}, user: {id: post.user.id}},
+                where: { post: { id: post.id }, user: { id: post.user.id } },
             });
             finalPosts.push({
-                content: post.content, // Structure for additional images if needed
+                content: post.content,
                 media: post.media,
                 id: post.id,
                 user: {
@@ -229,22 +255,22 @@ export class PostService {
                 likes: post.likes,
                 dislikes: post.dislikes,
                 commentsCount: 0,
-                sharesCount: post.shares, // If you have a share count, replace this
-                comments: [], // You'll need to fetch and structure comments separately if needed
+                sharesCount: post.shares,
+                comments: [],
                 createdAt: post.createdAt,
-                isLiked: (!!existingLike && existingLike.isLike == 1), // Set based on your logic
-                isDisliked: (!!existingLike && existingLike.isLike == -1), // Set based on your logic
-                isSaved: (!!existingSave), // Set based on your logic
+                isLiked: (!!existingLike && existingLike.isLike == 1),
+                isDisliked: (!!existingLike && existingLike.isLike == -1),
+                isSaved: (!!existingSave),
             });
         }
-
-
+    
         return {
             currentPage: paginationResult.page,
             totalPages: paginationResult.totalPages,
-            totalPosts: paginationResult.total,  // Fix: change to 'totalPosts' as in the example response
+            totalPosts: paginationResult.total,
             posts: finalPosts,
         };
     }
+    
 
 }

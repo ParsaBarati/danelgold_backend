@@ -15,9 +15,22 @@ import {SearchController} from "@/search/search.controller";
 import {NFT} from "@/NFT/nft/entity/nft.entity";
 import {CollectionEntity} from "@/Market/collection/entity/collection.entity";
 import {SearchService} from "@/search/search.service";
+import { FollowUser } from '@/Social/Follow/entity/follow.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Post, User, Comment, Story, Reply, likeComment, Comment, likePost, NFT, CollectionEntity])],
+    imports: [TypeOrmModule.forFeature([
+        Post, 
+        User, 
+        Comment, 
+        Story, 
+        Reply, 
+        likeComment, 
+        Comment, 
+        likePost, 
+        NFT, 
+        CollectionEntity,
+        FollowUser
+    ])],
     controllers: [PostsController, SearchController],
     providers: [PostService, PaginationService, CommentService, SearchService]
 })

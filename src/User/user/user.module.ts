@@ -10,6 +10,7 @@ import {Story} from "@/Social/Story/stories/entity/stories.entity";
 import {Club} from "@/Social/Club/entity/club.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
+import { savePost } from "@/Social/Post/save-post/entity/save-post.entity";
 
 
 @Module({
@@ -17,6 +18,7 @@ import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
         User,
         Token,
         Post,
+        savePost,
         Story,
         Club,
         FollowUser,

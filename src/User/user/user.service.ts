@@ -10,6 +10,7 @@ import {Story} from '@/Social/Story/stories/entity/stories.entity';
 import {Club} from '@/Social/Club/entity/club.entity';
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
+import { savePost } from '@/Social/Post/save-post/entity/save-post.entity';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,8 @@ export class UserService {
         private likePostRepository: Repository<likePost>,
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
+        @InjectRepository(savePost)
+        private readonly savePostRepository: Repository<savePost>,
         @InjectRepository(Story)
         private readonly storyRepository: Repository<Story>,
         @InjectRepository(Club)
@@ -51,9 +54,11 @@ export class UserService {
     }
 
     async getHomepageData(user: User): Promise<any> {
+        // Fetch followed users' stories
         const stories = await this.storyRepository
             .createQueryBuilder('stories')
             .leftJoinAndSelect('stories.user', 'user')
+            .leftJoin('follow', 'f', 'f.followingId = stories.userId')
             .select([
                 'stories.id AS story_id',
                 'stories.thumbnail AS story_thumbnail',
@@ -61,18 +66,21 @@ export class UserService {
                 'user.name AS user_name',
                 'user.profilePic AS user_profilePic',
                 'user.username AS user_username',
-                'stories.mediaUrl AS story_media', // Assuming media is a JSON or array column
+                'stories.mediaUrl AS story_media',
             ])
-            .where('stories.expiresAt IS NULL OR stories.expiresAt > :now', {now: new Date()})
+            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
+            .andWhere('f.followerId = :userId', { userId: user.id }) // Only stories from followed users
             .orderBy('stories.createdAt', 'DESC')
             .limit(10)
             .getRawMany();
-
+    
+        // Fetch followed users' posts
         const posts = await this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.postLikes', 'postLikes')
             .leftJoinAndSelect('post.comments', 'comments')
+            .leftJoin('follow', 'f', 'f.followingId = post.userId')
             .select([
                 'post.id AS post_id',
                 'post.mediaUrl AS post_mediaUrl',
@@ -90,11 +98,12 @@ export class UserService {
                 'post.media AS post_media',
                 'post.content AS post_content',
             ])
+            .where('f.followerId = :userId', { userId: user.id }) // Only posts from followed users
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC')
             .limit(10)
             .getRawMany();
-
+    
         const club = await this.clubRepository
             .createQueryBuilder('club')
             .select([
@@ -104,18 +113,19 @@ export class UserService {
                 'club.cover AS club_cover',
                 'club.link AS club_link',
             ])
-            .where('club.id = :id', {id: 1})
+            .where('club.id = :id', { id: 1 })
             .getRawOne();
+    
         const finalPosts = [];
         for (const post of posts) {
             let existingLike = await this.likePostRepository.findOne({
-                where: {post: {id: post.post_id}, user: {id: user.id}},
+                where: { post: { id: post.post_id }, user: { id: user.id } },
             });
-            let existingSave = await this.likePostRepository.findOne({
-                where: {post: {id: post.post_id}, user: {id: user.id}},
+            let existingSave = await this.savePostRepository.findOne({
+                where: { post: { id: post.post_id }, user: { id: user.id } },
             });
             finalPosts.push({
-                content: post.post_content, // Structure for additional images if needed
+                content: post.post_content,
                 media: post.media,
                 id: post.post_id,
                 user: {
@@ -129,23 +139,25 @@ export class UserService {
                 likes: post.post_likes,
                 dislikes: post.post_dislikes,
                 commentsCount: post.comments_count,
-                sharesCount: post.post_shares, // If you have a share count, replace this
-                comments: [], // You'll need to fetch and structure comments separately if needed
+                sharesCount: post.post_shares,
+                comments: [],
                 createdAt: post.createdAt,
-                isLiked: (!!existingLike && existingLike.isLike == 1), // Set based on your logic
-                isDisliked: (!!existingLike && existingLike.isLike == -1), // Set based on your logic
-                isSaved: (!!existingSave), // Set based on your logic
-                club: club ? {
-                    id: club.club_id,
-                    name: club.club_name,
-                    image: club.club_cover,
-                    memberCount: club.club_memberCount,
-                } : null,
+                isLiked: !!existingLike && existingLike.isLike == 1,
+                isDisliked: !!existingLike && existingLike.isLike == -1,
+                isSaved: !!existingSave,
+                club: club
+                    ? {
+                          id: club.club_id,
+                          name: club.club_name,
+                          image: club.club_cover,
+                          memberCount: club.club_memberCount,
+                      }
+                    : null,
             });
         }
+    
         return {
             posts: finalPosts,
-
             stories: stories.map((story) => ({
                 id: story.story_id,
                 user: {
@@ -159,6 +171,7 @@ export class UserService {
             })),
         };
     }
+    
     async getReels(user: User): Promise<any> {
 
         const posts = await this.postRepository
