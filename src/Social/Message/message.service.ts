@@ -152,7 +152,7 @@ export class MessageService {
         if (receiver.firebaseToken) {
             this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
                 content: message.content,
-            },"");
+            }, message.content.substring(0, 100));
         }
         return {
             message: 'Message sent successfully',
