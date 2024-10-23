@@ -277,7 +277,7 @@ export class AuthService {
         await this.userRepository.save(user);
     }
 
-    async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string) {
+    async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string, firebaseToken: string) {
 
 
         if (!token) {
@@ -288,9 +288,11 @@ export class AuthService {
             throw new UnauthorizedException('Invalid app details');
         }
         const user = await this.tokenService.getByToken(token);
-        if (!user){
+        if (!user) {
             throw new UnauthorizedException('User not found');
         }
+        user.firebaseToken = firebaseToken;
+        await  this.userRepository.save(user);
         return {
             message: 'Authentication successful',
             user: user,

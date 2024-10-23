@@ -6,12 +6,11 @@ import {
     ApiBearerAuth,
     ApiConflictResponse,
     ApiCreatedResponse,
-    ApiOperation,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import {AuthGuard} from '@nestjs/passport';
+import {Request} from 'express';
 
 
 @ApiTags('Auth')
@@ -119,16 +118,16 @@ export class AuthController {
         return await this.authService.resetPassword(password, confirm_password, userId);
     }
 
-    @ApiCreatedResponse({ description: 'Check User Authentication'})
+    @ApiCreatedResponse({description: 'Check User Authentication'})
     @Public()
     @Post('check')
-    @UseGuards(AuthGuard('jwt'))  
+    @UseGuards(AuthGuard('jwt'))
     async checkAuth(@Req() req: Request) {
 
-      const { appName, packageName, version, buildNumber } = req.body;
-      const token = req.headers.authorization.split(' ')[1]; 
+        const {appName, packageName, version, buildNumber, token} = req.body;
+        const headerToken = req.headers.authorization.split(' ')[1];
 
-      return await this.authService.checkAuthentication(token, appName, packageName, version, buildNumber);
+        return await this.authService.checkAuthentication(headerToken, appName, packageName, version, buildNumber, token);
     }
 
 }

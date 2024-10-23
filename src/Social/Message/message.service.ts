@@ -3,6 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Message} from "./entity/message.entity";
 import {Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
+import {NotificationService} from "@/Social/Notification/notification.service";
 
 
 @Injectable()
@@ -12,6 +13,7 @@ export class MessageService {
         private messageRepository: Repository<Message>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        private notification: NotificationService,
     ) {
     }
 
@@ -39,7 +41,7 @@ export class MessageService {
                 'receiver.name',
                 'receiver.username',
             ])
-            .where('message.senderId = :userId OR message.receiverId = :userId', { userId })
+            .where('message.senderId = :userId OR message.receiverId = :userId', {userId})
             .distinctOn(['message.senderId', 'message.receiverId'])  // Ensure unique chats
             .orderBy('message.senderId')  // Match the DISTINCT ON columns
             .addOrderBy('message.receiverId')  // Match the DISTINCT ON columns
@@ -89,8 +91,8 @@ export class MessageService {
             .createQueryBuilder('message')
             .leftJoinAndSelect('message.sender', 'sender')   // Ensure sender data is loaded
             .leftJoinAndSelect('message.receiver', 'receiver') // Ensure receiver data is loaded
-            .where('(message.senderId = :senderId AND message.receiverId = :receiverId)', { senderId, receiverId })
-            .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', { senderId, receiverId })
+            .where('(message.senderId = :senderId AND message.receiverId = :receiverId)', {senderId, receiverId})
+            .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', {senderId, receiverId})
             .orderBy('message.createdAt', 'ASC')  // Sort messages by creation date
             .getMany();
 
@@ -128,7 +130,7 @@ export class MessageService {
         if (!sender || !receiver) {
             throw new NotFoundException('Sender or Receiver not found');
         }
-        
+
         // Create a new message
         const message = this.messageRepository.create();
         message.sender = sender;
@@ -144,10 +146,14 @@ export class MessageService {
         if (replyId) {
             message.replyId = replyId;
         }
-    
+
         // Save the message in the database
         await this.messageRepository.save(message);
-
+        if (receiver.firebaseToken) {
+            this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
+                content: message.content,
+            },"");
+        }
         return {
             message: 'Message sent successfully',
             messageDetails: {
