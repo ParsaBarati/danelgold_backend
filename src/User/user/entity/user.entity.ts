@@ -31,7 +31,6 @@ import {Club} from '@/Social/Club/entity/club.entity';
 import {Message} from '@/Social/Message/entity/message.entity';
 import {Notification} from '@/Social/Notification/entity/notification.entity';
 import {Wallet} from '@/NFT/wallet/entity/wallet.entity';
-import {CryptoEntity} from '@/NFT/Crypto/entity/crypto.entity';
 import {FollowUser} from '@/Social/Follow/entity/follow.entity';
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
@@ -63,6 +62,9 @@ export class User {
 
     @Column({type: 'text'})
     password: string;
+
+    @Column({type: 'text', nullable: true})
+    firebaseToken: string;
 
     @Column({type: 'boolean', default: false})
     isVerified: boolean; // New field to mark user verification status
