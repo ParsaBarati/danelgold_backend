@@ -11,11 +11,15 @@ import {Story} from "@/Social/Story/stories/entity/stories.entity";
 import {Reply} from "@/Social/Comment/replyComment/entity/reply.entity";
 import {likeComment} from "@/Social/Comment/like-comment/entity/like-comment.entity";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
+import {SearchController} from "@/search/search.controller";
+import {NFT} from "@/NFT/nft/entity/nft.entity";
+import {CollectionEntity} from "@/Market/collection/entity/collection.entity";
+import {SearchService} from "@/search/search.service";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Post, User, Comment, Story, Reply, likeComment, Comment, likePost])],
-    controllers: [PostsController],
-    providers: [PostService, PaginationService, CommentService]
+    imports: [TypeOrmModule.forFeature([Post, User, Comment, Story, Reply, likeComment, Comment, likePost, NFT, CollectionEntity])],
+    controllers: [PostsController, SearchController],
+    providers: [PostService, PaginationService, CommentService, SearchService]
 })
 export class PostsModule {
 }
