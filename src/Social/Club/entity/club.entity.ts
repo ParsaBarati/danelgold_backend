@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, Relation } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, Relation, ManyToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@/User/user/entity/user.entity';
 
@@ -25,7 +25,7 @@ export class Club {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => User, (user) => user.phone)
+  @ManyToMany(() => User, (user) => user.clubs)
   @ApiProperty({ type: () => [User] })
   members: Relation<User[]>;
 }

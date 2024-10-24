@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    ManyToMany,
     ManyToOne,
     OneToMany,
     OneToOne,
@@ -189,8 +190,8 @@ export class User {
     @ApiProperty({type: () => [CryptoBalanceEntity]})
     cryptoBalances: Relation<CryptoBalanceEntity[]>;
 
-    @ManyToOne(() => Club, (club) => club.members)
+    @ManyToMany(() => Club, (clubs) => clubs.members)
     @ApiProperty({type: () => Club})
-    club: Relation<Club>;
+    clubs: Relation<Club>;
 
 }
