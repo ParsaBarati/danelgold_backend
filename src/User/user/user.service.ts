@@ -150,6 +150,7 @@ export class UserService {
                           id: club.club_id,
                           name: club.club_name,
                           image: club.club_cover,
+                          link: club.club_link,
                           memberCount: club.club_memberCount,
                       }
                     : null,
