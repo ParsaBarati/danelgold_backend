@@ -198,8 +198,9 @@ export class PostService {
             .where('follow.followerId = :userId', {userId: user.id})
             .getRawMany();
 
-        const followingUserIds = followingIds.map(follow => follow.followingId);
-
+        console.log('followingUserIds')
+        console.log(followingIds)
+        const followingUserIds = followingIds.map(follow => follow.follow_followingId);
         if (followingUserIds.length === 0) {
             // Return an empty result if the user is not following anyone
             return {

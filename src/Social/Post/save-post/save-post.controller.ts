@@ -1,4 +1,4 @@
-import {Controller, Param, ParseIntPipe, Post, Req} from '@nestjs/common';
+import {Controller, Get, Param, ParseIntPipe, Post, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
 import {User} from "@/User/user/entity/user.entity";
@@ -21,6 +21,16 @@ export class SavePostController {
     ) {
 
         return await this.savePostService.savePost(postId, (req.user as any));
+    }
+
+    @ApiOperation({summary: 'Saved Posts'})
+    @ApiOkResponse({description: 'List', example: {statusCode: 200}})
+    @Get()
+    async getSavedPosts(
+        @Req() req: Request,
+    ) {
+
+        return await this.savePostService.getSavedPosts((req.user as any));
     }
 
 

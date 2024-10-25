@@ -44,7 +44,7 @@ export class SavePostService {
         console.log(existingSave)
 
         if (!existingSave) {
-            console.log(postId,user)
+            console.log(postId, user)
             const save = await this.savePostRepository.create({
                 postId: postId,
                 userId: user.id,
@@ -66,4 +66,54 @@ export class SavePostService {
 
         return {saves: saveblePost.saves};
     }
+
+    async getSavedPosts(user: User): Promise<any[]> {
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Preload the saved posts with related user and post data, along with likes and saves
+        const savedPosts = await this.savePostRepository.find({
+            where: {user: {id: user.id}},
+            relations: ['post', 'post.user', 'post.postLikes'],
+        });
+
+        return savedPosts.map(savedPost => {
+            const post = savedPost.post;
+
+            // Check if the user liked or disliked the post
+            const userLike = post.postLikes.find(function (like) {
+                console.log(like)
+                return like.userId === user.id;
+            });
+            const isLiked = !!userLike && userLike.isLike === 1;
+            const isDisliked = !!userLike && userLike.isLike === -1;
+
+            // Check if the user has saved the post
+
+            return {
+                content: post.content,
+                media: post.media,
+                id: post.id,
+                user: {
+                    id: post.user.id,
+                    name: post.user.name,
+                    pic: post.user.profilePic,
+                    username: post.user.username,
+                },
+                caption: post.caption,
+                img: post.mediaUrl,
+                likes: post.likes,
+                dislikes: post.dislikes,
+                commentsCount: 0,
+                sharesCount: post.shares,
+                comments: [], // Populate this with actual comments if needed
+                createdAt: post.createdAt,
+                isLiked,
+                isDisliked,
+                isSaved: true,
+            };
+        });
+    }
+
 }

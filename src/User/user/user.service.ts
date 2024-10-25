@@ -335,6 +335,7 @@ export class UserService {
             id: story.id,
             thumb: story.thumbnail,
             createdAt: story.createdAt,
+            mediaUrl: story.mediaUrl,
             user: {
                 id: user.id,
                 name: user.name ?? user.username,

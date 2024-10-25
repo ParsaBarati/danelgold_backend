@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { LessThan, Repository } from 'typeorm';
+import {LessThan, MoreThan, Repository} from 'typeorm';
 import { Story } from './entity/stories.entity';
 import { CreateStoryDto } from './entity/dto/createStory.dto';
 import { ApiResponses, createResponse } from '@/utils/response.util';
@@ -31,7 +31,36 @@ export class StoriesService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-    
+        const recentStory = await this.storyRepository.findOne({
+            where: {
+                user: {id: user.id},
+                createdAt: MoreThan(new Date(Date.now() - 24 * 60 * 60 * 1000)) // آخرین ۲۴ ساعت
+            },
+        });
+        console.log(recentStory)
+
+        if (recentStory) {
+            // اگر استوری اخیر وجود داشت، mediaUrl جدید را اضافه کرده و استوری جدیدی ثبت نمی‌کنیم
+            recentStory.mediaUrl = [...recentStory.mediaUrl, ...mediaUrl];
+            const updatedStory = await this.storyRepository.save(recentStory);
+
+            const response = {
+                id: updatedStory.id,
+                mediaUrl: updatedStory.mediaUrl,
+                thumbnail: updatedStory.thumbnail,
+                expiresAt: updatedStory.expiresAt,
+                createdAt: updatedStory.createdAt,
+                updatedAt: updatedStory.updatedAt,
+                likes: updatedStory.likes,
+                dislikes: updatedStory.dislikes,
+                user: {
+                    username: user.username
+                }
+            };
+
+            return createResponse(200, response);
+        }
+
         const story = {
             mediaUrl: mediaUrl,
             thumbnail: mediaUrl[0],
