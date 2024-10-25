@@ -52,6 +52,7 @@ import {FollowUser} from './Social/Follow/entity/follow.entity';
 import {LikePostModule} from "@/Social/Post/like-post/like-post.module";
 import {SavePostModule} from "@/Social/Post/save-post/save-post.module";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
 
 
 @Module({
@@ -119,6 +120,7 @@ import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
         StoriesModule,
         PostsModule,
         LikePostModule,
+        LikeStoryModule,
         SavePostModule,
         RSTModule,
         MessageModule,

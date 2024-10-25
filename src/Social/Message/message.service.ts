@@ -124,7 +124,7 @@ export class MessageService {
         replyId?: number
     ): Promise<any> {
         // Ensure sender and receiver are valid
-        const sender = user;
+        const sender = await this.userRepository.findOne({where: {id: user.id}});
         const receiver = await this.userRepository.findOne({where: {id: receiverId}});
 
         if (!sender || !receiver) {
@@ -148,10 +148,20 @@ export class MessageService {
         }
 
         // Save the message in the database
-        await this.messageRepository.save(message);
+        const sentMessage = await this.messageRepository.save(message);
         if (receiver.firebaseToken) {
             this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
-                content: message.content,
+                type: "message",
+                message: JSON.stringify({
+                    id: sentMessage.id,
+                    timestamp: sentMessage.createdAt,
+                    content: sentMessage.content,
+                    storyId: message.storyId,  // Include optional fields in the response
+                    postId: message.postId,
+                    replyId: message.replyId,
+                    sender: sender,
+
+                }),
             }, message.content.substring(0, 100));
         }
         return {

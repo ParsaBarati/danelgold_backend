@@ -32,8 +32,7 @@ export class PostsController {
         @Req() req: Request,
         @Body() createPostDto: CreatePostDto
     ) {
-        const userIdentifier = (req.user as any).phone || (req.user as any).email;
-        return await this.postService.createPost(userIdentifier, createPostDto)
+        return await this.postService.createPost(req.user as any, createPostDto)
     }
 
     @ApiOperation({summary: 'UpdatePost'})

@@ -13,6 +13,7 @@ export class Story {
   thumbnail: string;
 
   @Column({ type: 'simple-array' })
+
   mediaUrl: string[];
 
   @Column({ type: 'int', default: 0 })

@@ -8,7 +8,7 @@ import {User} from "@/User/user/entity/user.entity";
 import {UpdatePostDto} from "./dto/updatePost.dto";
 import {PaginationService} from "@/common/paginate/pagitnate.service";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import { FollowUser } from "@/Social/Follow/entity/follow.entity";
+import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 
 
 @Injectable()
@@ -27,28 +27,25 @@ export class PostService {
     }
 
     async createPost(
-        userIdentifier: string,
+        user: User,
         createPostDto: CreatePostDto
     ): Promise<ApiResponses<Post>> {
 
         const {mediaUrl, caption} = createPostDto;
 
-        const user = await this.userRepository.findOne({
-            where: [
-                {phone: userIdentifier},
-                {email: userIdentifier}
-            ]
-        })
-
         if (!user) {
             throw new NotFoundException('User not found')
         }
 
+
+        const media = mediaUrl.shift();
         const post = {
-            mediaUrl,
+            mediaUrl: media,
+            media: media,
+            content: mediaUrl   ,
             caption,
             user,
-            userIdentifier: userIdentifier,
+            userId: user.id,
             createdAt: new Date()
         }
 
@@ -149,11 +146,11 @@ export class PostService {
         const followingIds = await this.followUserRepository
             .createQueryBuilder('follow')
             .select('follow.followingId')
-            .where('follow.followerId = :userId', { userId: user.id })
+            .where('follow.followerId = :userId', {userId: user.id})
             .getRawMany();
-    
+
         const followingUserIds = followingIds.map(follow => follow.followingId);
-    
+
         // Modify the query to fetch posts only from users the current user follows
         const queryBuilder = this.postRepository
             .createQueryBuilder('post')
@@ -169,11 +166,11 @@ export class PostService {
                 'user.email',
                 'user.phone',
             ])
-            .where('user.id IN (:...followingUserIds)', { followingUserIds })
+            .where('user.id IN (:...followingUserIds)', {followingUserIds})
             .orderBy('post.createdAt', 'DESC');
-    
+
         const posts = await queryBuilder.getMany();
-    
+
         const transformedPosts = posts.map((post) => ({
             id: post.id,
             img: post.mediaUrl,
@@ -187,22 +184,32 @@ export class PostService {
                 phone: post.user.phone,
             },
         }));
-    
-        return { posts: transformedPosts };
+
+        return {posts: transformedPosts};
     }
-    
+
     async getExplorer(query: any, user: User): Promise<any> {
-        const { page, limit } = query;
-    
+        const {page, limit} = query;
+
         // Fetch the list of user IDs that the current user follows
         const followingIds = await this.followUserRepository
             .createQueryBuilder('follow')
             .select('follow.followingId')
-            .where('follow.followerId = :userId', { userId: user.id })
+            .where('follow.followerId = :userId', {userId: user.id})
             .getRawMany();
-    
+
         const followingUserIds = followingIds.map(follow => follow.followingId);
-    
+
+        if (followingUserIds.length === 0) {
+            // Return an empty result if the user is not following anyone
+            return {
+                currentPage: page,
+                totalPages: 0,
+                totalPosts: 0,
+                posts: [],
+            };
+        }
+
         // Modify the query to fetch posts only from users the current user follows
         const queryBuilder = this.postRepository
             .createQueryBuilder('post')
@@ -222,23 +229,23 @@ export class PostService {
                 'post.media',
                 'post.content',
             ])
-            .where('user.id IN (:...followingUserIds)', { followingUserIds })
+            .where('user.id IN (:...followingUserIds)', {followingUserIds})
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC');
-    
+
         const paginationResult = await this.paginationService.paginate(
             queryBuilder,
             page,
             limit,
         );
-    
+
         const finalPosts = [];
         for (const post of paginationResult.data) {
             let existingLike = await this.likePostRepository.findOne({
-                where: { post: { id: post.id }, user: { id: post.id } },
+                where: {post: {id: post.id}, user: {id: post.id}},
             });
             let existingSave = await this.likePostRepository.findOne({
-                where: { post: { id: post.id }, user: { id: post.user.id } },
+                where: {post: {id: post.id}, user: {id: post.user.id}},
             });
             finalPosts.push({
                 content: post.content,
@@ -263,7 +270,7 @@ export class PostService {
                 isSaved: (!!existingSave),
             });
         }
-    
+
         return {
             currentPage: paginationResult.page,
             totalPages: paginationResult.totalPages,
@@ -271,7 +278,6 @@ export class PostService {
             posts: finalPosts,
         };
     }
-    
-    
+
 
 }

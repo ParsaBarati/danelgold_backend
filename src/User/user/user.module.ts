@@ -10,7 +10,8 @@ import {Story} from "@/Social/Story/stories/entity/stories.entity";
 import {Club} from "@/Social/Club/entity/club.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import { savePost } from "@/Social/Post/save-post/entity/save-post.entity";
+import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
 
 
 @Module({
@@ -23,6 +24,7 @@ import { savePost } from "@/Social/Post/save-post/entity/save-post.entity";
         Club,
         FollowUser,
         likePost,
+        likeStory
     ])],
     controllers: [UserController],
     providers: [UserService, SmsService]

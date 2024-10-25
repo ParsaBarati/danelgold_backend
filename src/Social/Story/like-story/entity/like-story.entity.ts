@@ -16,9 +16,6 @@ import {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @Column({ type: 'int', nullable: true, default: 0 })
-    isLike: number;
-  
     @Column({ type: 'int'})
     storyId: number;
   

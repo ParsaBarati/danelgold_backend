@@ -3,7 +3,9 @@ import { ApiBearerAuth, ApiExcludeController, ApiOkResponse, ApiOperation, ApiTa
 import { Request } from 'express';
 import { LikeStoryService } from './like-story.service';
 
-@ApiExcludeController()
+@ApiBearerAuth()
+@ApiTags('Likes')
+
 @Controller('like-story')
 export class LikeStoryController {
     constructor(private readonly likeStoryService: LikeStoryService) {}
@@ -15,16 +17,7 @@ export class LikeStoryController {
     @Param('storyId', ParseIntPipe) storyId: number,
     @Req () req: Request,
     ){
-    const userIdentifier = (req.user as any).phone || (req.user as any).email;
-    return await this.likeStoryService.likeStory(storyId,userIdentifier);
+    return await this.likeStoryService.likeStory(storyId,(req.user as any));
     }
 
-    @Post('/:storyId/dislike')
-    async dislikePost(
-    @Param('storyId', ParseIntPipe) storyId: number,
-    @Req () req: Request,
-    ){
-        const userIdentifier = (req.user as any).phone || (req.user as any).email;
-        return await this.likeStoryService.dislikeStory(storyId,userIdentifier);
-    }
 }

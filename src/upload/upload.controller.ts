@@ -14,17 +14,34 @@ import {
     Req,
     Res,
     UploadedFile,
+    UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
-import {FileInterceptor} from '@nestjs/platform-express';
+import {FileInterceptor, FilesInterceptor} from '@nestjs/platform-express';
 import path from 'path';
 import {Request, Response} from 'express';
 import {Public} from '@/common/decorators/public.decorator';
-import {ApiExcludeController, ApiQuery} from '@nestjs/swagger';
+import {ApiQuery} from '@nestjs/swagger';
 
 @Controller('upload')
 export class UploadController {
     constructor(private readonly uploadService: UploadService) {
+    }
+
+    @Post('bulk')
+    @UseInterceptors(FilesInterceptor('files')) // Ensure this matches your key
+    async createUploads(
+        @UploadedFiles(new ParseFilePipeBuilder()
+            .addMaxSizeValidator({
+                maxSize: 500 * 1024 * 1024, //b/kb/mb
+            })
+            .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                },
+            ),
+        ) files: Express.Multer.File[],
+    ) {
+        return await this.uploadService.createUploads(files);
     }
 
     @Post()

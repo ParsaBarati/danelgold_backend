@@ -99,7 +99,7 @@ export class NotificationService {
 
     }
 
-    async sendPushNotificationToPushId(pushId: string, title: string, data: any, body = '', imgUrl = ''): Promise<any> {
+    async sendPushNotificationToPushId(pushId: string, title: string, data: {}, body = '', imgUrl = ''): Promise<any> {
 
         if (!pushId) {
             throw new NotFoundException('Token not found');
@@ -116,6 +116,7 @@ export class NotificationService {
             message: {
                 token: pushId,
                 notification: notification,
+                data: data,
             },
         };
         console.log(accessToken)

@@ -63,6 +63,7 @@ export class TokenService {
   }
 
   async validateToken(token: string): Promise<boolean> {
+    console.log(token)
     const tokenEntity = await this.tokenRepository.findOne({
       where: { token },
     });

@@ -17,8 +17,7 @@ export class StoriesController {
         @Req() req: Request,
         @Body() createStoryDto: CreateStoryDto
     ){
-        const userIdentifier = (req.user as any).phone || (req.user as any).email;
-        return await this.storyService.createStory(userIdentifier,createStoryDto)
+        return await this.storyService.createStory((req.user as any),createStoryDto)
     }
 
     @ApiOperation({ summary: 'Update Story' })

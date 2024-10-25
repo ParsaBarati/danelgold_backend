@@ -24,7 +24,7 @@ export class Post {
     @Column({type: 'text'})
     media: string;
 
-    @Column({type: 'simple-array'})
+    @Column({type: 'text', array: true, default: []})
     content: string[];
 
     @Column({type: 'text'})

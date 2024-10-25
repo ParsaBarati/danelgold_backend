@@ -20,29 +20,24 @@ export class StoriesService {
     ){}
 
     async createStory(
-        userIdentifier: string,
+        user: User,
         createStoryDto: CreateStoryDto
     ): Promise<ApiResponses<any>> {
 
         const { mediaUrl, expiresAt } = createStoryDto;
     
-        const user = await this.userRepository.findOne({
-            where: [
-                { phone: userIdentifier }, 
-                { email: userIdentifier }
-            ],
-        });
+
     
         if (!user) {
             throw new NotFoundException('User not found');
         }
     
         const story = {
-            mediaUrl,
+            mediaUrl: mediaUrl,
             thumbnail: mediaUrl[0],
             expiresAt,
             user,
-            userIdentifier:userIdentifier,
+            userId:user.id,
             createdAt: new Date(),
         };
     

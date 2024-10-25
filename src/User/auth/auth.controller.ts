@@ -27,9 +27,9 @@ export class AuthController {
     @Public()
     @Post('login')
     async login(
-        @Body() {email_or_phone, password}: { email_or_phone: string; password: string }
+        @Body() {email_or_phone, password, token}: { email_or_phone: string; password: string; token: string }
     ) {
-        return await this.authService.login(email_or_phone, password);
+        return await this.authService.login(email_or_phone, password,token);
     }
 
 

@@ -19,7 +19,8 @@ export class AuthService {
 
     async login(
         email_or_phone: string,
-        password: string
+        password: string,
+        firebaseToken: string,
     ): Promise<any> {
 
         const isPhone = /^[0-9]+$/.test(email_or_phone);
@@ -44,6 +45,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials (pass)');
         }
 
+        user.firebaseToken = firebaseToken;
+        await  this.userRepository.save(user);
         const token = await this.tokenService.createToken(user);
 
         return {
@@ -292,7 +295,7 @@ export class AuthService {
             throw new UnauthorizedException('User not found');
         }
         user.firebaseToken = firebaseToken;
-        await  this.userRepository.save(user);
+        await this.userRepository.save(user);
         return {
             message: 'Authentication successful',
             user: user,

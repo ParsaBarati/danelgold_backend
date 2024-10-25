@@ -10,7 +10,8 @@ import {Story} from '@/Social/Story/stories/entity/stories.entity';
 import {Club} from '@/Social/Club/entity/club.entity';
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
-import { savePost } from '@/Social/Post/save-post/entity/save-post.entity';
+import {savePost} from '@/Social/Post/save-post/entity/save-post.entity';
+import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,8 @@ export class UserService {
         private followUserRepository: Repository<FollowUser>,
         @InjectRepository(likePost)
         private likePostRepository: Repository<likePost>,
+        @InjectRepository(likeStory)
+        private likeStoryRepository: Repository<likeStory>,
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
         @InjectRepository(savePost)
@@ -64,16 +67,16 @@ export class UserService {
                 'stories.thumbnail AS story_thumbnail',
                 'user.id AS user_id',
                 'user.name AS user_name',
-                'user.profilePic AS user_profilePic',
                 'user.username AS user_username',
+                'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
             ])
-            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
-            .andWhere('f.followerId = :userId', { userId: user.id }) // Only stories from followed users
+            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
+            .andWhere('f.followerId = :userId', {userId: user.id}) // Only stories from followed users
             .orderBy('stories.createdAt', 'DESC')
             .limit(10)
             .getRawMany();
-    
+
         // Fetch followed users' posts
         const posts = await this.postRepository
             .createQueryBuilder('post')
@@ -90,7 +93,7 @@ export class UserService {
                 'post.shares AS post_shares',
                 'user.id AS user_id',
                 'user.name AS user_name',
-                'user.profilePic AS user_profilePic',
+                'user.profilePic AS user_profilepic',
                 'user.username AS user_username',
                 'COUNT(comments.id) AS comments_count',
                 'COUNT(postLikes.id) AS like_count',
@@ -98,31 +101,31 @@ export class UserService {
                 'post.media AS post_media',
                 'post.content AS post_content',
             ])
-            .where('f.followerId = :userId', { userId: user.id }) // Only posts from followed users
+            .where('f.followerId = :userId', {userId: user.id}) // Only posts from followed users
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC')
             .limit(10)
             .getRawMany();
-    
-        const club = await this.clubRepository
-            .createQueryBuilder('club')
-            .select([
-                'club.id AS club_id',
-                'club.name AS club_name',
-                'club.memberCount AS club_memberCount',
-                'club.cover AS club_cover',
-                'club.link AS club_link',
-            ])
-            .where('club.id = :id', { id: 1 })
-            .getRawOne();
-    
+
+        // const club = await this.clubRepository
+        //     .createQueryBuilder('club')
+        //     .select([
+        //         'club.id AS club_id',
+        //         'club.name AS club_name',
+        //         'club.memberCount AS club_memberCount',
+        //         'club.cover AS club_cover',
+        //         'club.link AS club_link',
+        //     ])
+        //     .where('club.id = :id', { id: 1 })
+        //     .getRawOne();
+
         const finalPosts = [];
         for (const post of posts) {
             let existingLike = await this.likePostRepository.findOne({
-                where: { post: { id: post.post_id }, user: { id: user.id } },
+                where: {post: {id: post.post_id}, user: {id: user.id}},
             });
             let existingSave = await this.savePostRepository.findOne({
-                where: { post: { id: post.post_id }, user: { id: user.id } },
+                where: {post: {id: post.post_id}, user: {id: user.id}},
             });
             finalPosts.push({
                 content: post.post_content,
@@ -131,7 +134,7 @@ export class UserService {
                 user: {
                     id: post.user_id,
                     name: post.user_name,
-                    pic: post.user_profilePic,
+                    pic: post.user_profilepic,
                     username: post.user_username,
                 },
                 caption: post.post_caption,
@@ -145,35 +148,45 @@ export class UserService {
                 isLiked: !!existingLike && existingLike.isLike == 1,
                 isDisliked: !!existingLike && existingLike.isLike == -1,
                 isSaved: !!existingSave,
-                club: club
-                    ? {
-                          id: club.club_id,
-                          name: club.club_name,
-                          image: club.club_cover,
-                          link: club.club_link,
-                          memberCount: club.club_memberCount,
-                      }
-                    : null,
+                // club: club
+                //     ? {
+                //           id: club.club_id,
+                //           name: club.club_name,
+                //           image: club.club_cover,
+                //           link: club.club_link,
+                //           memberCount: club.club_memberCount,
+                //       }
+                //     : null,
             });
         }
-    
-        return {
-            posts: finalPosts,
-            stories: stories.map((story) => ({
+
+
+        const finalStories = [];
+        for (const story of stories) {
+            let existingLike = await this.likeStoryRepository.findOne({
+                where: {story: {id: story.id}, user: {id: user.id}},
+            });
+
+            finalStories.push({
                 id: story.story_id,
                 user: {
                     id: story.user_id,
                     name: story.user_name,
-                    pic: story.user_profilePic,
+                    pic: story.user_profilepic,
                     username: story.user_username,
                 },
                 thumb: story.story_thumbnail,
-                media: story.mediaUrl, // Ensure this is an array of URLs
-            })),
+                media: story.story_media, // Ensure this is an array of URLs
+                isLiked: !!existingLike,
+            });
+        }
+        return {
+            posts: finalPosts,
+            stories: finalStories,
         };
     }
-    
-    
+
+
     async getReels(user: User): Promise<any> {
 
         const posts = await this.postRepository
@@ -190,7 +203,7 @@ export class UserService {
                 'post.shares AS post_shares',
                 'user.id AS user_id',
                 'user.name AS user_name',
-                'user.profilePic AS user_profilePic',
+                'user.profilePic AS user_profilepic',
                 'user.username AS user_username',
                 'COUNT(comments.id) AS comments_count',
                 'COUNT(postLikes.id) AS like_count',
@@ -219,7 +232,7 @@ export class UserService {
                 user: {
                     id: post.user_id,
                     name: post.user_name,
-                    pic: post.user_profilePic,
+                    pic: post.user_profilepic,
                     username: post.user_username,
                 },
                 caption: post.post_caption,
@@ -264,7 +277,7 @@ export class UserService {
                 'storyLikes',
                 'postLikes',
                 'commentLikes',
-                'club',
+                // 'club',
             ],
         });
 
@@ -276,18 +289,47 @@ export class UserService {
         }
 
         // Correct the 'where' condition for follow counts
-        const followersCount = await this.userRepository.count({
-            where: {following: {id: userId}}, // Referencing the 'User' object here
+        const followersCount = await this.followUserRepository.count({
+            where: {followingId: userId}, // Referencing the 'User' object here
         });
 
-        const followingCount = await this.userRepository.count({
-            where: {followers: {id: userId}}, // Referencing the 'User' object here
+        const followingCount = await this.followUserRepository.count({
+            where: {followerId: userId}, // Referencing the 'User' object here
         });
 
-        const posts = user.posts.map(post => ({
-            id: post.id,
-            thumb: post.mediaUrl,
-        }));
+
+        const finalPosts = [];
+        for (const post of user.posts) {
+            let existingLike = await this.likePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: user.id}},
+            });
+            let existingSave = await this.savePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: user.id}},
+            });
+            console.log(post.content)
+            finalPosts.push({
+                content: post.content,
+                media: post.media,
+                id: post.id,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    pic: user.profilePic,
+                    username: user.username,
+                },
+                caption: post.caption,
+                img: post.media,
+                likes: post.likes,
+                dislikes: post.dislikes,
+                commentsCount: 0,
+                sharesCount: post.shares,
+                comments: [],
+                createdAt: post.createdAt,
+                isLiked: !!existingLike && existingLike.isLike == 1,
+                isDisliked: !!existingLike && existingLike.isLike == -1,
+                isSaved: !!existingSave,
+            });
+        }
 
         const stories = user.stories.map(story => ({
             id: story.id,
@@ -318,6 +360,7 @@ export class UserService {
             isFollowing: !!isFollowing,
             bio: user.bio,
             stories,
+            posts: finalPosts,
 
             settings: notifications ? notifications : null,
         };

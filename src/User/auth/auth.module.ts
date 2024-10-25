@@ -24,10 +24,11 @@ import {Club} from '@/Social/Club/entity/club.entity';
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
+import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, UserDetail, Token, Post, Story, Club, likePost,  savePost, FollowUser,]),
+        TypeOrmModule.forFeature([User, UserDetail, Token, Post, Story, Club, likePost, savePost, FollowUser, likeStory,]),
         PassportModule,
         UserModule,
         OtpModule,
