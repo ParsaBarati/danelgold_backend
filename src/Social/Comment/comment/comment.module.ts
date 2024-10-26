@@ -7,6 +7,9 @@ import { User } from '@/User/user/entity/user.entity';
 import { Reply } from '@/Social/Comment/replyComment/entity/reply.entity';
 import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
+import { Notification } from '@/Social/Notification/entity/notification.entity';
+import { NotificationService } from '@/Social/Notification/notification.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -14,8 +17,9 @@ import { PaginationService } from '@/common/paginate/pagitnate.service';
     Reply,
     likeComment,
     User,
-  ])],
+    Notification
+  ]),HttpModule],
   controllers: [CommentController],
-  providers: [CommentService,PaginationService],
+  providers: [CommentService,PaginationService,NotificationService],
 })
 export class CommentModule {}

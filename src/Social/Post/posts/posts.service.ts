@@ -9,6 +9,8 @@ import {UpdatePostDto} from "./dto/updatePost.dto";
 import {PaginationService} from "@/common/paginate/pagitnate.service";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
+import { NotificationService } from "@/Social/Notification/notification.service";
+import { NotificationAction } from "@/Social/Notification/entity/notification.entity";
 
 
 @Injectable()
@@ -22,6 +24,7 @@ export class PostService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(FollowUser)
         private readonly followUserRepository: Repository<FollowUser>,
+        private readonly notificationService: NotificationService,
         private readonly paginationService: PaginationService
     ) {
     }
@@ -66,6 +69,55 @@ export class PostService {
         return createResponse(201, savedPost)
     }
 
+    async repost(postId: number, user: User): Promise<{ success: boolean }> {
+        // Fetch the post to be reposted
+        const postToRepost = await this.postRepository.findOne({ where: { id: postId } });
+    
+        if (!postToRepost) {
+            throw new NotFoundException('Post not found!');
+        }
+    
+        // Check if the user has already reposted this post
+        if (!postToRepost.repostedBy) {
+            postToRepost.repostedBy = []; // Initialize if it doesn't exist
+        }
+    
+        const hasReposted = postToRepost.repostedBy.includes(user.id);
+    
+        if (!hasReposted) {
+            // Add the user ID to the repostedBy array
+            postToRepost.repostedBy.push(user.id);
+            
+            // Increment repost count
+            postToRepost.repostsCount = (postToRepost.repostsCount || 0) + 1;
+    
+            // Save the updated post
+            await this.postRepository.save(postToRepost);
+    
+            // Send notification to the original post owner
+            const originalPostOwner = await this.userRepository.findOne({ where: { id: postToRepost.user.id } });
+    
+            if (originalPostOwner) {
+                await this.notificationService.sendNotification(
+                    originalPostOwner.id, // Recipient: original post owner
+                    NotificationAction.REPOST, // Action type: can be POST for reposts
+                    `${user.username} reposted your post!`, // Notification title
+                    '', // Optional thumbnail
+                    user.id // Sender: current user ID
+                );
+            }
+        } else {
+            // Optionally handle removing a repost by checking if the user ID is in the repostedBy array
+            postToRepost.repostedBy = postToRepost.repostedBy.filter(id => id !== user.id);
+            postToRepost.repostsCount = Math.max((postToRepost.repostsCount || 0) - 1, 0); // Avoid negative count
+    
+            // Save the updated post
+            await this.postRepository.save(postToRepost);
+        }
+    
+        return { success: true };
+    }
+    
     async updatePost(
         postId: number,
         currentUserIdentifier: string,

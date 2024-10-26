@@ -12,6 +12,9 @@ import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
+import { NotificationService } from "@/Social/Notification/notification.service";
+import { Notification } from "@/Social/Notification/entity/notification.entity";
+import { HttpModule } from "@nestjs/axios";
 
 
 @Module({
@@ -24,10 +27,11 @@ import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
         Club,
         FollowUser,
         likePost,
-        likeStory
-    ])],
+        likeStory,
+        Notification
+    ]), HttpModule],
     controllers: [UserController],
-    providers: [UserService, SmsService]
+    providers: [UserService, SmsService, NotificationService]
 })
 export class UserModule {
 }

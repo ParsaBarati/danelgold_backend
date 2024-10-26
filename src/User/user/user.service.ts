@@ -12,6 +12,9 @@ import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {savePost} from '@/Social/Post/save-post/entity/save-post.entity';
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
+import { NotificationAction } from '@/Social/Notification/entity/notification.entity';
+import { NotificationService } from '@/Social/Notification/notification.service';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UserService {
@@ -34,7 +37,8 @@ export class UserService {
         private readonly clubRepository: Repository<Club>,
         @InjectRepository(Token)
         private readonly tokenRepository: Repository<Token>,
-        private readonly smsService: SmsService,
+        private readonly notificationService: NotificationService,
+        private readonly httpService: HttpService,
     ) {
     }
 
@@ -185,7 +189,6 @@ export class UserService {
             stories: finalStories,
         };
     }
-
 
     async getReels(user: User): Promise<any> {
 
@@ -378,36 +381,46 @@ export class UserService {
         };
     }
 
-    async follow(
+   async follow(
         userId: number,
         user: User,
     ): Promise<{ isFollowing: boolean }> {
 
+    if (!user) {
+        throw new NotFoundException('User not found');
+    }
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+    let isFollowing = await this.followUserRepository.findOneBy({
+        followerId: user.id,
+        followingId: userId
+    });
 
-        let isFollowing = await this.followUserRepository.findOneBy({
+    if (!isFollowing) {
+        console.log(user.id, userId);
+        
+        const follow = await this.followUserRepository.create({
             followerId: user.id,
             followingId: userId
         });
+        await this.followUserRepository.save(follow);
 
-
-        if (!isFollowing) {
-            console.log(user.id, userId)
-            const follow = await this.followUserRepository.create({
-                followerId: user.id,
-                followingId: userId
-            });
-            await this.followUserRepository.save(follow);
-        } else {
-            await this.followUserRepository.remove(isFollowing);
-        }
-
-        return {isFollowing: !isFollowing};
+        // Send notification after following action is completed
+        await this.notificationService.sendNotification(
+            userId,                    // The recipient: user being followed
+            NotificationAction.FOLLOW, // Action type for follow
+            "New Follower",            // Notification title
+            user.profilePic,    // Thumbnail (e.g., follower's profile picture)
+            user.id                    // Sender: the user who followed
+        );
+    } else {
+        // Remove follow relationship
+        await this.followUserRepository.remove(isFollowing);
     }
 
+    return { isFollowing: !isFollowing };
+}
+
+    
     async update(user: User, name: string, bio: string) {
         console.log(user)
         if (!user) {

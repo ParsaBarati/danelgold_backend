@@ -4,6 +4,7 @@ import {Message} from "./entity/message.entity";
 import {Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
+import { NotificationAction } from "../Notification/entity/notification.entity";
 
 
 @Injectable()
@@ -164,6 +165,15 @@ export class MessageService {
                 }),
             }, message.content.substring(0, 100));
         }
+
+        await this.notification.sendNotification(
+            receiverId,               // Recipient: the user receiving the message
+            NotificationAction.MESSAGE,   // Action type could be 'POST' or a new 'MESSAGE' type
+            `New message from ${sender.username}`, // Notification title
+            sender.profilePic,  // Thumbnail, e.g., sender's profile picture
+            sender.id                  // Sender: the user who sent the message
+        );
+
         return {
             message: 'Message sent successfully',
             messageDetails: {

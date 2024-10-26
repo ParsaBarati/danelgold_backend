@@ -16,6 +16,9 @@ import {NFT} from "@/NFT/nft/entity/nft.entity";
 import {CollectionEntity} from "@/Market/collection/entity/collection.entity";
 import {SearchService} from "@/search/search.service";
 import { FollowUser } from '@/Social/Follow/entity/follow.entity';
+import { Notification } from '@/Social/Notification/entity/notification.entity';
+import { HttpModule } from '@nestjs/axios';
+import { NotificationService } from '@/Social/Notification/notification.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([
@@ -29,10 +32,11 @@ import { FollowUser } from '@/Social/Follow/entity/follow.entity';
         likePost, 
         NFT, 
         CollectionEntity,
-        FollowUser
-    ])],
+        FollowUser,
+        Notification
+    ]),HttpModule],
     controllers: [PostsController, SearchController],
-    providers: [PostService, PaginationService, CommentService, SearchService]
+    providers: [PostService, PaginationService, CommentService, SearchService,NotificationService]
 })
 export class PostsModule {
 }

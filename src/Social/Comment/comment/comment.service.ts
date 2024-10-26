@@ -18,6 +18,8 @@ import { CreateCommentDTO } from './dto/CreateComment';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { Post } from '@/Social/Post/posts/entity/posts.entity';
 import { Story } from '@/Social/Story/stories/entity/stories.entity';
+import { NotificationService } from '@/Social/Notification/notification.service';
+import { NotificationAction } from '@/Social/Notification/entity/notification.entity';
 
 
 const MAX_COMMENTS_PER_Post = 5;
@@ -39,6 +41,7 @@ export class CommentService {
     private readonly replyRepository: Repository<Reply>,
     @InjectRepository(likeComment)
     private readonly likeCommentRepository: Repository<likeComment>,
+    private readonly notificationService: NotificationService
   ) {}
 
   async CommentPost(
@@ -47,35 +50,34 @@ export class CommentService {
     createCommentDTO: CreateCommentDTO,
   ): Promise<ApiResponses<Comment>> {
 
-
-
-    // if (userCommentCounts.has(`${userIdentifier}-${postId}`)) {
-    //   const commentCount =
-    //     userCommentCounts.get(`${userIdentifier}-${postId}`) || 0;
-    //
-    //   if (commentCount >= MAX_COMMENTS_PER_Post) {
-    //     throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
-    //   }
-    // }
-
     const post = await this.postRepository.findOne({
-      where: {id:postId}
-    })
+        where: { id: postId }
+    });
 
-    if(!post){
-      throw new NotFoundException('Post not found')
+    if (!post) {
+        throw new NotFoundException('Post not found');
     }
 
     const newComment = {
-      userId: user.id,
-      postId,
-      // storyId: 0,
-      content: createCommentDTO.content,
+        userId: user.id,
+        postId,
+        content: createCommentDTO.content,
     };
 
     const createdComment = await this.commentRepository.save(newComment);
 
-    return createResponse(201, createdComment, 'Comment saved ');
+    // Send notification to the post owner
+    if (post.user.id !== user.id) {
+        await this.notificationService.sendNotification(
+            post.user.id,                       // Recipient: post owner
+            NotificationAction.COMMENT,         // Action type: 'comment'
+            `${user.username} commented on your post`, // Notification title
+            user.profilePic,             // Thumbnail, e.g., commenter's profile picture
+            user.id                              // Sender: the user who commented
+        );
+    }
+
+    return createResponse(201, createdComment, 'Comment saved');
   }
 
   async CommentStory(
@@ -85,40 +87,50 @@ export class CommentService {
   ): Promise<ApiResponses<Comment>> {
 
     const user = await this.userRepository.findOne({
-      where: [{ phone: userIdentifier },{ email: userIdentifier }],
-      select: ['username'],
+        where: [{ phone: userIdentifier }, { email: userIdentifier }],
+        select: ['username'],
     });
 
     if (userCommentCounts.has(`${userIdentifier}-${storyId}`)) {
-      const commentCount =
-        userCommentCounts.get(`${userIdentifier}-${storyId}`) || 0;
+        const commentCount = userCommentCounts.get(`${userIdentifier}-${storyId}`) || 0;
 
-      if (commentCount >= MAX_COMMENTS_PER_Story) {
-        throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
-      }
+        if (commentCount >= MAX_COMMENTS_PER_Story) {
+            throw new BadRequestException('دیدگاه های شما به حد نصاب رسیده اند');
+        }
     }
 
     const story = await this.storyRepository.findOne({
-      where: { id: storyId}
-    })
+        where: { id: storyId }
+    });
 
-    if(!story){
-      throw new NotFoundException('استوری یافت نشد')
+    if (!story) {
+        throw new NotFoundException('استوری یافت نشد');
     }
 
     const newComment = {
-      user: {
-        username: user.username,
-        phone: userIdentifier,
-        email: userIdentifier
-      },
-      storyId,
-      content: createCommentDTO.content,
+        user: {
+            username: user.username,
+            phone: userIdentifier,
+            email: userIdentifier
+        },
+        storyId,
+        content: createCommentDTO.content,
     };
 
     const createdComment = await this.commentRepository.save(newComment);
 
-    return createResponse(201, createdComment, 'دیدگاه شما ثبت گردید ');
+    // Send notification to the story owner
+    if (story.user.id !== user.id) {
+        await this.notificationService.sendNotification(
+            story.user.id,                       // Recipient: story owner
+            NotificationAction.COMMENT,          // Action type: 'comment'
+            `${user.username} commented on your story`, // Notification title
+            user.profilePic,              // Thumbnail, e.g., commenter's profile picture
+            user.id                               // Sender: the user who commented
+        );
+    }
+
+    return createResponse(201, createdComment, 'دیدگاه شما ثبت گردید');
   }
 
   async updateComment(

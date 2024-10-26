@@ -7,6 +7,8 @@ import { CreateReplyDTO } from "./dto/CreateReply.dto";
 import { Comment } from "@/Social/Comment/comment/entity/comment.entity";
 import { UpdateReplyDTO } from "./dto/UpdateReply.dto";
 import { ApiResponses, createResponse } from "@/utils/response.util";
+import { NotificationService } from "@/Social/Notification/notification.service";
+import { NotificationAction } from "@/Social/Notification/entity/notification.entity";
 
 
 @Injectable()
@@ -18,24 +20,25 @@ export class ReplyService{
         private commentRepository: Repository<Comment>,
         @InjectRepository(User) 
         private userRepository: Repository<User>,
+        private readonly notificationService: NotificationService
       ) {}
     
       async createReply(
-        Identifier: string, 
+        Identifier: string,
         addReplyDto: CreateReplyDTO
       ): Promise<Reply> {
         const { content, parentCommentId, parentReplyId } = addReplyDto;
     
         console.log(`Fetching user with Identifier: ${Identifier}`);
-        
+    
         const user = await this.userRepository.findOne({
-          where: [{ phone: Identifier },{ email: Identifier }],
-          select: ['username'],
+            where: [{ phone: Identifier }, { email: Identifier }],
+            select: ['username'],
         });
     
         if (!user) {
-          console.error(`User not found with Identifier: ${Identifier}`);
-          throw new NotFoundException('User not found');
+            console.error(`User not found with Identifier: ${Identifier}`);
+            throw new NotFoundException('User not found');
         }
     
         console.log(`User found: ${user.username}`);
@@ -43,24 +46,37 @@ export class ReplyService{
         const existingComment = await this.commentRepository.findOne({ where: { id: parentCommentId } });
     
         if (!existingComment) {
-          console.error(`Parent comment not found with id: ${parentCommentId}`);
-          throw new NotFoundException('Parent comment not found');
+            console.error(`Parent comment not found with id: ${parentCommentId}`);
+            throw new NotFoundException('Parent comment not found');
         }
     
         const newReply = this.replyRepository.create({
-          user: {
-            username: user.username,
-            phone: Identifier,
-            email: Identifier
-          },
-          content,
-          parentCommentId,
-          parentReplyId,
+            user: {
+                username: user.username,
+                phone: Identifier,
+                email: Identifier
+            },
+            content,
+            parentCommentId,
+            parentReplyId,
         });
     
         const savedReply = await this.replyRepository.save(newReply);
+    
+        // Send notification to the comment owner
+        if (existingComment.user.id !== user.id) {
+            await this.notificationService.sendNotification(
+                existingComment.user.id,                  // Recipient: comment owner
+                NotificationAction.COMMENT,               // Action type: 'comment'
+                `${user.username} replied to your comment`, // Notification title
+                user.profilePic,                   // Thumbnail, e.g., replier's profile picture
+                user.id                                    // Sender: the user who replied
+            );
+        }
+    
         return savedReply;
-      }
+    }
+    
       
       async updateReply(
         replyId: number,

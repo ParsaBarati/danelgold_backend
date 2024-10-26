@@ -63,6 +63,9 @@ const _likepostmodule = require("./Social/Post/like-post/like-post.module");
 const _savepostmodule = require("./Social/Post/save-post/save-post.module");
 const _savepostentity = require("./Social/Post/save-post/entity/save-post.entity");
 const _likestorymodule = require("./Social/Story/like-story/like-story.module");
+const _notificationentity = require("./Social/Notification/entity/notification.entity");
+const _notificationservice = require("./Social/Notification/notification.service");
+const _axios = require("@nestjs/axios");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -177,7 +180,8 @@ AppModule = _ts_decorate([
                 _likestoryentity.likeStory,
                 _cryptoentity.CryptoEntity,
                 _followentity.FollowUser,
-                _savepostentity.savePost
+                _savepostentity.savePost,
+                _notificationentity.Notification
             ]),
             _auctionmodule.AuctionModule,
             _collectionmodule.CollectionEntityModule,
@@ -201,7 +205,8 @@ AppModule = _ts_decorate([
             _RSTmodule.RSTModule,
             _messagemodule.MessageModule,
             _notificationmodule.NotificationModule,
-            _walletmodule.WalletModule
+            _walletmodule.WalletModule,
+            _axios.HttpModule
         ],
         controllers: [
             _appcontroller.AppController
@@ -211,6 +216,7 @@ AppModule = _ts_decorate([
             _userservice.UserService,
             _IPFSservice.IPFSService,
             _smsservice.SmsService,
+            _notificationservice.NotificationService,
             _jwtstrategy.JwtStrategy,
             {
                 provide: _core.APP_GUARD,

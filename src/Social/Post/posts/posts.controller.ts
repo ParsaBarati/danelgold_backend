@@ -35,6 +35,15 @@ export class PostsController {
         return await this.postService.createPost(req.user as any, createPostDto)
     }
 
+    @ApiOperation({summary: ' Repost'})
+    @Post('repost/:postId')
+    async repost(
+        @Req() req: Request,
+        @Param('postId',ParseIntPipe) postId: number
+    ) {
+        return await this.postService.repost(postId ,req.user as any)
+    }
+
     @ApiOperation({summary: 'UpdatePost'})
     @Put()
     async updatePost(
