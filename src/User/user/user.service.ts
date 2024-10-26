@@ -441,10 +441,10 @@ export class UserService {
                 });
                 // ایجاد یک کپی از فالوور و اضافه کردن وضعیت فالو/آنفالو
                 return {
-                    id: follow.follower.id,
-                    name: follow.follower.name,
-                    username: follow.follower.username,
-                    pic: follow.follower.profilePic ?? "",
+                    id: follow.follower?.id,
+                    name: follow.follower?.name,
+                    username: follow.follower?.username,
+                    pic: follow.follower?.profilePic ?? "",
                     isFollowing: !!isFollowing,
                 };
             })
@@ -459,10 +459,10 @@ export class UserService {
 
         return followings.map(function (follow) {
             return {
-                id: follow.follower.id,
-                name: follow.follower.name,
-                username: follow.follower.username,
-                pic: follow.follower.profilePic ?? "",
+                id: follow.following?.id,
+                name: follow.following?.name,
+                username: follow.following?.username,
+                pic: follow.following.profilePic ?? "",
                 isFollowing: true,
             };
         });

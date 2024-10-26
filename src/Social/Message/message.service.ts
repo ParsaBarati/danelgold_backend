@@ -244,6 +244,7 @@ export class MessageService {
 
         // Iterate through each receiver and send the message
         for (const receiver of receivers) {
+            console.log(receiver)
             // Create a new message
             const message = this.messageRepository.create();
             message.sender = sender;
