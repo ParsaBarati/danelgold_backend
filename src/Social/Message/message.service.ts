@@ -1,7 +1,7 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Message} from "./entity/message.entity";
-import {Repository} from "typeorm";
+import {In, Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
 
@@ -18,59 +18,74 @@ export class MessageService {
     }
 
     async getMessage(user: User): Promise<any> {
-
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
         const userId = user.id;
 
+        // Fetch latest messages involving the user
         const chats = await this.messageRepository
             .createQueryBuilder('message')
             .leftJoinAndSelect('message.sender', 'sender')
             .leftJoinAndSelect('message.receiver', 'receiver')
             .select([
-                'message.id',
-                'message.createdAt',
-                'sender.id',
-                'sender.profilePic',
-                'sender.name',
-                'sender.username',
-                'receiver.id',
-                'receiver.profilePic',
-                'receiver.name',
-                'receiver.username',
+                'message.id AS message_id',
+                'message.content AS message_content',
+                'message.createdAt AS message_created_at',
+                'sender.id AS sender_id',
+                'sender.profilePic AS sender_profile_pic',
+                'sender.name AS sender_name',
+                'sender.username AS sender_username',
+                'receiver.id AS receiver_id',
+                'receiver.profilePic AS receiver_profile_pic',
+                'receiver.name AS receiver_name',
+                'receiver.username AS receiver_username',
             ])
-            .where('message.senderId = :userId OR message.receiverId = :userId', {userId})
-            .distinctOn(['message.senderId', 'message.receiverId'])  // Ensure unique chats
-            .orderBy('message.senderId')  // Match the DISTINCT ON columns
-            .addOrderBy('message.receiverId')  // Match the DISTINCT ON columns
-            .addOrderBy('message.createdAt', 'DESC')  // Sort by the latest message
-            .limit(10)
-            .getRawMany();
+            .where('message.senderId = :userId OR message.receiverId = :userId', { userId })
+            .orderBy('message.createdAt', 'DESC')  // Sort by createdAt to get latest messages first
+            .getRawMany();  // Use getRawMany to get raw results
 
-        const transformedChats = chats.map((chat) => {
-            console.log(chat)
+        // Check if chats were retrieved
+        if (!chats || chats.length === 0) {
+            return { chats: [] };  // Return empty if no chats found
+        }
+
+        // Create a map to hold unique chats
+        const uniqueChatsMap = new Map<string, any>();
+
+        // Iterate through chats to filter unique conversations
+        for (const chat of chats) {
             const otherUser = chat.sender_id === userId ? {
                 id: chat.receiver_id,
                 name: chat.receiver_name,
                 username: chat.receiver_username,
-                pic: chat.receiver_profilePic,
+                pic: chat.receiver_profile_pic,
             } : {
                 id: chat.sender_id,
                 name: chat.sender_name,
                 username: chat.sender_username,
-                pic: chat.sender_profilePic,
+                pic: chat.sender_profile_pic,
             };
-            return {
-                id: otherUser.id,
-                user: otherUser,
-                lastSeen: chat.message_createdAt,
-            };
-        });
+
+            // Create a unique key for the conversation based on user IDs
+            const uniqueKey = `${Math.min(chat.sender_id, chat.receiver_id)}_${Math.max(chat.sender_id, chat.receiver_id)}`;
+
+            // Check if this conversation has already been added to the map
+            if (!uniqueChatsMap.has(uniqueKey)) {
+                uniqueChatsMap.set(uniqueKey, {
+                    id: otherUser.id,
+                    user: otherUser,
+                    lastSeen: chat.message_created_at,
+                });
+            }
+        }
+
+        // Convert the map to an array of unique chats
+        const uniqueChats = Array.from(uniqueChatsMap.values());
 
         return {
-            chats: transformedChats,
+            chats: uniqueChats,
         };
     }
 
@@ -176,6 +191,78 @@ export class MessageService {
                 replyId: message.replyId,
                 timestamp: message.createdAt
             }
+        };
+    }
+
+    async shareContent(
+        user: User,
+        userIds: number[], // Array of user IDs to whom the content will be shared
+        content: string,
+        storyId?: number,
+        postId?: number
+    ): Promise<any> {
+        // Ensure sender is valid
+        const sender = user;
+        if (!sender) {
+            throw new NotFoundException('Sender not found');
+        }
+
+        // Validate receivers
+        const receivers = await this.userRepository.find({
+            where: {id: In(userIds)} // Using 'In' to find users by their IDs
+        });
+        if (receivers.length === 0) {
+            throw new NotFoundException('No receivers found');
+        }
+
+        const sentMessages = [];
+
+        // Iterate through each receiver and send the message
+        for (const receiver of receivers) {
+            // Create a new message
+            const message = this.messageRepository.create();
+            message.sender = sender;
+            message.receiver = receiver;
+            message.content = content;
+
+            if (storyId) {
+                message.storyId = storyId;
+            }
+            if (postId) {
+                message.postId = postId;
+            }
+
+            // Save the message in the database
+            const sentMessage = await this.messageRepository.save(message);
+            sentMessages.push(sentMessage);
+
+            // Send a notification if the receiver has a valid firebase token
+            if (receiver.firebaseToken) {
+                await this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `Shared content from ${sender.username}`, {
+                    type: "share",
+                    message: JSON.stringify({
+                        id: sentMessage.id,
+                        timestamp: sentMessage.createdAt,
+                        content: sentMessage.content,
+                        storyId: message.storyId,
+                        postId: message.postId,
+                        sender: sender,
+                    }),
+                }, content.substring(0, 100));
+            }
+        }
+
+        return {
+            message: 'Content shared successfully',
+            sharedMessages: sentMessages.map(msg => ({
+                id: msg.id,
+                content: msg.content,
+                sender: msg.sender,
+                receiver: msg.receiver,
+                storyId: msg.storyId,
+                postId: msg.postId,
+                timestamp: msg.createdAt,
+            }))
         };
     }
 

@@ -80,6 +80,24 @@ export class UserController {
         return await this.userService.getFollowings((req.user as any));
     }
 
+    @ApiOperation({summary: 'Sharing List'})
+    @ApiOkResponse({description: 'Sharing list', example: {statusCode: 200}})
+    @Get('/sharing')
+    @UseGuards(AuthGuard('jwt'))
+
+    async sharingList(
+        @Req() req: Request,
+    ) {
+        const followers = await this.userService.getFollowers(req.user as any);
+        const followings = await this.userService.getFollowings(req.user as any);
+
+        // Combine followers and followings
+        const combinedUsers = [...followers, ...followings];
+
+        // Create a unique list based on user ID
+        return Array.from(new Map(combinedUsers.map(user => [user.id, user])).values());
+    }
+
 
     @ApiExcludeEndpoint()
     @ApiOperation({summary: 'Get All Users'})
