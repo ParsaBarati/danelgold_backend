@@ -451,13 +451,21 @@ export class UserService {
         );
     }
 
-    async getFollowings(user: User): Promise<User[]> {
+    async getFollowings(user: User): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
         const followings = await this.followUserRepository.find({
             where: {followerId: user.id},
             relations: ['following'],
         });
 
-        return followings.map((follow) => follow.following);
+        return followings.map(function (follow) {
+            return {
+                id: follow.follower.id,
+                name: follow.follower.name,
+                username: follow.follower.username,
+                pic: follow.follower.profilePic ?? "",
+                isFollowing: true,
+            };
+        });
     }
 
 

@@ -42,13 +42,13 @@ export class MessageService {
                 'receiver.name AS receiver_name',
                 'receiver.username AS receiver_username',
             ])
-            .where('message.senderId = :userId OR message.receiverId = :userId', { userId })
+            .where('message.senderId = :userId OR message.receiverId = :userId', {userId})
             .orderBy('message.createdAt', 'DESC')  // Sort by createdAt to get latest messages first
             .getRawMany();  // Use getRawMany to get raw results
 
         // Check if chats were retrieved
         if (!chats || chats.length === 0) {
-            return { chats: [] };  // Return empty if no chats found
+            return {chats: []};  // Return empty if no chats found
         }
 
         // Create a map to hold unique chats
@@ -106,14 +106,43 @@ export class MessageService {
             .createQueryBuilder('message')
             .leftJoinAndSelect('message.sender', 'sender')   // Ensure sender data is loaded
             .leftJoinAndSelect('message.receiver', 'receiver') // Ensure receiver data is loaded
+            .leftJoinAndSelect('message.story', 'story') // Ensure story data is loaded (if any)
+            .leftJoinAndSelect('message.post', 'post') // Ensure post data is loaded (if any)
             .where('(message.senderId = :senderId AND message.receiverId = :receiverId)', {senderId, receiverId})
             .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', {senderId, receiverId})
             .orderBy('message.createdAt', 'ASC')  // Sort messages by creation date
             .getMany();
 
+        // Format messages for response
+        const formattedMessages = messages.map(msg => {
+            const formattedMessage: any = {
+                id: msg.id,
+                content: msg.content,
+                createdAt: msg.createdAt,
+                sender: msg.sender,
+                story: msg.story ? {
+                    id: msg.story.id,
+                    thumbnail: msg.story.thumbnail, // Assuming story has a title
+                    isStory: true,
+                    isAvailable: msg.story && (new Date().getTime() - new Date(msg.story.createdAt).getTime() <= 24 * 60 * 60 * 1000), // Check if created in last 24 hours
+
+                    // Add other fields as necessary
+                } : null,
+                post: msg.post ? {
+                    id: msg.post.id,
+                    thumbnail: msg.post.mediaUrl, // Assuming post has a title
+                    isStory: false,
+                    isReel: false,
+                    isAvailable: true,
+                    // Add other fields as necessary
+                } : null,
+            };
+            return formattedMessage;
+        });
+
         return {
             chat: {
-                id: 0,
+                id: receiver.id,
                 user: {
                     id: receiver.id,
                     name: receiver.name,
@@ -121,14 +150,10 @@ export class MessageService {
                     pic: receiver.profilePic,
                 },
             },
-            messages: messages.map(msg => ({
-                id: msg.id,
-                content: msg.content,
-                createdAt: msg.createdAt,
-                sender: msg.sender,
-            }))
+            messages: formattedMessages,
         };
     }
+
 
     async sendMessage(
         user: User,
