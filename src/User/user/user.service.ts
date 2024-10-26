@@ -454,23 +454,31 @@ export class UserService {
                 });
                 // ایجاد یک کپی از فالوور و اضافه کردن وضعیت فالو/آنفالو
                 return {
-                    id: follow.follower.id,
-                    name: follow.follower.name,
-                    username: follow.follower.username,
-                    pic: follow.follower.profilePic ?? "",
+                    id: follow.follower?.id,
+                    name: follow.follower?.name,
+                    username: follow.follower?.username,
+                    pic: follow.follower?.profilePic ?? "",
                     isFollowing: !!isFollowing,
                 };
             })
         );
     }
 
-    async getFollowings(user: User): Promise<User[]> {
+    async getFollowings(user: User): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
         const followings = await this.followUserRepository.find({
             where: {followerId: user.id},
             relations: ['following'],
         });
 
-        return followings.map((follow) => follow.following);
+        return followings.map(function (follow) {
+            return {
+                id: follow.following?.id,
+                name: follow.following?.name,
+                username: follow.following?.username,
+                pic: follow.following.profilePic ?? "",
+                isFollowing: true,
+            };
+        });
     }
 
 

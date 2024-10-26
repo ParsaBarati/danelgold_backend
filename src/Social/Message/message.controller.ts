@@ -40,6 +40,25 @@ export class MessageController {
         );
     }
 
+
+    @Post('/share')
+    async share(
+        @Body('receiverIds') receiverIds: number[], // Accept an array of user IDs
+        @Body('content') content: string,
+        @Req() req: Request,
+        @Body('storyId') storyId?: number,
+        @Body('postId') postId?: number,
+    ) {
+        return await this.messageService.shareContent(
+            (req.user as any),
+            receiverIds, // Pass the array of receiver IDs
+            content,
+            storyId,
+            postId,
+        );
+    }
+
+
     @ApiOperation({summary: 'fetchMessagesByOtherUser'})
     @Get('/chat/:userId')
     async getMessagesForChat(
