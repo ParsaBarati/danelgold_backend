@@ -12,6 +12,8 @@ import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {savePost} from '@/Social/Post/save-post/entity/save-post.entity';
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
+import {NotificationService} from "@/Social/Notification/notification.service";
+import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
 
 @Injectable()
 export class UserService {
@@ -35,6 +37,7 @@ export class UserService {
         @InjectRepository(Token)
         private readonly tokenRepository: Repository<Token>,
         private readonly smsService: SmsService,
+        private readonly notificationService: NotificationService
     ) {
     }
 
@@ -226,9 +229,9 @@ export class UserService {
                 where: {post: {id: post.post_id}, user: {id: user.id}},
             });
             finalPosts.push({
+                id: post.post_id,
                 content: post.post_content, // Structure for additional images if needed
                 media: post.media,
-                id: post.post_id,
                 user: {
                     id: post.user_id,
                     name: post.user_name,
@@ -401,8 +404,11 @@ export class UserService {
                 followingId: userId
             });
             await this.followUserRepository.save(follow);
+            this.notificationService.sendNotification(userId, NotificationAction.FOLLOW, `${user.username} Started following you`, null, user.id,);
         } else {
             await this.followUserRepository.remove(isFollowing);
+            this.notificationService.sendNotification(userId, NotificationAction.UNFOLLOW, `${user.username} Stopped following you`, null, user.id,);
+
         }
 
         return {isFollowing: !isFollowing};

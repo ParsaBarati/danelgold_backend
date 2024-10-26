@@ -4,6 +4,10 @@ import {Message} from "./entity/message.entity";
 import {In, Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
+import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
+import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {Post} from "@/Social/Post/posts/entity/posts.entity";
+import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
 
 
 @Injectable()
@@ -11,9 +15,15 @@ export class MessageService {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
+        @InjectRepository(Post)
+        private postRepository: Repository<Post>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        private notification: NotificationService,
+        @InjectRepository(likePost)
+        private likePostRepository: Repository<likePost>,
+        @InjectRepository(savePost)
+        private savePostRepository: Repository<savePost>,
+        private notificationService: NotificationService,
     ) {
     }
 
@@ -190,7 +200,7 @@ export class MessageService {
         // Save the message in the database
         const sentMessage = await this.messageRepository.save(message);
         if (receiver.firebaseToken) {
-            this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
+            this.notificationService.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
                 type: "message",
                 message: JSON.stringify({
                     id: sentMessage.id,
@@ -241,7 +251,7 @@ export class MessageService {
         }
 
         const sentMessages = [];
-
+        console.log(receivers)
         // Iterate through each receiver and send the message
         for (const receiver of receivers) {
             console.log(receiver)
@@ -251,31 +261,32 @@ export class MessageService {
             message.receiver = receiver;
             message.content = content;
 
+            let type;
+            let thumb = null;
             if (storyId) {
                 message.storyId = storyId;
+                type = 'story';
             }
             if (postId) {
                 message.postId = postId;
+                type = 'post';
+                const post = await this.postRepository.findOne({where: {id: postId}});
+                if (post) {
+                    thumb = post.media;
+                    post.shares += 1;
+                    await this.postRepository.save(post);
+                } else {
+                    throw  new NotFoundException("Post not found");
+                }
             }
 
             // Save the message in the database
             const sentMessage = await this.messageRepository.save(message);
             sentMessages.push(sentMessage);
 
-            // Send a notification if the receiver has a valid firebase token
-            if (receiver.firebaseToken) {
-                await this.notification.sendPushNotificationToPushId(receiver.firebaseToken, `Shared content from ${sender.username}`, {
-                    type: "share",
-                    message: JSON.stringify({
-                        id: sentMessage.id,
-                        timestamp: sentMessage.createdAt,
-                        content: sentMessage.content,
-                        storyId: message.storyId,
-                        postId: message.postId,
-                        sender: sender,
-                    }),
-                }, content.substring(0, 100));
-            }
+            // Send a notification
+            this.notificationService.sendNotification(user.id, NotificationAction.SHARE, `${user.username} shared a ${type}`, thumb, user.id,);
+
         }
 
         return {
@@ -290,6 +301,83 @@ export class MessageService {
                 timestamp: msg.createdAt,
             }))
         };
+    }
+
+
+    async getPostsInChat(senderId: number,
+                         receiverId: number) {
+        const posts = await this.messageRepository
+            .createQueryBuilder('message')
+            .leftJoinAndSelect('message.post', 'post')
+            .leftJoinAndSelect('post.postLikes', 'postLikes')
+            .leftJoinAndSelect('post.comments', 'comments')
+            .leftJoinAndSelect('post.user', 'user') // Include post creator's information
+            .where(
+                '(message.senderId = :senderId AND message.receiverId = :receiverId) OR ' +
+                '(message.senderId = :receiverId AND message.receiverId = :senderId)',
+                {senderId, receiverId}
+            )
+            .andWhere('message.postId IS NOT NULL') // Only messages with posts
+            .select([
+                'post.id AS post_id',
+                'post.mediaUrl AS post_mediaUrl',
+                'post.caption AS post_caption',
+                'post.likes AS post_likes',
+                'post.dislikes AS post_dislikes',
+                'post.shares AS post_shares',
+                'user.id AS user_id',
+                'user.name AS user_name',
+                'user.profilePic AS user_profilepic',
+                'user.username AS user_username',
+                'COUNT(comments.id) AS comments_count',
+                'COUNT(postLikes.id) AS like_count',
+                'post.createdAt AS createdAt',
+                'post.media AS post_media',
+                'post.content AS post_content',
+            ])
+            .groupBy('post.id, user.id') // Group to count likes and comments correctly
+            .getRawMany();
+
+
+        const finalPosts = [];
+
+        for (const post of posts) {
+            // یافتن اطلاعات لایک و ذخیره بودن پست برای کاربر
+            const existingLike = await this.likePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: senderId}},
+            });
+            const existingSave = await this.savePostRepository.findOne({
+                where: {post: {id: post.id}, user: {id: senderId}},
+            });
+
+            if (post.post_id > 0) {
+                finalPosts.push({
+                    content: post.post_content, // Structure for additional images if needed
+                    media: post.media,
+                    id: post.post_id,
+                    user: {
+                        id: post.user_id,
+                        name: post.user_name,
+                        pic: post.user_profilepic,
+                        username: post.user_username,
+                    },
+                    caption: post.post_caption,
+                    img: post.post_media,
+                    likes: post.post_likes,
+                    dislikes: post.post_dislikes,
+                    commentsCount: post.comments_count,
+                    sharesCount: post.post_shares, // If you have a share count, replace this
+                    comments: [], // You'll need to fetch and structure comments separately if needed
+                    createdAt: post.createdAt,
+                    isLiked: (!!existingLike && existingLike.isLike == 1), // Set based on your logic
+                    isDisliked: (!!existingLike && existingLike.isLike == -1), // Set based on your logic
+                    isSaved: (!!existingSave), // Set based on your logic
+
+                });
+            }
+        }
+
+        return finalPosts;
     }
 
 }

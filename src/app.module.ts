@@ -53,6 +53,9 @@ import {LikePostModule} from "@/Social/Post/like-post/like-post.module";
 import {SavePostModule} from "@/Social/Post/save-post/save-post.module";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
+import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {NotificationService} from "@/Social/Notification/notification.service";
+import {HttpModule, HttpService} from "@nestjs/axios";
 
 
 @Module({
@@ -102,6 +105,7 @@ import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
             CryptoEntity,
             FollowUser,
             savePost,
+            Notification,
         ]),
         AuctionModule,
         CollectionEntityModule,
@@ -126,6 +130,8 @@ import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
         MessageModule,
         NotificationModule,
         WalletModule,
+        HttpModule,
+
     ],
     controllers: [AppController,],
     providers: [
@@ -134,6 +140,7 @@ import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
         IPFSService,
         SmsService,
         JwtStrategy,
+        NotificationService,
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,

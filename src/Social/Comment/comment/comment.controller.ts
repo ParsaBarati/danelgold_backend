@@ -27,11 +27,12 @@ import {UpdateCommentDTO} from './dto/UpdateComment.dto';
 import {CreateCommentDTO} from './dto/CreateComment';
 import {Roles} from '@/common/decorators/roles.decorator';
 import {Request} from 'express';
+import {NotificationService} from "@/Social/Notification/notification.service";
 
 @ApiExcludeController()
 @Controller('comment')
 export class CommentController {
-    constructor(private readonly commentsService: CommentService) {
+    constructor(private readonly commentsService: CommentService, private readonly notificationService: NotificationService,) {
     }
 
     @ApiOperation({summary: 'CommentPost'})

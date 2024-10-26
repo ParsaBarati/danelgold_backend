@@ -71,7 +71,7 @@ export class PostsController {
     @ApiOperation({summary: 'getExplorerWithoutPaginate'})
     @Get('explorer')
     async getAllPosts(
-        @Req() req:Request
+        @Req() req: Request
     ) {
         return await this.postService.getAllPosts((req.user as any));
     }
@@ -86,7 +86,7 @@ export class PostsController {
         @Req() req: Request
     ) {
         const query = {page, limit};
-        return this.postService.getExplorer(query,(req.user as any));
+        return this.postService.getExplorer(query, (req.user as any));
     }
 
     @ApiOperation({summary: 'comments'})
