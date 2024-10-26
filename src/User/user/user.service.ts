@@ -423,4 +423,42 @@ export class UserService {
         await this.userRepository.save(user);
         return user;
     }
+
+    async getFollowers(user: User): Promise<Awaited<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }>[]> {
+        const followers = await this.followUserRepository.find({
+            where: {followingId: user.id},
+            relations: ['follower'],
+        });
+
+        // بررسی وضعیت فالو/آنفالو برای هر فالوور
+        return await Promise.all(
+            followers.map(async (follow) => {
+                const isFollowing = await this.followUserRepository.findOne({
+                    where: {
+                        followerId: user.id,
+                        followingId: follow.follower.id,
+                    },
+                });
+                // ایجاد یک کپی از فالوور و اضافه کردن وضعیت فالو/آنفالو
+                return {
+                    id: follow.follower.id,
+                    name: follow.follower.name,
+                    username: follow.follower.username,
+                    pic: follow.follower.profilePic ?? "",
+                    isFollowing: !!isFollowing,
+                };
+            })
+        );
+    }
+
+    async getFollowings(user: User): Promise<User[]> {
+        const followings = await this.followUserRepository.find({
+            where: {followerId: user.id},
+            relations: ['following'],
+        });
+
+        return followings.map((follow) => follow.following);
+    }
+
+
 }

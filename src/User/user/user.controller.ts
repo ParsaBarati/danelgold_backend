@@ -56,6 +56,30 @@ export class UserController {
         return await this.userService.follow(userId, (req.user as any));
     }
 
+    @ApiOperation({summary: 'Followers'})
+    @ApiOkResponse({description: 'Followers list', example: {statusCode: 200}})
+    @Get('/followers')
+    @UseGuards(AuthGuard('jwt'))
+
+    async followers(
+        @Req() req: Request,
+    ) {
+
+        return await this.userService.getFollowers((req.user as any));
+    }
+
+    @ApiOperation({summary: 'Followings'})
+    @ApiOkResponse({description: 'Followings list', example: {statusCode: 200}})
+    @Get('/followings')
+    @UseGuards(AuthGuard('jwt'))
+
+    async followings(
+        @Req() req: Request,
+    ) {
+
+        return await this.userService.getFollowings((req.user as any));
+    }
+
 
     @ApiExcludeEndpoint()
     @ApiOperation({summary: 'Get All Users'})
@@ -75,7 +99,7 @@ export class UserController {
         @Req() req: Request,
     ) {
         const {name, bio} = updateUserDTO;
-        console.log('User: ',req.user)
+        console.log('User: ', req.user)
         return await this.userService.update(req.user as any, name, bio,);
     }
 }
