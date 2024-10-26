@@ -1,11 +1,9 @@
-import {Controller, Get, Param, Req, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Req, UseGuards} from "@nestjs/common";
 import {NotificationService} from "./notification.service";
 import {ApiBearerAuth, ApiOperation, ApiTags} from "@nestjs/swagger";
 import { Request } from 'express';
-import {User} from "@/User/user/entity/user.entity";
 import {AuthGuard} from "@nestjs/passport";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import { NotificationAction } from "./entity/notification.entity";
 
 @ApiTags('Notification')
 @ApiBearerAuth()
@@ -13,8 +11,24 @@ import {Repository} from "typeorm";
 export class NotificationController {
     constructor(
         private readonly notificationService: NotificationService
-    ) {
-    }
+    ) {}
+
+    @Post('send')
+  async sendNotification(
+    @Body('recipientId') recipientId: number,
+    @Body('action') action: NotificationAction,
+    @Body('title') title: string,
+    @Body('thumb') thumb: string,
+    @Body('senderId') senderId?: number, // senderId is optional
+  ) {
+    return this.notificationService.sendNotification(
+      recipientId,
+      action,
+      title,
+      thumb,
+      senderId,
+    );
+  }
 
     @ApiOperation({summary: 'GetNotifications'})
     @Get('/')
@@ -25,15 +39,17 @@ export class NotificationController {
         return await this.notificationService.getNotifications(req.user as any)
     }
 
-
     @ApiOperation({summary: 'SendNotif'})
     @Get('send')
     @UseGuards(AuthGuard('jwt'))
 
-    async sendNotification(
+    async sendPushNotification(
         @Req() req: Request
     ) {
-        return await this.notificationService.sendPushNotification((req.user as any),"Test","Sample data","Sample body")
+        return await this.notificationService.sendPushNotification(
+            (req.user as any),
+            "Test","Sample data","Sample body"
+        )
     }
 
 
