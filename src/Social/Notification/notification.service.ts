@@ -1,12 +1,13 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Notification} from './entity/notification.entity';
+import {Notification, NotificationAction} from './entity/notification.entity';
 import {lastValueFrom} from "rxjs";
 import {HttpService} from '@nestjs/axios';
 import * as fs from "fs";
 import * as jwt from 'jsonwebtoken';
 import {User} from "@/User/user/entity/user.entity";
+
 
 @Injectable()
 export class NotificationService {
@@ -18,6 +19,7 @@ export class NotificationService {
         private readonly httpService: HttpService,
     ) {
     }
+    
 
     async getNotifications(userIdentifier: string): Promise<any> {
 
@@ -86,7 +88,6 @@ export class NotificationService {
         return response.data.access_token;
     }
 
-
     async sendPushNotification(user: User, title: string, data: any, body = '', imgUrl = ''): Promise<any> {
         const self = await this.userRepository.findOne({
             where: {id: user.id,}
@@ -139,4 +140,36 @@ export class NotificationService {
         }
 
     }
+
+    async sendNotification(
+        recipientId: number,
+        action: NotificationAction,
+        title: string,
+        thumb: string,
+        senderId?: number,
+      ): Promise<Notification> {
+
+        const recipient = await this.userRepository.findOne({ 
+            where: { id: recipientId } 
+        });
+
+        const sender = senderId ? await this.userRepository.findOne({
+            where: { id: senderId } 
+        }) : null;
+    
+        if (!recipient) {
+          throw new Error('Invalid recipient');
+        }
+    
+        const notification = this.notificationRepository.create({
+          title,
+          thumb,
+          action,
+          user: sender, 
+          recipient,
+        });
+    
+        return await this.notificationRepository.save(notification);
+      }
+
 }

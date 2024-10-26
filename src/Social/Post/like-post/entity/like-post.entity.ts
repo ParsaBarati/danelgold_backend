@@ -21,6 +21,7 @@ import {
   
     @Column({ type: 'int'})
     postId: number;
+    
     @Column({ type: 'int'})
     userId: number;
   

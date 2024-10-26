@@ -64,6 +64,12 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let UploadController = class UploadController {
+    createUploads(files) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            return yield _this.uploadService.createUploads(files);
+        })();
+    }
     createUpload(file) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -125,6 +131,20 @@ let UploadController = class UploadController {
         this.uploadService = uploadService;
     }
 };
+_ts_decorate([
+    (0, _common.Post)('bulk'),
+    (0, _common.UseInterceptors)((0, _platformexpress.FilesInterceptor)('files')),
+    _ts_param(0, (0, _common.UploadedFiles)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
+        maxSize: 500 * 1024 * 1024
+    }).build({
+        errorHttpStatusCode: _common.HttpStatus.UNPROCESSABLE_ENTITY
+    }))),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        Array
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], UploadController.prototype, "createUploads", null);
 _ts_decorate([
     (0, _common.Post)(),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),

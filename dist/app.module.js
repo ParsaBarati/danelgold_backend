@@ -62,6 +62,7 @@ const _followentity = require("./Social/Follow/entity/follow.entity");
 const _likepostmodule = require("./Social/Post/like-post/like-post.module");
 const _savepostmodule = require("./Social/Post/save-post/save-post.module");
 const _savepostentity = require("./Social/Post/save-post/entity/save-post.entity");
+const _likestorymodule = require("./Social/Story/like-story/like-story.module");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -195,6 +196,7 @@ AppModule = _ts_decorate([
             _storiesmodule.StoriesModule,
             _postsmodule.PostsModule,
             _likepostmodule.LikePostModule,
+            _likestorymodule.LikeStoryModule,
             _savepostmodule.SavePostModule,
             _RSTmodule.RSTModule,
             _messagemodule.MessageModule,

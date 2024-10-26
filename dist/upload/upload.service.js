@@ -8,6 +8,7 @@ Object.defineProperty(exports, "UploadService", {
         return UploadService;
     }
 });
+const _pagitnateservice = require("../common/paginate/pagitnate.service");
 const _common = require("@nestjs/common");
 const _typeorm = require("@nestjs/typeorm");
 const _uplaodentity = require("./entity/uplaod.entity");
@@ -15,7 +16,6 @@ const _typeorm1 = require("typeorm");
 const _path = require("path");
 const _fsextra = /*#__PURE__*/ _interop_require_default(require("fs-extra"));
 const _responseutil = require("../utils/response.util");
-const _pagitnateservice = require("../common/paginate/pagitnate.service");
 const _userentity = require("../User/user/entity/user.entity");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
@@ -118,11 +118,44 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let UploadService = class UploadService {
+    createUploads(files) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            if (!files || !files || files.length === 0) {
+                throw new _common.NotFoundException('No files to upload');
+            }
+            const uploads = [];
+            const links = [];
+            const baseUrl = process.env.BASE_URL_UPLOAD;
+            const timestamp = Date.now();
+            for (const file of files){
+                const sizeFile = file.size;
+                const uploadFileName = file.filename;
+                const uploadDestination = file.destination;
+                const uploadMemType = file.mimetype;
+                const newUpload = _this.uploadRepository.create({
+                    name: uploadFileName,
+                    size: sizeFile,
+                    memType: file.mimetype,
+                    destination: file.destination
+                });
+                const savedUpload = yield _this.uploadRepository.save(newUpload);
+                const encodedFileName = `${savedUpload.destination.replace(/\\/g, '/')}/${encodeURIComponent(savedUpload.name)}`;
+                const link = baseUrl + encodedFileName;
+                uploads.push(savedUpload);
+                links.push(link);
+            }
+            return {
+                uploads,
+                links
+            };
+        })();
+    }
     createUpload(file) {
         var _this = this;
         return _async_to_generator(function*() {
             if (!file) {
-                throw new _common.NotFoundException('فایلی برای آپلود یافت نشد');
+                throw new _common.NotFoundException('No file to upload');
             }
             const sizeFile = file.size;
             const uploadFileName = file.filename;

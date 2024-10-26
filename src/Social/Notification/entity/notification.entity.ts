@@ -4,10 +4,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export enum NotificationAction {
   FOLLOW = 'follow',
-  UNFOLLOW = 'unfollow',
-  POST = 'post',
-  COMMENT = 'comment',
+  MESSAGE = 'message',
   LIKE = 'like',
+  COMMENT = 'comment',
+  REPLY = 'reply',
+  MENTION = 'mention',
+  SHARE = 'share',
+  REPOST = 'repost',
+  SUGGESTION = 'suggestion',
 }
 
 @Entity('notifications')
@@ -30,9 +34,9 @@ export class Notification {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.sentNotifications)
+  @ManyToOne(() => User, (user) => user.sentNotifications, { nullable: true })
   @ApiProperty({ type: () => User })
-  user: Relation<User>; 
+  user: Relation<User> | null;
 
   @ManyToOne(() => User, (user) => user.receivedNotifications)
   @ApiProperty({ type: () => User })
