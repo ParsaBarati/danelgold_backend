@@ -66,6 +66,19 @@ export class UserController {
         return await this.userService.follow(userId, (req.user as any));
     }
 
+    @ApiOperation({summary: 'Block'})
+    @ApiOkResponse({description: 'Block', example: {statusCode: 200}})
+    @Post('/:userId/block')
+    @UseGuards(AuthGuard('jwt'))
+
+    async blockUser(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Req() req: Request,
+    ) {
+
+        return await this.userService.blockUser(userId, (req.user as any));
+    }
+
     @ApiOperation({summary: 'Followers'})
     @ApiOkResponse({description: 'Followers list', example: {statusCode: 200}})
     @Get('/followers')
@@ -88,6 +101,18 @@ export class UserController {
     ) {
 
         return await this.userService.getFollowings((req.user as any));
+    }
+
+    @ApiOperation({summary: 'blocked'})
+    @ApiOkResponse({description: 'blocked list', example: {statusCode: 200}})
+    @Get('/blocked')
+    @UseGuards(AuthGuard('jwt'))
+
+    async getBlocked(
+        @Req() req: Request,
+    ) {
+
+        return await this.userService.getBlocked((req.user as any));
     }
 
     @ApiOperation({summary: 'Sharing List'})

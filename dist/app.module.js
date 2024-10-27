@@ -67,6 +67,7 @@ const _notificationservice = require("./Social/Notification/notification.service
 const _axios = require("@nestjs/axios");
 const _messagemodule = require("./Social/Message/message/message.module");
 const _likemessagemodule = require("./Social/Message/like-message/like-message.module");
+const _blockentity = require("./Social/Block/entity/block.entity");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -181,6 +182,7 @@ AppModule = _ts_decorate([
                 _likestoryentity.likeStory,
                 _cryptoentity.CryptoEntity,
                 _followentity.FollowUser,
+                _blockentity.BlockUser,
                 _savepostentity.savePost,
                 _notificationentity.Notification
             ]),

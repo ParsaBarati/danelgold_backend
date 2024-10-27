@@ -29,10 +29,24 @@ import {NotificationService} from "@/Social/Notification/notification.service";
 import {HttpModule} from "@nestjs/axios";
 import {Notification} from "@/Social/Notification/entity/notification.entity";
 import {NotificationModule} from "@/Social/Notification/notification.module";
+import { BlockUser } from '@/Social/Block/entity/block.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, UserDetail, Token, Post, Story, Club, likePost, savePost, FollowUser, likeStory,Notification]),
+        TypeOrmModule.forFeature([
+            User, 
+            UserDetail, 
+            Token, 
+            Post, 
+            Story, 
+            Club, 
+            likePost, 
+            savePost, 
+            FollowUser,
+            BlockUser, 
+            likeStory,
+            Notification
+        ]),
         PassportModule,
         UserModule,
         OtpModule,

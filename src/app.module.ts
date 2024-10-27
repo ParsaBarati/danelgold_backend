@@ -57,6 +57,7 @@ import { NotificationService } from './Social/Notification/notification.service'
 import { HttpModule } from '@nestjs/axios';
 import { MessageModule } from './Social/Message/message/message.module';
 import { LikeMessageModule } from './Social/Message/like-message/like-message.module';
+import { BlockUser } from './Social/Block/entity/block.entity';
 
 
 
@@ -106,6 +107,7 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
             likeStory,
             CryptoEntity,
             FollowUser,
+            BlockUser,
             savePost,
             Notification,
         ]),

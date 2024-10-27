@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm/index';
 import {User} from '@/User/user/entity/user.entity';
@@ -14,6 +14,7 @@ import {savePost} from '@/Social/Post/save-post/entity/save-post.entity';
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
 import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
+import { BlockUser } from '@/Social/Block/entity/block.entity';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,8 @@ export class UserService {
         private userRepository: Repository<User>,
         @InjectRepository(FollowUser)
         private followUserRepository: Repository<FollowUser>,
+        @InjectRepository(BlockUser)
+        private blockUserRepository: Repository<BlockUser>,
         @InjectRepository(likePost)
         private likePostRepository: Repository<likePost>,
         @InjectRepository(likeStory)
@@ -60,7 +63,7 @@ export class UserService {
     }
 
     async getHomepageData(user: User): Promise<any> {
-        // Fetch user's own story (if exists)
+
         const userStory = await this.storyRepository
             .createQueryBuilder('stories')
             .leftJoinAndSelect('stories.user', 'user')
@@ -207,7 +210,6 @@ export class UserService {
             stories: finalStories,
         };
     }
-
 
     async getReels(user: User): Promise<any> {
 
@@ -359,11 +361,8 @@ export class UserService {
 
     }
 
-
-
     async getPostsForUser(userId, user: User) {
 
-        // Fetch posts created by the user
         const posts = await this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.postLikes', 'postLikes')
@@ -431,7 +430,6 @@ export class UserService {
         return finalPosts;
     }
 
-
     async getAllUsers() {
         const users = await this.userRepository.find({
             select: ['username', 'name', 'id', 'profilePic', 'createdAt'], // Adjust fields as necessary
@@ -451,6 +449,15 @@ export class UserService {
 
         if (!user) {
             throw new NotFoundException('User not found');
+        }
+
+        const isBlocked = await this.blockUserRepository.findOneBy([
+            { blockerId: user.id, blockedId: userId },
+            { blockerId: userId, blockedId: user.id }
+        ]);
+    
+        if (isBlocked) {
+            throw new ForbiddenException('Action not allowed due to a block.');
         }
 
         let isFollowing = await this.followUserRepository.findOneBy({
@@ -476,6 +483,32 @@ export class UserService {
         return {isFollowing: !isFollowing};
     }
 
+    async blockUser(
+        userId: number,
+        user: User,
+    ): Promise<{ isBlocked: boolean }> {
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+    
+        const isBlocked = await this.blockUserRepository.findOneBy({
+            blockerId: user.id,
+            blockedId: userId
+        });
+    
+        if (!isBlocked) {
+            const block = await this.blockUserRepository.create({
+                blockerId: user.id,
+                blockedId: userId
+            });
+            await this.blockUserRepository.save(block);
+            return { isBlocked: true };
+        } else {
+            await this.blockUserRepository.remove(isBlocked);
+            return { isBlocked: false };
+        }
+    }
+    
     async update(user: User, name: string, bio: string) {
         console.log(user)
         if (!user) {
@@ -535,6 +568,22 @@ export class UserService {
             };
         });
     }
+
+    async getBlocked(user: User): Promise<{ isBlocked: boolean; name: string; id: number; pic: string; username: string }[]> {
+        const blockedUsers = await this.blockUserRepository.find({
+            where: { blockerId: user.id },
+            relations: ['blocked'],
+        });
+    
+        return blockedUsers.map((block) => ({
+            id: block.blocked?.id,
+            name: block.blocked?.name,
+            username: block.blocked?.username,
+            pic: block.blocked?.profilePic ?? "",
+            isBlocked: true,
+        }));
+    }
+    
 
 
 }

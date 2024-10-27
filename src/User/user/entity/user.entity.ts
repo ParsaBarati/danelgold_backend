@@ -35,6 +35,7 @@ import {FollowUser} from '@/Social/Follow/entity/follow.entity';
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 import { Message } from '@/Social/Message/message/entity/message.entity';
+import { BlockUser } from '@/Social/Block/entity/block.entity';
 
 export enum UserRole {
     USER = 'user',
@@ -93,6 +94,14 @@ export class User {
     @OneToMany(() => FollowUser, (followUser) => followUser.following)
     @ApiProperty({type: () => [FollowUser]})
     following: Relation<FollowUser[]>;
+
+    @OneToMany(() => BlockUser, (blockUser) => blockUser.blocker)
+    @ApiProperty({ type: () => [BlockUser] })
+    blockedUsers: Relation<BlockUser[]>;
+
+    @OneToMany(() => BlockUser, (blockUser) => blockUser.blocked)
+    @ApiProperty({ type: () => [BlockUser] })
+    blockingUsers: Relation<BlockUser[]>;
 
     @OneToMany(() => Token, (token) => token.user)
     @ApiProperty({type: () => [Token]})
