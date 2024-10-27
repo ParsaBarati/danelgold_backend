@@ -29,12 +29,12 @@ import {likePost} from '@/Social/Post/like-post/entity/like-post.entity';
 import {Reply} from '@/Social/Comment/replyComment/entity/reply.entity';
 import {likeStory} from '@/Social/Story/like-story/entity/like-story.entity';
 import {Club} from '@/Social/Club/entity/club.entity';
-import {Message} from '@/Social/Message/entity/message.entity';
 import {Notification} from '@/Social/Notification/entity/notification.entity';
 import {Wallet} from '@/NFT/wallet/entity/wallet.entity';
 import {FollowUser} from '@/Social/Follow/entity/follow.entity';
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
+import { Message } from '@/Social/Message/message/entity/message.entity';
 
 export enum UserRole {
     USER = 'user',

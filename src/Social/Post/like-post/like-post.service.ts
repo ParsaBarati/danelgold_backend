@@ -88,7 +88,6 @@ export class LikePostService {
         return { isLike: existingLike.isLike };
     }
     
-
     async dislikePost(
         postId: number,
         user: User,

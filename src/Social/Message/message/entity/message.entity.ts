@@ -1,8 +1,9 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation} from 'typeorm';
 import {ApiProperty} from '@nestjs/swagger';
 import {User} from '@/User/user/entity/user.entity';
 import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {Story} from "@/Social/Story/stories/entity/stories.entity";
+import { likeMessage } from '../../like-message/entity/like-message.entity';
 
 @Entity('messages')
 export class Message {
@@ -12,8 +13,14 @@ export class Message {
     @Column({type: 'text', nullable: true})
     content: string | null;
 
+    @Column({ type: 'int', default: 0 })
+    likes: number;
+
     @CreateDateColumn()
     createdAt: Date;
+
+    @Column({ type: 'boolean', default: false })
+    isLiked: boolean;
 
     @ManyToOne(() => User, (sender) => sender.sentMessages)
     @ApiProperty({type: () => User})
@@ -39,6 +46,9 @@ export class Message {
     @Column({type: 'boolean', default: false})
     isShared: boolean;
 
+    @OneToMany(() => likeMessage, (messagelikes) => messagelikes.message)
+    @ApiProperty({ type: () => likeMessage })
+    messagelikes: Relation<likeMessage[]>
 
     @ManyToOne(() => Post, (post) => [])
     @JoinColumn({name: 'postId', referencedColumnName: 'id'})

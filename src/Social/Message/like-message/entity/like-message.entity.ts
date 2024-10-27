@@ -10,14 +10,18 @@ import {
   import { ApiProperty } from '@nestjs/swagger';
   import { User } from '@/User/user/entity/user.entity';
   import { Post } from '@/Social/Post/posts/entity/posts.entity';
+import { Message } from '../../message/entity/message.entity';
   
-  @Entity({ name: 'postSaves' })
-  export class savePost {
+  @Entity({ name: 'messageLikes' })
+  export class likeMessage {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ type: 'int', nullable: true, default: 0 })
+    isLike: number;
+
     @Column({ type: 'int'})
-    postId: number;
+    messsageId: number;
 
     @Column({ type: 'int'})
     userId: number;
@@ -25,10 +29,10 @@ import {
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
   
-    @ManyToOne(() => Post, (post) => post.postSaves)
-    @JoinColumn({ name: 'postId', referencedColumnName: 'id' })
-    @ApiProperty({ type: () => Post })
-    post: Relation<Post>;
+    @ManyToOne(() => Message, (message) => message.messagelikes)
+    @JoinColumn({ name: 'messageId', referencedColumnName: 'id' })
+    @ApiProperty({ type: () => Message })
+    message: Relation<Message>;
   
     @ManyToOne(() => User, (user) => user.postSaves)
     @JoinColumn({ name: 'userId', referencedColumnName: 'id' })

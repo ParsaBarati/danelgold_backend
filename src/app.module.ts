@@ -44,7 +44,6 @@ import {likePost} from './Social/Post/like-post/entity/like-post.entity';
 import {likeStory} from './Social/Story/like-story/entity/like-story.entity';
 import {RSTModule} from './Social/Support-Ticket/RST/RST.module';
 import {Club} from './Social/Club/entity/club.entity';
-import {MessageModule} from './Social/Message/message.module';
 import {NotificationModule} from './Social/Notification/notification.module';
 import {WalletModule} from './NFT/wallet/wallet.module';
 import {CryptoEntity} from './NFT/Crypto/entity/crypto.entity';
@@ -56,6 +55,8 @@ import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
 import { Notification } from './Social/Notification/entity/notification.entity';
 import { NotificationService } from './Social/Notification/notification.service';
 import { HttpModule } from '@nestjs/axios';
+import { MessageModule } from './Social/Message/message/message.module';
+import { LikeMessageModule } from './Social/Message/like-message/like-message.module';
 
 
 @Module({
@@ -128,6 +129,7 @@ import { HttpModule } from '@nestjs/axios';
         SavePostModule,
         RSTModule,
         MessageModule,
+        LikeMessageModule,
         NotificationModule,
         WalletModule,
         HttpModule

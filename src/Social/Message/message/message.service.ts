@@ -1,10 +1,10 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Message} from "./entity/message.entity";
 import {In, Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
-import { NotificationAction } from "../Notification/entity/notification.entity";
+import { Message } from "./entity/message.entity";
+import { NotificationAction } from "@/Social/Notification/entity/notification.entity";
 
 
 @Injectable()

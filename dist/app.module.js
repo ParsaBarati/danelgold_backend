@@ -54,7 +54,6 @@ const _likepostentity = require("./Social/Post/like-post/entity/like-post.entity
 const _likestoryentity = require("./Social/Story/like-story/entity/like-story.entity");
 const _RSTmodule = require("./Social/Support-Ticket/RST/RST.module");
 const _clubentity = require("./Social/Club/entity/club.entity");
-const _messagemodule = require("./Social/Message/message.module");
 const _notificationmodule = require("./Social/Notification/notification.module");
 const _walletmodule = require("./NFT/wallet/wallet.module");
 const _cryptoentity = require("./NFT/Crypto/entity/crypto.entity");
@@ -66,6 +65,8 @@ const _likestorymodule = require("./Social/Story/like-story/like-story.module");
 const _notificationentity = require("./Social/Notification/entity/notification.entity");
 const _notificationservice = require("./Social/Notification/notification.service");
 const _axios = require("@nestjs/axios");
+const _messagemodule = require("./Social/Message/message/message.module");
+const _likemessagemodule = require("./Social/Message/like-message/like-message.module");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -204,6 +205,7 @@ AppModule = _ts_decorate([
             _savepostmodule.SavePostModule,
             _RSTmodule.RSTModule,
             _messagemodule.MessageModule,
+            _likemessagemodule.LikeMessageModule,
             _notificationmodule.NotificationModule,
             _walletmodule.WalletModule,
             _axios.HttpModule

@@ -418,9 +418,8 @@ export class UserService {
     }
 
     return { isFollowing: !isFollowing };
-}
-
-    
+   }
+  
     async update(user: User, name: string, bio: string) {
         console.log(user)
         if (!user) {
