@@ -14,6 +14,7 @@ export enum NotificationAction {
   SUGGESTION = 'suggestion',
 }
 
+
 @Entity('notifications')
 export class Notification {
   @PrimaryGeneratedColumn()
