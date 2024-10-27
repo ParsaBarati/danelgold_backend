@@ -29,7 +29,7 @@ import {HttpModule} from "@nestjs/axios";
         likePost,
         likeStory,
         Notification,
-    ]),HttpModule],
+    ])],
     controllers: [UserController],
     providers: [UserService, SmsService, NotificationService]
 })

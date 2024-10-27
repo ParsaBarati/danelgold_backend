@@ -38,7 +38,6 @@ import {NotificationModule} from "@/Social/Notification/notification.module";
         OtpModule,
         TokenModule,
         ConfigModule,
-        HttpModule,
     ],
     controllers: [AuthController],
     providers: [

@@ -28,7 +28,7 @@ import {NotificationService} from "@/Social/Notification/notification.service";
         UserModule,
         TypeOrmModule.forFeature([Token, User, Post, Story, Club, likePost, savePost, FollowUser, likeStory, Notification]),
         ConfigModule,
-        HttpModule,
+
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

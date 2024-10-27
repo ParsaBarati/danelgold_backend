@@ -86,6 +86,7 @@ export class NotificationService {
         );
 
         return response.data.access_token;
+        return  "";
     }
 
     async sendPushNotification(user: User, title: string, data: any, body = '', imgUrl = ''): Promise<any> {
@@ -132,7 +133,7 @@ export class NotificationService {
             const response = await lastValueFrom(
                 this.httpService.post("https://fcm.googleapis.com/v1/projects/hive-e1b7e/messages:send", fields, {headers}),
             );
-            console.log("Push ID: ", response.data)
+            console.log("Response: ", response.data)
             return response.data;
 
         } catch (e) {

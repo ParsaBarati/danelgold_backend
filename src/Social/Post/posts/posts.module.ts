@@ -34,7 +34,7 @@ import {HttpModule} from "@nestjs/axios";
         CollectionEntity,
         FollowUser,
         Notification
-    ]),HttpModule],
+    ])],
     controllers: [PostsController, SearchController],
     providers: [PostService, PaginationService, CommentService, SearchService, NotificationService]
 })

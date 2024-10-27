@@ -55,7 +55,7 @@ import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {LikeStoryModule} from "@/Social/Story/like-story/like-story.module";
 import {Notification} from "@/Social/Notification/entity/notification.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
-import {HttpModule, HttpService} from "@nestjs/axios";
+import {HttpModule} from "@nestjs/axios";
 
 
 @Module({
@@ -130,7 +130,10 @@ import {HttpModule, HttpService} from "@nestjs/axios";
         MessageModule,
         NotificationModule,
         WalletModule,
-        HttpModule,
+        {
+            global: true,
+            ...HttpModule.register({maxRedirects: 5}),
+        }
 
     ],
     controllers: [AppController,],
@@ -158,7 +161,7 @@ import {HttpModule, HttpService} from "@nestjs/axios";
             useClass: AllExceptionsFilter,
         },
     ],
-    exports: [IPFSService]
+    exports: [IPFSService, HttpModule]
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

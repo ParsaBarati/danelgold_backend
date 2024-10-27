@@ -14,7 +14,7 @@ import {Story} from "@/Social/Story/stories/entity/stories.entity";
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Message, User, Notification, likePost, savePost, Post, Story]), HttpModule],
+    imports: [TypeOrmModule.forFeature([Message, User, Notification, likePost, savePost, Post, Story])],
     controllers: [MessageController],
     providers: [MessageService, NotificationService]
 })

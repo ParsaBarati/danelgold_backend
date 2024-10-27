@@ -18,7 +18,7 @@ import {HttpModule} from "@nestjs/axios";
         likeComment,
         User,
         Notification,
-    ]),HttpModule],
+    ])],
     controllers: [CommentController],
     providers: [CommentService, PaginationService, NotificationService],
 })

@@ -36,11 +36,21 @@ export class UserController {
 
     @ApiOperation({summary: 'Profile By ID'})
     @Get('profile/:id')
+    @UseGuards(AuthGuard('jwt'))
     async getProfileById(
         @Param('id', ParseIntPipe) id: number,
         @Req() req: Request,
     ) {
         return await this.userService.getProfileById(id, (req.user as any))
+    }
+    @ApiOperation({summary: 'Posts By User Id'})
+    @Get('profile/:id/posts')
+    @UseGuards(AuthGuard('jwt'))
+    async getPostsByUserId(
+        @Param('id', ParseIntPipe) id: number,
+        @Req() req: Request,
+    ) {
+        return await this.userService.getPostsForUser(id, (req.user as any))
     }
 
     @ApiOperation({summary: 'Follow'})
