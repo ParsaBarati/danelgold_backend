@@ -35,15 +35,6 @@ export class PostsController {
         return await this.postService.createPost(req.user as any, createPostDto)
     }
 
-    @ApiOperation({summary: ' Repost'})
-    @Post('repost/:postId')
-    async repost(
-        @Req() req: Request,
-        @Param('postId',ParseIntPipe) postId: number
-    ) {
-        return await this.postService.repost(postId ,req.user as any)
-    }
-
     @ApiOperation({summary: 'UpdatePost'})
     @Put()
     async updatePost(
@@ -80,7 +71,7 @@ export class PostsController {
     @ApiOperation({summary: 'getExplorerWithoutPaginate'})
     @Get('explorer')
     async getAllPosts(
-        @Req() req:Request
+        @Req() req: Request
     ) {
         return await this.postService.getAllPosts((req.user as any));
     }
@@ -95,7 +86,7 @@ export class PostsController {
         @Req() req: Request
     ) {
         const query = {page, limit};
-        return this.postService.getExplorer(query,(req.user as any));
+        return this.postService.getExplorer(query, (req.user as any));
     }
 
     @ApiOperation({summary: 'comments'})

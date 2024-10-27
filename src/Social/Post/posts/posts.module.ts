@@ -15,28 +15,28 @@ import {SearchController} from "@/search/search.controller";
 import {NFT} from "@/NFT/nft/entity/nft.entity";
 import {CollectionEntity} from "@/Market/collection/entity/collection.entity";
 import {SearchService} from "@/search/search.service";
-import { FollowUser } from '@/Social/Follow/entity/follow.entity';
-import { Notification } from '@/Social/Notification/entity/notification.entity';
-import { HttpModule } from '@nestjs/axios';
-import { NotificationService } from '@/Social/Notification/notification.service';
+import {FollowUser} from '@/Social/Follow/entity/follow.entity';
+import {NotificationService} from "@/Social/Notification/notification.service";
+import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
     imports: [TypeOrmModule.forFeature([
-        Post, 
-        User, 
-        Comment, 
-        Story, 
-        Reply, 
-        likeComment, 
-        Comment, 
-        likePost, 
-        NFT, 
+        Post,
+        User,
+        Comment,
+        Story,
+        Reply,
+        likeComment,
+        Comment,
+        likePost,
+        NFT,
         CollectionEntity,
         FollowUser,
         Notification
-    ]),HttpModule],
+    ])],
     controllers: [PostsController, SearchController],
-    providers: [PostService, PaginationService, CommentService, SearchService,NotificationService]
+    providers: [PostService, PaginationService, CommentService, SearchService, NotificationService]
 })
 export class PostsModule {
 }

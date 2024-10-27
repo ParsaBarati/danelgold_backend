@@ -25,30 +25,19 @@ import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
-import { Notification } from '@/Social/Notification/entity/notification.entity';
-import { HttpModule } from '@nestjs/axios';
-import { NotificationService } from '@/Social/Notification/notification.service';
+import {NotificationService} from "@/Social/Notification/notification.service";
+import {HttpModule} from "@nestjs/axios";
+import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {NotificationModule} from "@/Social/Notification/notification.module";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            User, 
-            UserDetail, 
-            Token, 
-            Post, 
-            Story, 
-            Club, 
-            likePost, 
-            savePost, 
-            FollowUser, 
-            likeStory, 
-            Notification]),
+        TypeOrmModule.forFeature([User, UserDetail, Token, Post, Story, Club, likePost, savePost, FollowUser, likeStory,Notification]),
         PassportModule,
         UserModule,
         OtpModule,
         TokenModule,
         ConfigModule,
-        HttpModule
     ],
     controllers: [AuthController],
     providers: [
@@ -61,7 +50,7 @@ import { NotificationService } from '@/Social/Notification/notification.service'
         UserDetailService,
         SmsService,
         PaginationService,
-        NotificationService
+        NotificationService,
     ],
     exports: [JwtStrategy, PassportModule],
 })

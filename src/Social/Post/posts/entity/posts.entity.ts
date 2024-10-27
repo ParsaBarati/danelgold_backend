@@ -8,67 +8,60 @@ import {
     Relation,
     UpdateDateColumn,
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { Comment } from '@/Social/Comment/comment/entity/comment.entity';
-import { ApiProperty } from '@nestjs/swagger';
-import { likePost } from '@/Social/Post/like-post/entity/like-post.entity';
-import { savePost } from "@/Social/Post/save-post/entity/save-post.entity";
+import {User} from '@/User/user/entity/user.entity';
+import {Comment} from '@/Social/Comment/comment/entity/comment.entity';
+import {ApiProperty} from '@nestjs/swagger';
+import {likePost} from '@/Social/Post/like-post/entity/like-post.entity';
+import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 
 @Entity('posts')
 export class Post {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'text' })
+    @Column({type: 'text'})
     mediaUrl: string;
-
-    @Column({ type: 'text' })
+    @Column({type: 'text'})
     media: string;
 
-    @Column({ type: 'text', array: true, default: [] })
+    @Column({type: 'text', array: true, default: []})
     content: string[];
 
-    @Column({ type: 'text' })
+    @Column({type: 'text'})
     caption: string;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({type: 'int', default: 0})
     likes: number;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({type: 'int', default: 0})
     saves: number;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({type: 'int', default: 0})
     dislikes: number;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({type: 'int', default: 0})
     shares: number; // New field for shares
 
-    @Column({ type: 'int', default: 0 })
-    repostsCount: number; // New field for repost count
-
-    @Column({ type: 'boolean', default: false })
+    @Column({type: 'boolean', default: false})
     isSaved: boolean; // New field for isSaved
 
-    @Column({ type: 'boolean', default: false })
+    @Column({type: 'boolean', default: false})
     isLiked: boolean; // New field for isLiked
 
-    @Column({ type: 'boolean', default: false })
+    @Column({type: 'boolean', default: false})
     isDisliked: boolean; // New field for isDisliked
 
-    @Column({ type: 'boolean', default: false })
+    @Column({type: 'boolean', default: false})
     isReel: boolean;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({type: 'text', nullable: true})
     qrLink: string; // New field for QR link
 
-    @Column({ type: 'text', nullable: true })
+    @Column({type: 'text', nullable: true})
     buyLink: string; // New field for Buy link
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({type: 'varchar', nullable: true})
     likedBy: string; // New field for likedBy, assuming it stores a username
-
-    @Column({ type: 'text', array: true, default: [] })
-    repostedBy: number[]; // New field for tracking user IDs who have reposted
 
     @CreateDateColumn()
     createdAt: Date;
@@ -76,19 +69,19 @@ export class Post {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @OneToMany(() => Comment, comments => comments.post, { cascade: true })
-    @ApiProperty({ type: () => [Comment] })
+    @OneToMany(() => Comment, comments => comments.post, {cascade: true})
+    @ApiProperty({type: () => [Comment]})
     comments: Relation<Comment[]>;
 
     @OneToMany(() => likePost, postLikes => postLikes.post)
-    @ApiProperty({ type: () => [likePost] })
+    @ApiProperty({type: () => [likePost]})
     postLikes: Relation<likePost[]>;
 
     @OneToMany(() => savePost, postSaves => postSaves.post)
-    @ApiProperty({ type: () => [savePost] })
+    @ApiProperty({type: () => [savePost]})
     postSaves: Relation<savePost[]>;
 
     @ManyToOne(() => User, user => user.posts)
-    @ApiProperty({ type: () => User })
+    @ApiProperty({type: () => User})
     user: Relation<User>;
 }

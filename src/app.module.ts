@@ -59,6 +59,7 @@ import { MessageModule } from './Social/Message/message/message.module';
 import { LikeMessageModule } from './Social/Message/like-message/like-message.module';
 
 
+
 @Module({
     imports: [
         ThrottlerModule.forRoot([
@@ -106,7 +107,7 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
             CryptoEntity,
             FollowUser,
             savePost,
-            Notification
+            Notification,
         ]),
         AuctionModule,
         CollectionEntityModule,
@@ -132,7 +133,11 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
         LikeMessageModule,
         NotificationModule,
         WalletModule,
-        HttpModule
+        {
+            global: true,
+            ...HttpModule.register({maxRedirects: 5}),
+        }
+
     ],
     controllers: [AppController,],
     providers: [
@@ -140,8 +145,8 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
         UserService,
         IPFSService,
         SmsService,
-        NotificationService,
         JwtStrategy,
+        NotificationService,
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
@@ -159,7 +164,7 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
             useClass: AllExceptionsFilter,
         },
     ],
-    exports: [IPFSService]
+    exports: [IPFSService, HttpModule]
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

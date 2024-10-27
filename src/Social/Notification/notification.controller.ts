@@ -19,7 +19,7 @@ export class NotificationController {
     @Body('action') action: NotificationAction,
     @Body('title') title: string,
     @Body('thumb') thumb: string,
-    @Body('senderId') senderId?: number,
+    @Body('senderId') senderId?: number, // senderId is optional
   ) {
     return this.notificationService.sendNotification(
       recipientId,

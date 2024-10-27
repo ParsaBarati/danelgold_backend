@@ -67,6 +67,14 @@ export class MessageController {
     ) {
         return await this.messageService.getMessagesForChat((req.user as any).id, userId);
     }
+    @ApiOperation({summary: 'fetchMessagesByOtherUser'})
+    @Get('/chat/:userId/posts')
+    async getPostForChat(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Req() req: Request
+    ) {
+        return await this.messageService.getPostsInChat((req.user as any).id, userId);
+    }
 
 
 }

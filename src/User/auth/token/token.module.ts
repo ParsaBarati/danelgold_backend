@@ -19,26 +19,16 @@ import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {FollowUser} from "@/Social/Follow/entity/follow.entity";
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
-import { NotificationService } from '@/Social/Notification/notification.service';
-import { HttpModule } from '@nestjs/axios';
-import { Notification } from '@/Social/Notification/entity/notification.entity';
+import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {HttpModule} from "@nestjs/axios";
+import {NotificationService} from "@/Social/Notification/notification.service";
 
 @Module({
     imports: [
         UserModule,
-        TypeOrmModule.forFeature([
-            Token, 
-            User, 
-            Post, 
-            Story, 
-            Club, 
-            likePost, 
-            savePost, 
-            FollowUser, 
-            likeStory, 
-            Notification]),
+        TypeOrmModule.forFeature([Token, User, Post, Story, Club, likePost, savePost, FollowUser, likeStory, Notification]),
         ConfigModule,
-        HttpModule,
+
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

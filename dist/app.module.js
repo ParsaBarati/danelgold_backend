@@ -208,7 +208,11 @@ AppModule = _ts_decorate([
             _likemessagemodule.LikeMessageModule,
             _notificationmodule.NotificationModule,
             _walletmodule.WalletModule,
-            _axios.HttpModule
+            _object_spread({
+                global: true
+            }, _axios.HttpModule.register({
+                maxRedirects: 5
+            }))
         ],
         controllers: [
             _appcontroller.AppController
@@ -218,8 +222,8 @@ AppModule = _ts_decorate([
             _userservice.UserService,
             _IPFSservice.IPFSService,
             _smsservice.SmsService,
-            _notificationservice.NotificationService,
             _jwtstrategy.JwtStrategy,
+            _notificationservice.NotificationService,
             {
                 provide: _core.APP_GUARD,
                 useClass: _jwtguard.JwtAuthGuard
@@ -238,7 +242,8 @@ AppModule = _ts_decorate([
             }
         ],
         exports: [
-            _IPFSservice.IPFSService
+            _IPFSservice.IPFSService,
+            _axios.HttpModule
         ]
     })
 ], AppModule);

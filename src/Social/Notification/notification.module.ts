@@ -8,7 +8,7 @@ import {User} from "@/User/user/entity/user.entity";
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Notification, User]), HttpModule,],
+    imports: [TypeOrmModule.forFeature([Notification, User]),],
 
     controllers: [NotificationController],
     providers: [NotificationService]

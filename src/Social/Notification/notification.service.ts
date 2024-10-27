@@ -19,9 +19,9 @@ export class NotificationService {
         private readonly httpService: HttpService,
     ) {
     }
-    
 
-    async getNotifications(userIdentifier: string): Promise<any> {
+
+    async getNotifications(user: User): Promise<any> {
 
         const notifications = await this.notificationRepository
             .createQueryBuilder('notification')
@@ -36,7 +36,7 @@ export class NotificationService {
                 'user.profilePic',
                 'user.username',
             ])
-            .where('notification.recipientId = :userIdentifier', {userIdentifier})
+            .where('notification.recipientId = :userId', {userId: user.id})
             .orderBy('notification.createdAt', 'DESC')
             .getMany();
 
@@ -86,6 +86,7 @@ export class NotificationService {
         );
 
         return response.data.access_token;
+        return  "";
     }
 
     async sendPushNotification(user: User, title: string, data: any, body = '', imgUrl = ''): Promise<any> {
@@ -132,6 +133,7 @@ export class NotificationService {
             const response = await lastValueFrom(
                 this.httpService.post("https://fcm.googleapis.com/v1/projects/hive-e1b7e/messages:send", fields, {headers}),
             );
+            console.log("Response: ", response.data)
             return response.data;
 
         } catch (e) {
@@ -147,29 +149,40 @@ export class NotificationService {
         title: string,
         thumb: string,
         senderId?: number,
-      ): Promise<Notification> {
+    ): Promise<Notification> {
 
-        const recipient = await this.userRepository.findOne({ 
-            where: { id: recipientId } 
+        const recipient = await this.userRepository.findOne({
+            where: {id: recipientId}
         });
 
         const sender = senderId ? await this.userRepository.findOne({
-            where: { id: senderId } 
+            where: {id: senderId}
         }) : null;
-    
+
         if (!recipient) {
-          throw new Error('Invalid recipient');
+            throw new Error('Invalid recipient');
         }
-    
+
         const notification = this.notificationRepository.create({
-          title,
-          thumb,
-          action,
-          user: sender, 
-          recipient,
+            title,
+            thumb,
+            action,
+            user: sender,
+            recipient,
         });
-    
+        console.log(recipient.firebaseToken, ' = recipient.firebaseToken')
+        if (recipient.firebaseToken) {
+            this.sendPushNotificationToPushId(recipient.firebaseToken, sender?.username ?? "DanelGold", {
+                type: "notification",
+                data: JSON.stringify({
+                    user: sender,
+                    action: action,
+                    thumb: thumb,
+                }),
+            }, title.replaceAll(sender?.username, ""), thumb);
+        }
+
         return await this.notificationRepository.save(notification);
-      }
+    }
 
 }
