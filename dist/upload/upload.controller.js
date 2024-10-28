@@ -111,13 +111,12 @@ let UploadController = class UploadController {
     getByPath(filePath, res) {
         var _this = this;
         return _async_to_generator(function*() {
-            const filePathClean = filePath.replace(/\\/g, '/');
+            const filePathClean = _path.default.normalize(filePath).replace(/\\/g, '/');
             const file = yield _this.uploadService.getUploadByPath(filePathClean);
             if (!file) {
-                throw new _common.NotFoundException('فایلی پیدا نشد');
+                throw new _common.NotFoundException('File not found');
             }
             const absolutePath = _path.default.resolve(__dirname, '..', '..', file.result);
-            // ارسال فایل
             res.sendFile(absolutePath);
         })();
     }
@@ -132,6 +131,9 @@ let UploadController = class UploadController {
     }
 };
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Upload Multiple Files in Bulk'
+    }),
     (0, _common.Post)('bulk'),
     (0, _common.UseInterceptors)((0, _platformexpress.FilesInterceptor)('files')),
     _ts_param(0, (0, _common.UploadedFiles)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
@@ -146,6 +148,9 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createUploads", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Upload Single File'
+    }),
     (0, _common.Post)(),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),
     _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
@@ -160,6 +165,9 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createUpload", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Upload Profile Picture'
+    }),
     (0, _common.Post)('profile-pic'),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),
     _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
@@ -176,25 +184,37 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createProfilePictureUpload", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Get All Uploads with Filtering Options'
+    }),
     (0, _swagger.ApiQuery)({
         name: 'page',
-        required: false
+        required: false,
+        example: 1,
+        description: 'Page number for pagination'
     }),
     (0, _swagger.ApiQuery)({
         name: 'limit',
-        required: false
+        required: false,
+        example: 10,
+        description: 'Number of items per page'
     }),
     (0, _swagger.ApiQuery)({
         name: 'search',
-        required: false
+        required: false,
+        description: 'Search term to filter uploads'
     }),
     (0, _swagger.ApiQuery)({
         name: 'sort',
-        required: false
+        required: false,
+        description: 'Sort by a specific field',
+        example: 'id'
     }),
     (0, _swagger.ApiQuery)({
         name: 'sortOrder',
-        required: false
+        required: false,
+        description: 'Order of sorting',
+        example: 'DESC'
     }),
     (0, _common.Get)('all'),
     _ts_param(0, (0, _common.Query)('page', new _common.DefaultValuePipe(1), _common.ParseIntPipe)),
@@ -213,8 +233,14 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "getAllUploads", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Delete an Upload by ID'
+    }),
+    (0, _swagger.ApiOkResponse)({
+        description: 'Upload deleted successfully'
+    }),
     (0, _common.Delete)(':id'),
-    _ts_param(0, (0, _common.Param)('id')),
+    _ts_param(0, (0, _common.Param)('id', _common.ParseIntPipe)),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         Number
@@ -222,7 +248,14 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "deleteUpload", null);
 _ts_decorate([
-    (0, _common.Delete)(''),
+    (0, _swagger.ApiOperation)({
+        summary: 'Delete Multiple Uploads'
+    }),
+    (0, _swagger.ApiQuery)({
+        name: 'delete',
+        description: 'Comma-separated list of IDs to delete'
+    }),
+    (0, _common.Delete)(),
     _ts_param(0, (0, _common.Query)('delete')),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
@@ -231,6 +264,9 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "deleteMultipleUploads", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Get File by Path'
+    }),
     (0, _publicdecorator.Public)(),
     (0, _common.Get)('/path/:filePath'),
     _ts_param(0, (0, _common.Param)('filePath')),
@@ -243,6 +279,9 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "getByPath", null);
 _ts_decorate([
+    (0, _swagger.ApiOperation)({
+        summary: 'Get Upload by ID'
+    }),
     (0, _common.Get)(':id'),
     _ts_param(0, (0, _common.Param)('id', new _common.ParseIntPipe({
         errorHttpStatusCode: _common.HttpStatus.BAD_REQUEST
@@ -254,6 +293,7 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "getUploadById", null);
 UploadController = _ts_decorate([
+    (0, _swagger.ApiTags)('Uploads'),
     (0, _common.Controller)('upload'),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

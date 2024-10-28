@@ -11,54 +11,54 @@ import {
     Query,
     Req
 } from '@nestjs/common';
-import {PostService} from './posts.service';
-import {Request} from 'express';
-import {CreatePostDto} from './dto/createPost.dto';
-import {ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiQuery, ApiTags} from '@nestjs/swagger';
-import {UpdatePostDto} from './dto/updatePost.dto';
-import {CommentService} from "@/Social/Comment/comment/comment.service";
-import {CreateCommentDTO} from "@/Social/Comment/comment/dto/CreateComment";
+import { PostService } from './posts.service';
+import { Request } from 'express';
+import { CreatePostDto } from './dto/createPost.dto';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UpdatePostDto } from './dto/updatePost.dto';
+import { CommentService } from "@/Social/Comment/comment/comment.service";
+import { CreateCommentDTO } from "@/Social/Comment/comment/dto/CreateComment";
 
 @ApiTags('Post')
 @ApiBearerAuth()
 @Controller('post')
 export class PostsController {
-    constructor(private readonly postService: PostService, private readonly commentsService: CommentService,) {
-    }
+    constructor(
+        private readonly postService: PostService,
+        private readonly commentsService: CommentService,
+    ) {}
 
-    @ApiOperation({summary: 'Create Post'})
+    @ApiOperation({ summary: 'Create Post' })
     @Post()
     async createPost(
         @Req() req: Request,
         @Body() createPostDto: CreatePostDto
     ) {
-        return await this.postService.createPost(req.user as any, createPostDto)
+        return await this.postService.createPost(req.user as any, createPostDto);
     }
 
-    @ApiOperation({summary: 'UpdatePost'})
-    @Put()
+    @ApiOperation({ summary: 'Update Post' })
+    @Put('/:postId')
     async updatePost(
         @Param('postId', ParseIntPipe) postId: number,
         @Req() req: Request,
         @Body() updatePostDto: UpdatePostDto
     ) {
         const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
-        return await this.postService.updatePost(postId, currentUserIdentifier, updatePostDto)
+        return await this.postService.updatePost(postId, currentUserIdentifier, updatePostDto);
     }
 
     @ApiExcludeEndpoint()
-    @ApiOperation({summary: 'DeletePost'})
-    @Delete()
+    @Delete('/:postId')
     async deletePost(
         @Param('postId', ParseIntPipe) postId: number,
         @Req() req: Request
     ) {
         const currentUserIdentifier = (req.user as any).phone || (req.user as any).email;
-        return await this.postService.deletePost(postId, currentUserIdentifier)
+        return await this.postService.deletePost(postId, currentUserIdentifier);
     }
 
-    @ApiExcludeEndpoint()
-    @ApiOperation({summary: 'GetUserCommentsOnPosts'})
+    @ApiOperation({ summary: 'Get User Comments on Posts' })
     @Get('postComment')
     async getPostCommentsByUser(
         @Query('postId', new DefaultValuePipe(1), ParseIntPipe) postId: number | undefined,
@@ -68,28 +68,28 @@ export class PostsController {
         return await this.postService.getPostsByUser(phone, postId);
     }
 
-    @ApiOperation({summary: 'getExplorerWithoutPaginate'})
+    @ApiOperation({ summary: 'Get Explorer Without Pagination' })
     @Get('explorer')
     async getAllPosts(
         @Req() req: Request
     ) {
-        return await this.postService.getAllPosts((req.user as any));
+        return await this.postService.getAllPosts(req.user as any);
     }
 
-    @ApiOperation({summary: 'getExplorerWithPaginate'})
-    @ApiQuery({name: 'page', required: false})
-    @ApiQuery({name: 'limit', required: false})
+    @ApiOperation({ summary: 'Get Explorer with Pagination' })
+    @ApiQuery({ name: 'page', required: false })
+    @ApiQuery({ name: 'limit', required: false })
     @Get('/explore')
     async getExplorer(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Req() req: Request
     ) {
-        const query = {page, limit};
-        return this.postService.getExplorer(query, (req.user as any));
+        const query = { page, limit };
+        return this.postService.getExplorer(query, req.user as any);
     }
 
-    @ApiOperation({summary: 'comments'})
+    @ApiOperation({ summary: 'Get Comments on a Post' })
     @Get("/comments/:postId")
     async comments(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -97,25 +97,17 @@ export class PostsController {
         @Param('postId', ParseIntPipe) postId: number,
         @Req() req: Request,
     ) {
-        const query = {page, limit};
-
-        return this.commentsService.getCommentsByPost(postId, (req.user as any), query);
+        const query = { page, limit };
+        return this.commentsService.getCommentsByPost(postId, req.user as any, query);
     }
 
-    @ApiOperation({summary: 'comments post'})
+    @ApiOperation({ summary: 'Add Comment to a Post' })
     @Post("/comment/:postId")
-    async comment(
+    async addCommentToPost(
         @Param('postId', ParseIntPipe) postId: number,
         @Req() req: Request,
         @Body() createCommentDTO: CreateCommentDTO,
     ) {
-        return await this.commentsService.CommentPost(postId, (req.user as any), createCommentDTO);
+        return await this.commentsService.CommentPost(postId, req.user as any, createCommentDTO);
     }
-} 
-
-
-
-
-
-
-
+}

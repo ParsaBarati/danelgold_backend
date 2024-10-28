@@ -10,7 +10,7 @@ import {AuthGuard} from "@nestjs/passport";
 export class WalletController{
     constructor( private readonly walletService: WalletService){}
 
-    @ApiOperation({ summary: 'GetWallet' })
+    @ApiOperation({ summary: 'Get User Wallet' })
     @UseGuards(AuthGuard('jwt'))
     @Get()
     async getWallet(

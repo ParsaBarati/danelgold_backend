@@ -35,8 +35,7 @@ _ts_decorate([
     _ts_metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 AppController = _ts_decorate([
-    (0, _swagger.ApiTags)('app'),
-    (0, _swagger.ApiBearerAuth)(),
+    (0, _swagger.ApiExcludeController)(),
     (0, _common.Controller)(),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [

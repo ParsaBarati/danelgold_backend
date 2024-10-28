@@ -1,26 +1,34 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Req} from "@nestjs/common";
-import {MessageService} from "./message.service";
-import {Request} from "express";
-import {ApiBearerAuth, ApiOperation, ApiTags} from "@nestjs/swagger";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Req } from "@nestjs/common";
+import { MessageService } from "./message.service";
+import { Request } from "express";
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiBody } from "@nestjs/swagger";
 
-@ApiTags('Message')
+@ApiTags('Messages')
 @ApiBearerAuth()
-
 @Controller('message')
 export class MessageController {
-    constructor(private readonly messageService: MessageService) {
-    }
+    constructor(private readonly messageService: MessageService) {}
 
-    @ApiOperation({summary: 'getMessages'})
+    @ApiOperation({ summary: 'Retrieve all messages for the current user' })
     @Get()
-    async getMessage(
+    async getMessages(
         @Req() req: Request
     ) {
-
-        return await this.messageService.getMessage((req.user as any))
+        return await this.messageService.getMessage((req.user as any));
     }
 
-
+    @ApiOperation({ summary: 'Send a message to another user' })
+    @ApiBody({
+        schema: {
+            properties: {
+                receiverId: { type: 'integer', example: 1 },
+                content: { type: 'string', example: 'Hello!' },
+                storyId: { type: 'integer', example: 10, nullable: true },
+                postId: { type: 'integer', example: 15, nullable: true },
+                replyId: { type: 'integer', example: 5, nullable: true },
+            }
+        }
+    })
     @Post('/send')
     async sendMessage(
         @Body('receiverId') receiverId: number,
@@ -31,8 +39,8 @@ export class MessageController {
         @Body('replyId') replyId?: number,
     ) {
         return await this.messageService.sendMessage(
-            (req.user as any), 
-            receiverId, 
+            (req.user as any),
+            receiverId,
             content,
             storyId,
             postId,
@@ -40,9 +48,19 @@ export class MessageController {
         );
     }
 
-
+    @ApiOperation({ summary: 'Share content with multiple users' })
+    @ApiBody({
+        schema: {
+            properties: {
+                receiverIds: { type: 'array', items: { type: 'integer' }, example: [1, 2, 3] },
+                content: { type: 'string', example: 'Check this out!' },
+                storyId: { type: 'integer', example: 10, nullable: true },
+                postId: { type: 'integer', example: 15, nullable: true },
+            }
+        }
+    })
     @Post('/share')
-    async share(
+    async shareContent(
         @Body('receiverIds') receiverIds: number[], // Accept an array of user IDs
         @Body('content') content: string,
         @Req() req: Request,
@@ -51,15 +69,14 @@ export class MessageController {
     ) {
         return await this.messageService.shareContent(
             (req.user as any),
-            receiverIds, // Pass the array of receiver IDs
+            receiverIds,
             content,
             storyId,
-            postId,
+            postId
         );
     }
 
-
-    @ApiOperation({summary: 'fetchMessagesByOtherUser'})
+    @ApiOperation({ summary: 'Fetch chat messages between current user and another user' })
     @Get('/chat/:userId')
     async getMessagesForChat(
         @Param('userId', ParseIntPipe) userId: number,
@@ -67,14 +84,13 @@ export class MessageController {
     ) {
         return await this.messageService.getMessagesForChat((req.user as any).id, userId);
     }
-    @ApiOperation({summary: 'fetchMessagesByOtherUser'})
+
+    @ApiOperation({ summary: 'Fetch posts shared in chat with another user' })
     @Get('/chat/:userId/posts')
-    async getPostForChat(
+    async getPostsForChat(
         @Param('userId', ParseIntPipe) userId: number,
         @Req() req: Request
     ) {
         return await this.messageService.getPostsInChat((req.user as any).id, userId);
     }
-
-
 }

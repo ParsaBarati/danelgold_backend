@@ -13,8 +13,9 @@ export class NotificationController {
         private readonly notificationService: NotificationService
     ) {}
 
+    @ApiOperation({ summary: 'Send Notification' })
     @Post('send')
-  async sendNotification(
+    async sendNotification(
     @Body('recipientId') recipientId: number,
     @Body('action') action: NotificationAction,
     @Body('title') title: string,
@@ -30,7 +31,7 @@ export class NotificationController {
     );
   }
 
-    @ApiOperation({summary: 'GetNotifications'})
+    @ApiOperation({summary: 'Get Notifications For User'})
     @Get('/')
 
     async getNotifications(
@@ -39,7 +40,7 @@ export class NotificationController {
         return await this.notificationService.getNotifications(req.user as any)
     }
 
-    @ApiOperation({summary: 'SendNotif'})
+    @ApiOperation({ summary: 'Send Push Notification' })
     @Get('send')
     @UseGuards(AuthGuard('jwt'))
 
@@ -48,8 +49,10 @@ export class NotificationController {
     ) {
         return await this.notificationService.sendPushNotification(
             (req.user as any),
-            "Test","Sample data","Sample body"
-        )
+            "Test",
+            "Sample data",
+            "Sample body"
+        );
     }
 
 
