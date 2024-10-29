@@ -9,7 +9,8 @@ import {
     Post,
     Put,
     Query,
-    Req
+    Req,
+    UseGuards
 } from '@nestjs/common';
 import { PostService } from './posts.service';
 import { Request } from 'express';
@@ -18,6 +19,7 @@ import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiQuery, ApiTags } fr
 import { UpdatePostDto } from './dto/updatePost.dto';
 import { CommentService } from "@/Social/Comment/comment/comment.service";
 import { CreateCommentDTO } from "@/Social/Comment/comment/dto/CreateComment";
+import { JwtAuthGuard } from '@/User/auth/guards/jwt.guard';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -35,6 +37,17 @@ export class PostsController {
         @Body() createPostDto: CreatePostDto
     ) {
         return await this.postService.createPost(req.user as any, createPostDto);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('Reel')
+    @ApiOperation({ summary: 'Upload a new reel' })
+    async uploadReel(
+        @Body('mediaUrl') mediaUrl: string,
+        @Body('caption') caption: string,
+        @Req() req: Request
+    ){
+        return this.postService.uploadReel(mediaUrl, caption, (req.user as any));
     }
 
     @ApiOperation({ summary: 'Update Post' })
