@@ -86,7 +86,7 @@ export class NotificationService {
         );
 
         return response.data.access_token;
-        return  "";
+        return "";
     }
 
     async sendPushNotification(user: User, title: string, data: any, body = '', imgUrl = ''): Promise<any> {
@@ -175,7 +175,12 @@ export class NotificationService {
             this.sendPushNotificationToPushId(recipient.firebaseToken, sender?.username ?? "DanelGold", {
                 type: "notification",
                 data: JSON.stringify({
-                    user: sender,
+                    user: sender ? {
+                        id: sender.id,
+                        name: sender.name,
+                        username: sender.username,
+                        profilePic: sender.profilePic,
+                    } : null,
                     action: action,
                     thumb: thumb,
                 }),

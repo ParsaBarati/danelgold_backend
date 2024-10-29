@@ -307,9 +307,18 @@ export class MessageService {
             id: sentMessage.id,
             content: sentMessage.content,
             createdAt: sentMessage.createdAt,
+            receiver: {
+                id: receiver.id,
+                username: receiver.username,
+                profilePic: receiver.profilePic,
+                name: receiver.name,
+            },
             sender: {
                 id: sender.id,
                 username: sender.username,
+
+                profilePic: sender.profilePic,
+                name: sender.name,
             },
             // Check if the message has an associated story
             story: story ? {
