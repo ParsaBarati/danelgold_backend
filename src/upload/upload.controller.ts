@@ -63,6 +63,7 @@ export class UploadController {
         return await this.uploadService.createUpload(file);
     }
 
+    @ApiOperation({ summary: 'Upload Reel' })
     @Post('upload')
     @ApiOperation({ summary: 'Upload a new reel' })
     @UseInterceptors(FileInterceptor('file'))
@@ -75,8 +76,7 @@ export class UploadController {
         @Body('caption') caption: string,
         @Req() req
     ){
-        const user = req.user;  // Extract user from the request
-        return this.uploadService.uploadReel(file, caption, user);
+        return this.uploadService.uploadReel(file, caption, (req.uesr as any));
     }
 
     @ApiOperation({ summary: 'Upload Profile Picture' })
