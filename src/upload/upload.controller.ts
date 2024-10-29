@@ -64,7 +64,7 @@ export class UploadController {
     }
 
     @ApiOperation({ summary: 'Upload Reel' })
-    @Post('upload')
+    @Post('Reel')
     @ApiOperation({ summary: 'Upload a new reel' })
     @UseInterceptors(FileInterceptor('file'))
     async uploadReel(
