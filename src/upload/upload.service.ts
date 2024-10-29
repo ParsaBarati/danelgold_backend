@@ -9,12 +9,15 @@ import fs from 'fs-extra';
 import {ApiResponses, createResponse} from '@/utils/response.util';
 
 import {User} from '@/User/user/entity/user.entity';
+import { Post } from '@/Social/Post/posts/entity/posts.entity';
 
 @Injectable()
 export class UploadService {
     constructor(
         @InjectRepository(Upload)
         private readonly uploadRepository: Repository<Upload>,
+        @InjectRepository(Post)
+        private readonly postRepository: Repository<Post>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly paginationService: PaginationService,
@@ -55,7 +58,6 @@ export class UploadService {
         return {uploads, links};
     }
 
-
     async createUpload(file: any): Promise<{ upload: Upload; link: string }> {
         if (!file) {
             throw new NotFoundException('No file to upload');
@@ -82,6 +84,19 @@ export class UploadService {
 
         // Return an object with the Upload entity and the generated link
         return {upload: savedUpload, link};
+    }
+
+    async uploadReel(file: Express.Multer.File, caption: string, user: User): Promise<Post> {
+        const { link } = await this.createUpload(file);
+        
+        const reel = this.postRepository.create({
+            mediaUrl: link,
+            caption,
+            isReel: true,
+            user,
+        });
+        
+        return this.postRepository.save(reel);
     }
 
     async getAllUploads(

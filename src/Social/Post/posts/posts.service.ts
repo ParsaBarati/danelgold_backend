@@ -66,17 +66,6 @@ export class PostService {
         return createResponse(201, savedPost)
     }
 
-    async uploadReel(mediaUrl: string, caption: string, user: User): Promise<Post> {
-        const reel = this.postRepository.create({
-            mediaUrl,
-            caption,
-            isReel: true,
-            user
-        });
-        
-        return this.postRepository.save(reel);
-    }
-
     async updatePost(
         postId: number,
         currentUserIdentifier: string,

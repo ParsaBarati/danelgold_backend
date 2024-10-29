@@ -1,5 +1,6 @@
 import { UploadService } from './upload.service';
 import {
+    Body,
     Controller,
     DefaultValuePipe,
     Delete,
@@ -15,6 +16,7 @@ import {
     Res,
     UploadedFile,
     UploadedFiles,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -22,6 +24,7 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { Public } from '@/common/decorators/public.decorator';
 import { ApiOperation, ApiQuery, ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/User/auth/guards/jwt.guard';
 
 @ApiTags('Uploads')
 @Controller('upload')
@@ -60,6 +63,23 @@ export class UploadController {
         ) file: Express.Multer.File,
     ) {
         return await this.uploadService.createUpload(file);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('upload')
+    @ApiOperation({ summary: 'Upload a new reel' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadReel(
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addMaxSizeValidator({ maxSize: 50 * 1024 * 1024 }) // Adjust max file size for videos
+                .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+        ) file: Express.Multer.File,
+        @Body('caption') caption: string,
+        @Req() req
+    ){
+        const user = req.user;  // Extract user from the request
+        return this.uploadService.uploadReel(file, caption, user);
     }
 
     @ApiOperation({ summary: 'Upload Profile Picture' })

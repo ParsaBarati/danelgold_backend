@@ -39,17 +39,6 @@ export class PostsController {
         return await this.postService.createPost(req.user as any, createPostDto);
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Post('Reel')
-    @ApiOperation({ summary: 'Upload a new reel' })
-    async uploadReel(
-        @Body('mediaUrl') mediaUrl: string,
-        @Body('caption') caption: string,
-        @Req() req: Request
-    ){
-        return this.postService.uploadReel(mediaUrl, caption, (req.user as any));
-    }
-
     @ApiOperation({ summary: 'Update Post' })
     @Put('/:postId')
     async updatePost(
