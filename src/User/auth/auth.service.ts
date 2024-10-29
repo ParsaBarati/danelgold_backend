@@ -46,7 +46,7 @@ export class AuthService {
         }
 
         user.firebaseToken = firebaseToken;
-        await  this.userRepository.save(user);
+        await this.userRepository.save(user);
         const token = await this.tokenService.createToken(user);
 
         return {
@@ -221,10 +221,18 @@ export class AuthService {
             throw new NotFoundException('User not found');
         }
 
-        // Send OTP to user email or phone
-        await this.otpService.sendOTPToEmail(user.phone || user.email);
+        const identifier = user.phone || user.email;
 
-        return {status: 'success', message: 'Verification code sent'};
+        const isPhone2 = /^[0-9]+$/.test(identifier);
+        const isEmail2 = /\S+@\S+\.\S+/.test(identifier);
+        // Send OTP to user email or phone
+        let otp;
+        if (isPhone2) {
+            otp = await this.otpService.sendOTP(identifier);
+        } else if (isEmail2) {
+            otp = await this.otpService.sendOTPToEmail(identifier);
+        }
+        return {status: 'success', message: 'Verification code sent', otp,};
     }
 
     async verifyForgotPasswordCode(
@@ -263,22 +271,31 @@ export class AuthService {
     async resetPassword(
         password: string,
         confirm_password: string,
-        userId: number): Promise<void> {
+        email_or_phone_or_username: string
+    ): Promise<void> {
         if (password !== confirm_password) {
             throw new BadRequestException('Passwords do not match');
         }
 
-        const user = await this.userRepository.findOneBy({id: userId});
+        // جستجوی کاربر با یکی از فیلدهای ایمیل، شماره تلفن یا نام کاربری
+        const user = await this.userRepository.findOne({
+            where: [
+                { email: email_or_phone_or_username },
+                { phone: email_or_phone_or_username },
+                { username: email_or_phone_or_username }
+            ]
+        });
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
+        // هش کردن رمز عبور جدید
+        user.password = await bcrypt.hash(password, 10);
 
         await this.userRepository.save(user);
     }
+
 
     async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string, firebaseToken: string) {
 

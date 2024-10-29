@@ -37,6 +37,7 @@ export class MessageController {
         @Body('storyId') storyId?: number,
         @Body('postId') postId?: number,
         @Body('replyId') replyId?: number,
+        @Body('isStoryReply') isStoryReply?: boolean, // Add isStoryReply parameter
     ) {
         return await this.messageService.sendMessage(
             (req.user as any),
@@ -44,9 +45,11 @@ export class MessageController {
             content,
             storyId,
             postId,
-            replyId
+            replyId,
+            isStoryReply // Pass the isStoryReply parameter to the service
         );
     }
+
 
     @ApiOperation({ summary: 'Share content with multiple users' })
     @ApiBody({

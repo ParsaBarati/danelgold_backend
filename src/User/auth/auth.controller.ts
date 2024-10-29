@@ -104,8 +104,7 @@ export class AuthController {
             verification_code
         }: { email_or_phone_or_username: string; verification_code: string }
     ) {
-        const result = await this.authService.verifyForgotPasswordCode(email_or_phone_or_username, verification_code);
-        return result;
+        return await this.authService.verifyForgotPasswordCode(email_or_phone_or_username, verification_code);
     }
 
     @ApiCreatedResponse({description: 'Password reset successfully'})
@@ -113,9 +112,9 @@ export class AuthController {
     @Public()
     @Post('password/reset')
     async resetPassword(
-        @Body() {password, confirm_password, userId}: { password: string; confirm_password: string; userId: number }
+        @Body() {password, confirm_password, email_or_phone_or_username}: { password: string; confirm_password: string; email_or_phone_or_username: string }
     ) {
-        return await this.authService.resetPassword(password, confirm_password, userId);
+        return await this.authService.resetPassword(password, confirm_password, email_or_phone_or_username);
     }
 
     @ApiCreatedResponse({description: 'Check User Authentication'})

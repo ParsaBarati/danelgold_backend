@@ -1,9 +1,18 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation} from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Relation
+} from 'typeorm';
 import {ApiProperty} from '@nestjs/swagger';
 import {User} from '@/User/user/entity/user.entity';
 import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import { likeMessage } from '../../like-message/entity/like-message.entity';
+import {likeMessage} from '../../like-message/entity/like-message.entity';
 
 @Entity('messages')
 export class Message {
@@ -13,16 +22,17 @@ export class Message {
     @Column({type: 'text', nullable: true})
     content: string | null;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({type: 'int', default: 0})
     likes: number;
 
     @CreateDateColumn()
     createdAt: Date;
 
-    @Column({ type: 'boolean', default: false })
+    @Column({type: 'boolean', default: false})
     isLiked: boolean;
 
     @ManyToOne(() => User, (sender) => sender.sentMessages)
+    @JoinColumn({name: 'senderId', referencedColumnName: 'id'})
     @ApiProperty({type: () => User})
     sender: Relation<User>;
 
@@ -33,6 +43,9 @@ export class Message {
     // For story reply (null if not a story reply)
     @Column({type: 'int', nullable: true})
     storyId: number;
+    // For story reply (null if not a story reply)
+    @Column({type: 'int'})
+    senderId: number;
 
     // For post sharing (null if not a post sharing)
     @Column({type: 'int', nullable: true})
@@ -42,12 +55,17 @@ export class Message {
     @Column({type: 'int', nullable: true})
     replyId: number;
 
+    // For story reply (null if not a story reply)
+    @Column({type: 'int', nullable: true})
+    storyReplyId: number;
+
     // For shared stories or posts (null if not shared)
     @Column({type: 'boolean', default: false})
     isShared: boolean;
 
+
     @OneToMany(() => likeMessage, (messagelikes) => messagelikes.message)
-    @ApiProperty({ type: () => likeMessage })
+    @ApiProperty({type: () => likeMessage})
     messagelikes: Relation<likeMessage[]>
 
     @ManyToOne(() => Post, (post) => [])
@@ -60,4 +78,15 @@ export class Message {
     @ApiProperty({type: () => Story})
     story: Relation<Story>;
 
+    // self-referencing relation to other messages
+    @ManyToOne(() => Message, {nullable: true})
+    @JoinColumn({name: 'replyId', referencedColumnName: 'id'})
+    @ApiProperty({type: () => Message})
+    replyMessage: Relation<Message> | null;
+
+    // relationship to Story
+    @ManyToOne(() => Story, {nullable: true})
+    @JoinColumn({name: 'storyReplyId', referencedColumnName: 'id'})
+    @ApiProperty({type: () => Story})
+    storyReply: Relation<Story> | null;
 }

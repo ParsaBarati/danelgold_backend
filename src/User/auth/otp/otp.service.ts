@@ -44,7 +44,9 @@ export class OtpService {
       existingOTP.isVerified = false;
       existingOTP.createdAt = new Date();
       existingOTP.expirationTime = new Date(Date.now() + OTP_EXPIRATION_TIME_MS);
-      await this.otpRepository.save(existingOTP);
+      console.log(existingOTP)
+      let res = await this.otpRepository.save(existingOTP);
+      console.log("Save res: ",res)
     } else {
       const hashedOTP = await bcrypt.hash(otp, 10);
       const expirationTime = new Date(Date.now() + OTP_EXPIRATION_TIME_MS);
@@ -103,16 +105,23 @@ export class OtpService {
       console.log('No OTP record found.');
       return false;
     }
+    console.log("OTP: ",otpRecord)
   
     const currentTime = Date.now();
     const otpTimestamp = otpRecord.createdAt.getTime();
     const otpExpirationTime = OTP_EXPIRATION_TIME_MS;
-  
+
+    console.log('Current Time:', currentTime);
+    console.log('OTP Created At:', otpTimestamp);
+    console.log('OTP Expiration Time (ms):', otpExpirationTime);
+    console.log('Time Difference:', currentTime - otpTimestamp);
+
     if (currentTime - otpTimestamp > otpExpirationTime) {
       console.log('OTP has expired.');
-      throw new BadRequestException('زمان رمز یکبار مصرف منقضی شده است');
+      throw new BadRequestException('Your OTP has expired');
+    } else {
+      console.log('OTP is still valid.');
     }
-  
     const isValidOTP = await bcrypt.compare(otp, otpRecord.otp);
     console.log(`isValidOTP VERIFY: ${isValidOTP}`);
     if (isValidOTP) {

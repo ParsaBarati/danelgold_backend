@@ -14,7 +14,7 @@ import {savePost} from '@/Social/Post/save-post/entity/save-post.entity';
 import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
 import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
-import { BlockUser } from '@/Social/Block/entity/block.entity';
+import {BlockUser} from '@/Social/Block/entity/block.entity';
 
 @Injectable()
 export class UserService {
@@ -76,9 +76,9 @@ export class UserService {
                 'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
             ])
-            .where('stories.userId = :userId', { userId: user.id })
-            .andWhere('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
-            .andWhere('stories.createdAt > :last24hours', { last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000) }) // Only stories from the last 24 hours
+            .where('stories.userId = :userId', {userId: user.id})
+            .andWhere('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
+            .andWhere('stories.createdAt > :last24hours', {last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000)}) // Only stories from the last 24 hours
             .getRawOne(); // Fetch the user's own story, if exists
 
         // Fetch followed users' stories within the last 24 hours
@@ -95,9 +95,9 @@ export class UserService {
                 'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
             ])
-            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
-            .andWhere('f.followerId = :userId', { userId: user.id }) // Only stories from followed users
-            .andWhere('stories.createdAt > :last24hours', { last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000) }) // Only stories from the last 24 hours
+            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
+            .andWhere('f.followerId = :userId', {userId: user.id}) // Only stories from followed users
+            .andWhere('stories.createdAt > :last24hours', {last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000)}) // Only stories from the last 24 hours
             .orderBy('stories.createdAt', 'DESC')
             .getRawMany();
 
@@ -107,7 +107,7 @@ export class UserService {
         // Add the user's own story first, if it exists
         if (userStory) {
             let existingLike = await this.likeStoryRepository.findOne({
-                where: { story: { id: userStory.story_id }, user: { id: user.id } },
+                where: {story: {id: userStory.story_id}, user: {id: user.id}},
             });
             finalStories.push({
                 id: userStory.story_id,
@@ -126,7 +126,7 @@ export class UserService {
         // Add followed users' stories
         for (const story of stories) {
             let existingLike = await this.likeStoryRepository.findOne({
-                where: { story: { id: story.story_id }, user: { id: user.id } },
+                where: {story: {id: story.story_id}, user: {id: user.id}},
             });
 
             finalStories.push({
@@ -167,7 +167,7 @@ export class UserService {
                 'post.media AS post_media',
                 'post.content AS post_content',
             ])
-            .where('f.followerId = :userId', { userId: user.id }) // Only posts from followed users
+            .where('f.followerId = :userId', {userId: user.id}) // Only posts from followed users
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC')
             .limit(10)
@@ -176,10 +176,10 @@ export class UserService {
         const finalPosts = [];
         for (const post of posts) {
             let existingLike = await this.likePostRepository.findOne({
-                where: { post: { id: post.post_id }, user: { id: user.id } },
+                where: {post: {id: post.post_id}, user: {id: user.id}},
             });
             let existingSave = await this.savePostRepository.findOne({
-                where: { post: { id: post.post_id }, user: { id: user.id } },
+                where: {post: {id: post.post_id}, user: {id: user.id}},
             });
             finalPosts.push({
                 content: post.post_content,
@@ -345,17 +345,31 @@ export class UserService {
             followerId: self.id,
             followingId: userId
         });
+        let isFollowingMe = await this.followUserRepository.findOneBy({
+            followingId: self.id,
+            followerId: userId
+        });
+        const isBlocked = await this.blockUserRepository.findOneBy([
+            {blockerId: userId, blockedId: self.id},
+        ]);
+
+        const iHaveBlocked = await this.blockUserRepository.findOneBy([
+            {blockerId: self.id, blockedId: userId},
+        ]);
+
         return {
             id: user.id,
             username: user.username,
-            profilePic: user.profilePic,
+            profilePic: !isBlocked ? user.profilePic : "",
             followers: followersCount,
             following: followingCount,
             isFollowing: !!isFollowing,
+            isFollowingMe: !!isFollowingMe,
             bio: user.bio,
-            stories,
-            posts: finalPosts,
-
+            stories: !isBlocked ? stories : [],
+            posts: (!isBlocked ? finalPosts : []),
+            isBlocked: !!isBlocked,
+            iHaveBlocked: !!iHaveBlocked,
             // settings: notifications ? notifications : null,
         };
 
@@ -368,7 +382,7 @@ export class UserService {
             .leftJoinAndSelect('post.postLikes', 'postLikes')
             .leftJoinAndSelect('post.comments', 'comments')
             .leftJoinAndSelect('post.user', 'postUser') // Include post creator's information
-            .where('post.userId = :userId', { userId })
+            .where('post.userId = :userId', {userId})
             .select([
                 'post.id AS post_id',
                 'post.mediaUrl AS post_mediaUrl',
@@ -396,10 +410,10 @@ export class UserService {
             // Check if the user has liked or saved this post
             const [existingLike, existingSave] = await Promise.all([
                 this.likePostRepository.findOne({
-                    where: { post: { id: post.post_id }, user: { id: user.id } },
+                    where: {post: {id: post.post_id}, user: {id: user.id}},
                 }),
                 this.savePostRepository.findOne({
-                    where: { post: { id: post.post_id }, user: { id: user.id } },
+                    where: {post: {id: post.post_id}, user: {id: user.id}},
                 })
             ]);
 
@@ -452,10 +466,10 @@ export class UserService {
         }
 
         const isBlocked = await this.blockUserRepository.findOneBy([
-            { blockerId: user.id, blockedId: userId },
-            { blockerId: userId, blockedId: user.id }
+            {blockerId: user.id, blockedId: userId},
+            {blockerId: userId, blockedId: user.id}
         ]);
-    
+
         if (isBlocked) {
             throw new ForbiddenException('Action not allowed due to a block.');
         }
@@ -477,7 +491,6 @@ export class UserService {
         } else {
             await this.followUserRepository.remove(isFollowing);
             this.notificationService.sendNotification(userId, NotificationAction.UNFOLLOW, `${user.username} Stopped following you`, null, user.id,);
-
         }
 
         return {isFollowing: !isFollowing};
@@ -490,25 +503,31 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-    
+
         const isBlocked = await this.blockUserRepository.findOneBy({
             blockerId: user.id,
             blockedId: userId
         });
-    
+
         if (!isBlocked) {
             const block = await this.blockUserRepository.create({
                 blockerId: user.id,
                 blockedId: userId
             });
+            let followRelationships = await this.followUserRepository.findBy([
+                { followerId: userId, followingId: user.id },
+                { followerId: user.id, followingId: userId }
+            ]);
+            
+            await this.followUserRepository.remove(followRelationships);
             await this.blockUserRepository.save(block);
-            return { isBlocked: true };
+            return {isBlocked: true};
         } else {
             await this.blockUserRepository.remove(isBlocked);
-            return { isBlocked: false };
+            return {isBlocked: false};
         }
     }
-    
+
     async update(user: User, name: string, bio: string) {
         console.log(user)
         if (!user) {
@@ -571,10 +590,10 @@ export class UserService {
 
     async getBlocked(user: User): Promise<{ isBlocked: boolean; name: string; id: number; pic: string; username: string }[]> {
         const blockedUsers = await this.blockUserRepository.find({
-            where: { blockerId: user.id },
+            where: {blockerId: user.id},
             relations: ['blocked'],
         });
-    
+
         return blockedUsers.map((block) => ({
             id: block.blocked?.id,
             name: block.blocked?.name,
@@ -583,7 +602,6 @@ export class UserService {
             isBlocked: true,
         }));
     }
-    
 
 
 }

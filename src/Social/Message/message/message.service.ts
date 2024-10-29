@@ -3,11 +3,13 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {In, Repository} from "typeorm";
 import {User} from "@/User/user/entity/user.entity";
 import {NotificationService} from "@/Social/Notification/notification.service";
-import { Message } from "./entity/message.entity";
+import {Message} from "./entity/message.entity";
 import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
 import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
+import {BlockUser} from "@/Social/Block/entity/block.entity";
+import {Story} from "@/Social/Story/stories/entity/stories.entity";
 
 
 @Injectable()
@@ -17,8 +19,12 @@ export class MessageService {
         private messageRepository: Repository<Message>,
         @InjectRepository(Post)
         private postRepository: Repository<Post>,
+        @InjectRepository(Story)
+        private storyRepository: Repository<Story>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        @InjectRepository(BlockUser)
+        private blockUserRepository: Repository<BlockUser>,
         @InjectRepository(likePost)
         private likePostRepository: Repository<likePost>,
         @InjectRepository(savePost)
@@ -111,43 +117,116 @@ export class MessageService {
             throw new NotFoundException('Sender or Receiver not found');
         }
 
+        // Check if either user has blocked the other
+        const [isBlocked, iHaveBlocked] = await Promise.all([
+            this.blockUserRepository.findOneBy({blockerId: receiverId, blockedId: senderId}),
+            this.blockUserRepository.findOneBy({blockerId: senderId, blockedId: receiverId})
+        ]);
+
+        if (isBlocked) {
+            return {
+                chat: {
+                    id: receiver.id,
+                    user: {
+                        id: receiver.id,
+                        name: receiver.name,
+                        username: receiver.username,
+                        pic: receiver.profilePic,
+                    },
+                },
+                messages: [],
+                isBlocked: true,
+                iHaveBlocked: !!iHaveBlocked,
+            };
+        }
+
         // Fetch messages exchanged between the two users (both directions)
         const messages = await this.messageRepository
             .createQueryBuilder('message')
-            .leftJoinAndSelect('message.sender', 'sender')   // Ensure sender data is loaded
-            .leftJoinAndSelect('message.receiver', 'receiver') // Ensure receiver data is loaded
-            .leftJoinAndSelect('message.story', 'story') // Ensure story data is loaded (if any)
-            .leftJoinAndSelect('message.post', 'post') // Ensure post data is loaded (if any)
+            .leftJoinAndSelect('message.sender', 'sender')
+            .leftJoinAndSelect('message.receiver', 'receiver')
+            .leftJoinAndSelect('message.story', 'story') // Load story data if any
+            .leftJoinAndSelect('message.post', 'post') // Load post data if any
+            .leftJoinAndSelect('message.replyMessage', 'replyMessage') // Load reply data if any
+            .leftJoinAndSelect('message.storyReply', 'storyReply') // Load reply data if any
+            .leftJoinAndSelect('replyMessage.post', 'replyMessage.post') // Load post data from the reply message
+            .leftJoinAndSelect('replyMessage.story', 'replyMessage.story') // Load story data from the reply message
             .where('(message.senderId = :senderId AND message.receiverId = :receiverId)', {senderId, receiverId})
             .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', {senderId, receiverId})
-            .orderBy('message.createdAt', 'ASC')  // Sort messages by creation date
+            .orderBy('message.createdAt', 'ASC')
             .getMany();
 
         // Format messages for response
         const formattedMessages = messages.map(msg => {
+            // Initial formatted message structure with essential fields
             const formattedMessage: any = {
                 id: msg.id,
                 content: msg.content,
                 createdAt: msg.createdAt,
-                sender: msg.sender,
+                sender: msg.sender, // Sender information for the message
+
+                // Check if the message has an associated story
                 story: msg.story ? {
                     id: msg.story.id,
-                    thumbnail: msg.story.thumbnail, // Assuming story has a title
+                    thumbnail: msg.story.thumbnail,
                     isStory: true,
-                    isAvailable: msg.story && (new Date().getTime() - new Date(msg.story.createdAt).getTime() <= 24 * 60 * 60 * 1000), // Check if created in last 24 hours
+                    // Check if the story is available based on the 24-hour timeframe
+                    isAvailable: (new Date().getTime() - new Date(msg.story.createdAt).getTime()) <= 24 * 60 * 60 * 1000
+                } : null, // Null if no story is associated with this message
 
-                    // Add other fields as necessary
-                } : null,
+                // Check if the message has an associated post
                 post: msg.post ? {
                     id: msg.post.id,
-                    thumbnail: msg.post.mediaUrl, // Assuming post has a title
+                    thumbnail: msg.post.mediaUrl,
                     isStory: false,
                     isReel: false,
-                    isAvailable: true,
-                    // Add other fields as necessary
-                } : null,
+                    isAvailable: true // Post is always considered available
+                } : null, // Null if no post is associated with this message
+
+                // Initialize placeholders for story and message replies
+                storyReply: null,
+                messageReply: null
             };
-            return formattedMessage;
+
+            // If this message is a reply to another message and not a story reply
+            if (msg.replyMessage !== null) {
+                // Populate messageReply with details from the replied message
+                formattedMessage.messageReply = {
+                    id: msg.replyMessage.id,
+                    content: msg.replyMessage.content,
+                    createdAt: msg.replyMessage.createdAt,
+                    senderId: msg.senderId,
+                    // Include story information if the replied message has an associated story
+                    story: msg.replyMessage.story ? {
+                        id: msg.replyMessage.story.id,
+                        thumbnail: msg.replyMessage.story.thumbnail,
+                        isStory: true,
+                        isAvailable: (new Date().getTime() - new Date(msg.replyMessage.story.createdAt).getTime()) <= 24 * 60 * 60 * 1000
+                    } : null, // Null if no story is associated with the replied message
+
+                    // Include post information if the replied message has an associated post
+                    post: msg.replyMessage.post ? {
+                        id: msg.replyMessage.post.id,
+                        thumbnail: msg.replyMessage.post.mediaUrl,
+                        isStory: false,
+                        isReel: false,
+                        isAvailable: true
+                    } : null // Null if no post is associated with the replied message
+                };
+            }
+            // If this message is a reply to a story (and not another message)
+            else if (msg.storyReply !== null) {
+                // Populate storyReply with story details
+                formattedMessage.storyReply = {
+                    id: msg.storyReply.id,
+                    thumbnail: msg.storyReply.thumbnail,
+                    isStory: true,
+                    // Check if the story reply is available based on the 24-hour timeframe
+                    isAvailable: (new Date().getTime() - new Date(msg.storyReply.createdAt).getTime()) <= 24 * 60 * 60 * 1000
+                };
+            }
+
+            return formattedMessage; // Return the formatted message object for each message in the array
         });
 
         return {
@@ -160,6 +239,8 @@ export class MessageService {
                     pic: receiver.profilePic,
                 },
             },
+            isBlocked: !!isBlocked,
+            iHaveBlocked: !!iHaveBlocked,
             messages: formattedMessages,
         };
     }
@@ -171,7 +252,8 @@ export class MessageService {
         content: string,
         storyId?: number,
         postId?: number,
-        replyId?: number
+        replyId?: number,
+        isStoryReply?: boolean // Add isStoryReply parameter
     ): Promise<any> {
         // Ensure sender and receiver are valid
         const sender = await this.userRepository.findOne({where: {id: user.id}});
@@ -181,11 +263,22 @@ export class MessageService {
             throw new NotFoundException('Sender or Receiver not found');
         }
 
+        // Check if the sender is blocked by the receiver
+        const isBlocked = await this.blockUserRepository.findOneBy({
+            blockerId: receiver.id,
+            blockedId: sender.id
+        });
+
+        if (isBlocked) {
+            throw new NotFoundException('You are blocked and cannot send a message to this user');
+        }
+
         // Create a new message
         const message = this.messageRepository.create();
         message.sender = sender;
         message.receiver = receiver;
         message.content = content;
+
 
         if (storyId) {
             message.storyId = storyId;
@@ -194,40 +287,94 @@ export class MessageService {
             message.postId = postId;
         }
         if (replyId) {
-            message.replyId = replyId;
+            if (isStoryReply) {
+                message.storyReplyId = replyId
+            } else {
+                message.replyId = replyId;
+            }
         }
 
         // Save the message in the database
         const sentMessage = await this.messageRepository.save(message);
-        if (receiver.firebaseToken) {
-            this.notificationService.sendPushNotificationToPushId(receiver.firebaseToken, `A new message from ${sender.username}`, {
-                type: "message",
-                message: JSON.stringify({
-                    id: sentMessage.id,
-                    timestamp: sentMessage.createdAt,
-                    content: sentMessage.content,
-                    storyId: message.storyId,  // Include optional fields in the response
-                    postId: message.postId,
-                    replyId: message.replyId,
-                    sender: sender,
 
-                }),
-            }, message.content.substring(0, 100));
+        // Fetch associated post and story if available
+        const post = postId ? await this.postRepository.findOne({where: {id: postId}}) : null;
+        const story = storyId ? await this.storyRepository.findOne({where: {id: storyId}}) : null;
+        const replyMessage = replyId ? await this.messageRepository.findOne({where: {id: replyId}}) : null;
+
+        // Format the message details for response and Firebase
+        const formattedMessage: any = {
+            id: sentMessage.id,
+            content: sentMessage.content,
+            createdAt: sentMessage.createdAt,
+            sender: {
+                id: sender.id,
+                username: sender.username,
+            },
+            // Check if the message has an associated story
+            story: story ? {
+                id: story.id,
+                thumbnail: story.thumbnail, // Assuming thumbnail is part of the story
+                isStory: true,
+                isAvailable: (new Date().getTime() - new Date(story.createdAt).getTime()) <= 24 * 60 * 60 * 1000,
+            } : null,
+            // Check if the message has an associated post
+            post: post ? {
+                id: post.id,
+                thumbnail: post.mediaUrl, // Assuming mediaUrl is part of the post
+                isStory: false,
+                isReel: false,
+                isAvailable: true,
+            } : null,
+            // Initialize placeholders for story and message replies
+            storyReply: null,
+            messageReply: null,
+        };
+
+        // If this message is a reply to another message
+        if (replyMessage) {
+            formattedMessage.messageReply = {
+                id: replyMessage.id,
+                content: replyMessage.content,
+                createdAt: replyMessage.createdAt,
+                senderId: replyMessage.senderId,
+                // Include story information if the replied message has an associated story
+                story: replyMessage.story ? {
+                    id: replyMessage.story.id,
+                    thumbnail: replyMessage.story.thumbnail,
+                    isStory: true,
+                    isAvailable: (new Date().getTime() - new Date(replyMessage.story.createdAt).getTime()) <= 24 * 60 * 60 * 1000,
+                } : null,
+                // Include post information if the replied message has an associated post
+                post: replyMessage.post ? {
+                    id: replyMessage.post.id,
+                    thumbnail: replyMessage.post.mediaUrl,
+                    isStory: false,
+                    isReel: false,
+                    isAvailable: true,
+                } : null,
+            };
         }
+
+        // Send notification if receiver has a Firebase token
+        if (receiver.firebaseToken) {
+            this.notificationService.sendPushNotificationToPushId(
+                receiver.firebaseToken,
+                `${sender.username} Sent a message`,
+                {
+                    type: "message",
+                    message: JSON.stringify(formattedMessage), // Use formatted message
+                },
+                message.content.substring(0, 100) // Truncate content for the notification body
+            );
+        }
+
         return {
             message: 'Message sent successfully',
-            messageDetails: {
-                id: message.id,
-                content: message.content,
-                sender: message.sender,
-                receiver: message.receiver,
-                storyId: message.storyId,  // Include optional fields in the response
-                postId: message.postId,
-                replyId: message.replyId,
-                timestamp: message.createdAt
-            }
+            messageDetails: formattedMessage, // Return the formatted message structure
         };
     }
+
 
     async shareContent(
         user: User,
