@@ -75,6 +75,7 @@ export class UserService {
                 'user.username AS user_username',
                 'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
+                'stories.createdAt AS story_createdAt',
             ])
             .where('stories.userId = :userId', {userId: user.id})
             .andWhere('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
@@ -94,6 +95,8 @@ export class UserService {
                 'user.username AS user_username',
                 'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
+                'stories.createdAt AS story_createdAt',
+
             ])
             .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
             .andWhere('f.followerId = :userId', {userId: user.id}) // Only stories from followed users
@@ -120,6 +123,7 @@ export class UserService {
                 thumb: userStory.story_thumbnail,
                 media: userStory.story_media, // Ensure this is an array of URLs
                 isLiked: !!existingLike,
+                createdAt: userStory.createdAt,
             });
         }
 
@@ -140,6 +144,8 @@ export class UserService {
                 thumb: story.story_thumbnail,
                 media: story.story_media,
                 isLiked: !!existingLike,
+                createdAt: story.createdAt,
+
             });
         }
 

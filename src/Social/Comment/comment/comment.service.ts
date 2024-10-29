@@ -55,7 +55,8 @@ export class CommentService {
         // }
 
         const post = await this.postRepository.findOne({
-            where: {id: postId}
+            where: {id: postId},
+            relations: ['user'], // Include the user relationship
         })
 
         if (!post) {
@@ -70,7 +71,7 @@ export class CommentService {
         };
 
         const createdComment = await this.commentRepository.save(newComment);
-        this.notificationService.sendNotification(user.id, NotificationAction.COMMENT, `${user.username} just commented on your post`, post.media, user.id,);
+        this.notificationService.sendNotification(post.user.id, NotificationAction.COMMENT, `${user.username} just commented on your post`, post.media, user.id,);
 
         return createResponse(201, createdComment, 'Comment saved ');
     }

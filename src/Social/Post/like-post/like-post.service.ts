@@ -25,9 +25,10 @@ export class LikePostService {
         user: User,
     ): Promise<{ isLike: number }> {
 
-        const likablePost = await this.postRepository.findOneBy(
-            {id: postId}
-        );
+        const likablePost = await this.postRepository.findOne({
+            where: {id: postId},
+            relations: ['user'], // Include the user relationship
+        });
 
         if (!likablePost) {
             throw new NotFoundException('Post not found!');
@@ -68,7 +69,7 @@ export class LikePostService {
 
         try {
             if (!unlike) {
-                this.notificationService.sendNotification(user.id, NotificationAction.LIKE, `${user.username} Liked your post`, likablePost.media, user.id,);
+                await this.notificationService.sendNotification(likablePost.user.id, NotificationAction.LIKE, `${user.username} Liked your post`, likablePost.media, user.id,);
             }
             await this.likePostRepository.save(existingLike);
             await this.postRepository.save(likablePost);
@@ -78,7 +79,6 @@ export class LikePostService {
 
         return {isLike: existingLike.isLike};
     }
-    
 
     async dislikePost(
         postId: number,
