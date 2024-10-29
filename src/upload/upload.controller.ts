@@ -16,7 +16,6 @@ import {
     Res,
     UploadedFile,
     UploadedFiles,
-    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -24,7 +23,6 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { Public } from '@/common/decorators/public.decorator';
 import { ApiOperation, ApiQuery, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@/User/auth/guards/jwt.guard';
 
 @ApiTags('Uploads')
 @Controller('upload')
@@ -65,7 +63,6 @@ export class UploadController {
         return await this.uploadService.createUpload(file);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post('upload')
     @ApiOperation({ summary: 'Upload a new reel' })
     @UseInterceptors(FileInterceptor('file'))

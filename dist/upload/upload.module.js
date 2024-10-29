@@ -18,6 +18,10 @@ const _uplaodentity = require("./entity/uplaod.entity");
 const _multerutils = require("../common/utils/multer.utils");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
 const _userentity = require("../User/user/entity/user.entity");
+const _postsentity = require("../Social/Post/posts/entity/posts.entity");
+const _tokenservice = require("../User/auth/token/token.service");
+const _tokenentity = require("../User/auth/token/entity/token.entity");
+const _jwt = require("@nestjs/jwt");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -31,6 +35,8 @@ UploadModule = _ts_decorate([
         imports: [
             _typeorm.TypeOrmModule.forFeature([
                 _uplaodentity.Upload,
+                _postsentity.Post,
+                _tokenentity.Token,
                 _userentity.User
             ]),
             _platformexpress.MulterModule.registerAsync({
@@ -48,6 +54,8 @@ UploadModule = _ts_decorate([
         ],
         providers: [
             _uploadservice.UploadService,
+            _tokenservice.TokenService,
+            _jwt.JwtService,
             _pagitnateservice.PaginationService
         ]
     })

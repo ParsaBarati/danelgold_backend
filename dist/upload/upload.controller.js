@@ -76,6 +76,13 @@ let UploadController = class UploadController {
             return yield _this.uploadService.createUpload(file);
         })();
     }
+    uploadReel(file, caption, req) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const user = req.user; // Extract user from the request
+            return _this.uploadService.uploadReel(file, caption, user);
+        })();
+    }
     createProfilePictureUpload(file, req) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -164,6 +171,27 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createUpload", null);
+_ts_decorate([
+    (0, _common.Post)('upload'),
+    (0, _swagger.ApiOperation)({
+        summary: 'Upload a new reel'
+    }),
+    (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),
+    _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
+        maxSize: 50 * 1024 * 1024
+    }).build({
+        errorHttpStatusCode: _common.HttpStatus.UNPROCESSABLE_ENTITY
+    }))),
+    _ts_param(1, (0, _common.Body)('caption')),
+    _ts_param(2, (0, _common.Req)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        typeof Express === "undefined" || typeof Express.Multer === "undefined" || typeof Express.Multer.File === "undefined" ? Object : Express.Multer.File,
+        String,
+        void 0
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], UploadController.prototype, "uploadReel", null);
 _ts_decorate([
     (0, _swagger.ApiOperation)({
         summary: 'Upload Profile Picture'

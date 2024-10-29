@@ -17,6 +17,7 @@ const _path = require("path");
 const _fsextra = /*#__PURE__*/ _interop_require_default(require("fs-extra"));
 const _responseutil = require("../utils/response.util");
 const _userentity = require("../User/user/entity/user.entity");
+const _postsentity = require("../Social/Post/posts/entity/posts.entity");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -179,6 +180,19 @@ let UploadService = class UploadService {
             };
         })();
     }
+    uploadReel(file, caption, user) {
+        var _this = this;
+        return _async_to_generator(function*() {
+            const { link } = yield _this.createUpload(file);
+            const reel = _this.postRepository.create({
+                mediaUrl: link,
+                caption,
+                isReel: true,
+                user
+            });
+            return _this.postRepository.save(reel);
+        })();
+    }
     getAllUploads(query) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -321,8 +335,9 @@ let UploadService = class UploadService {
             return (0, _responseutil.createResponse)(200, uploadWithLink, 'Profile picture uploaded successfully!');
         })();
     }
-    constructor(uploadRepository, userRepository, paginationService){
+    constructor(uploadRepository, postRepository, userRepository, paginationService){
         this.uploadRepository = uploadRepository;
+        this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.paginationService = paginationService;
     }
@@ -330,9 +345,11 @@ let UploadService = class UploadService {
 UploadService = _ts_decorate([
     (0, _common.Injectable)(),
     _ts_param(0, (0, _typeorm.InjectRepository)(_uplaodentity.Upload)),
-    _ts_param(1, (0, _typeorm.InjectRepository)(_userentity.User)),
+    _ts_param(1, (0, _typeorm.InjectRepository)(_postsentity.Post)),
+    _ts_param(2, (0, _typeorm.InjectRepository)(_userentity.User)),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
+        typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _typeorm1.Repository === "undefined" ? Object : _typeorm1.Repository,
         typeof _pagitnateservice.PaginationService === "undefined" ? Object : _pagitnateservice.PaginationService
