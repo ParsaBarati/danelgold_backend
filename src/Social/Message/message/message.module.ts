@@ -11,10 +11,11 @@ import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
 import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {Story} from "@/Social/Story/stories/entity/stories.entity";
 import {BlockUser} from "@/Social/Block/entity/block.entity";
+import {Upload} from "@/upload/entity/uplaod.entity";
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Message, User, Notification, likePost, savePost, Post, Story, BlockUser,])],
+    imports: [TypeOrmModule.forFeature([Message, User, Notification, likePost, savePost, Post, Story, BlockUser, Upload])],
     controllers: [MessageController],
     providers: [MessageService, NotificationService]
 })

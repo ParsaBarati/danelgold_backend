@@ -287,14 +287,14 @@ export class UserService {
 
     async getProfileById(userId: number, self: User) {
 
-        const user = await this.userRepository.findOne({
-            where: {id: userId},
-            relations: [
-                'posts',
-                'stories',
-                // 'club',
-            ],
-        });
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.posts', 'post')
+            .leftJoinAndSelect('user.stories', 'story')
+            .where('user.id = :userId', { userId })
+            .orderBy('post.createdAt', 'DESC')
+            .addOrderBy('story.createdAt', 'DESC')
+            .getOne();
         if (!user) {
             throw new Error('User not found');
         }

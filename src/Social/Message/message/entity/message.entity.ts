@@ -13,6 +13,7 @@ import {User} from '@/User/user/entity/user.entity';
 import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {Story} from "@/Social/Story/stories/entity/stories.entity";
 import {likeMessage} from '../../like-message/entity/like-message.entity';
+import {Upload} from "@/upload/entity/uplaod.entity";
 
 @Entity('messages')
 export class Message {
@@ -63,6 +64,15 @@ export class Message {
     @Column({type: 'boolean', default: false})
     isShared: boolean;
 
+
+    // For media (null if not a message reply)
+    @Column({type: 'int', nullable: true})
+    mediaId: number;
+
+    @ManyToOne(() => Upload, (upload) => [])
+    @JoinColumn({name: 'mediaId', referencedColumnName: 'id'})
+    @ApiProperty({type: () => Upload})
+    media: Relation<Upload>;
 
     @OneToMany(() => likeMessage, (messagelikes) => messagelikes.message)
     @ApiProperty({type: () => likeMessage})
