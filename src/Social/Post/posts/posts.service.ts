@@ -192,24 +192,24 @@ export class PostService {
         const {page, limit} = query;
 
         // Fetch the list of user IDs that the current user follows
-        const followingIds = await this.followUserRepository
-            .createQueryBuilder('follow')
-            .select('follow.followingId')
-            .where('follow.followerId = :userId', {userId: user.id})
-            .getRawMany();
-
-        console.log('followingUserIds')
-        console.log(followingIds)
-        const followingUserIds = followingIds.map(follow => follow.follow_followingId);
-        if (followingUserIds.length === 0) {
-            // Return an empty result if the user is not following anyone
-            return {
-                currentPage: page,
-                totalPages: 0,
-                totalPosts: 0,
-                posts: [],
-            };
-        }
+        // const followingIds = await this.followUserRepository
+        //     .createQueryBuilder('follow')
+        //     .select('follow.followingId')
+        //     .where('follow.followerId = :userId', {userId: user.id})
+        //     .getRawMany();
+        //
+        // console.log('followingUserIds')
+        // console.log(followingIds)
+        // const followingUserIds = followingIds.map(follow => follow.follow_followingId);
+        // if (followingUserIds.length === 0) {
+        //     // Return an empty result if the user is not following anyone
+        //     return {
+        //         currentPage: page,
+        //         totalPages: 0,
+        //         totalPosts: 0,
+        //         posts: [],
+        //     };
+        // }
 
         // Modify the query to fetch posts only from users the current user follows
         const queryBuilder = this.postRepository
@@ -230,7 +230,7 @@ export class PostService {
                 'post.media',
                 'post.content',
             ])
-            .where('user.id IN (:...followingUserIds)', {followingUserIds})
+            // .where('user.id IN (:...followingUserIds)', {followingUserIds})
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC');
 

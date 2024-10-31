@@ -60,6 +60,10 @@ export class Message {
     @Column({type: 'int', nullable: true})
     storyReplyId: number;
 
+    // has the recepient read this message
+    @Column({type: 'boolean', default: false})
+    isRead: boolean;
+
     // For shared stories or posts (null if not shared)
     @Column({type: 'boolean', default: false})
     isShared: boolean;
@@ -69,7 +73,7 @@ export class Message {
     @Column({type: 'int', nullable: true})
     mediaId: number;
 
-    @ManyToOne(() => Upload, (upload) => [])
+    @ManyToOne(() => Upload, {nullable: true})
     @JoinColumn({name: 'mediaId', referencedColumnName: 'id'})
     @ApiProperty({type: () => Upload})
     media: Relation<Upload>;

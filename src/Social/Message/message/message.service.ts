@@ -52,6 +52,7 @@ export class MessageService {
                 'message.id AS message_id',
                 'message.content AS message_content',
                 'message.createdAt AS message_created_at',
+                'message.isRead AS message_isread',
                 'sender.id AS sender_id',
                 'sender.profilePic AS sender_profile_pic',
                 'sender.name AS sender_name',
@@ -61,7 +62,7 @@ export class MessageService {
                 'receiver.name AS receiver_name',
                 'receiver.username AS receiver_username',
             ])
-            .where('message.senderId = :userId OR message.receiverId = :userId', {userId})
+            .where('message.receiverId = :userId', {userId})
             .orderBy('message.createdAt', 'DESC')  // Sort by createdAt to get latest messages first
             .getRawMany();  // Use getRawMany to get raw results
 
@@ -95,6 +96,7 @@ export class MessageService {
                 uniqueChatsMap.set(uniqueKey, {
                     id: otherUser.id,
                     user: otherUser,
+                    isRead: chat.message_isread == true,
                     lastSeen: chat.message_created_at,
                 });
             }
@@ -160,6 +162,18 @@ export class MessageService {
             .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', {senderId, receiverId})
             .orderBy('message.createdAt', 'ASC')
             .getMany();
+        // Identify messages sent by the opposite user to the current user
+        const messagesToUpdate = messages.filter(message => message.receiver.id === receiverId);
+
+// Update isRead to true for messages sent to the current user by the opposite user
+        if (messagesToUpdate.length > 0) {
+            await this.messageRepository
+                .createQueryBuilder()
+                .update(Message)
+                .set({isRead: true})
+                .where('id IN (:...ids)', {ids: messagesToUpdate.map(message => message.id)})
+                .execute();
+        }
 
         // Format messages for response
         const formattedMessages = messages.map(msg => {
@@ -365,7 +379,7 @@ export class MessageService {
                 profilePic: sender.profilePic,
                 name: sender.name,
             },
-            media: sentMessage.media,
+            media: mediaId > 0 ? sentMessage.media : null,
 
             // Check if the message has an associated story
             story: story ? {
