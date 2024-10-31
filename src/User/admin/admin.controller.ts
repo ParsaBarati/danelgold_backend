@@ -27,9 +27,9 @@ export class AdminController {
     @Public()
     @Post('login')
     async login(
-        @Body() {email_or_phone, password, token}: { email_or_phone: string; password: string; token: string }
+        @Body() {email, password, token}: { email: string; password: string; token: string }
     ) {
-        return await this.adminService.login(email_or_phone, password,token);
+        return await this.adminService.login(email, password,token);
     }
 
 
@@ -44,13 +44,13 @@ export class AdminController {
     }
 
     @ApiCreatedResponse({description: 'Verification code sent'})
-    @ApiConflictResponse({description: 'Invalid email or phone number'})
+    @ApiConflictResponse({description: 'Invalid email'})
     @Public()
     @Post('signup/request-code')
     async requestVerificationCode(
-        @Body() {email_or_phone}: { email_or_phone: string }
+        @Body() {email}: { email: string }
     ) {
-        return await this.adminService.sendOTPToPhoneOrEmail(email_or_phone)
+        return await this.adminService.sendOTPToEmail(email)
     }
 
     @ApiCreatedResponse({description: 'Code verified successfully'})
@@ -59,13 +59,13 @@ export class AdminController {
     @Post('signup/verify-code')
     async verifyCode(
         @Body() {
-            email_or_phone,
+            email,
             verification_code,
             username,
             password
-        }: { email_or_phone: string; verification_code: string; username: string; password: string }
+        }: { email: string; verification_code: string; username: string; password: string }
     ) {
-        return await this.adminService.verifyCode(email_or_phone, username, password,
+        return await this.adminService.verifyCode(email, username, password,
             verification_code
         );
     }
@@ -76,12 +76,12 @@ export class AdminController {
     @Post('signup/set-password')
     async setPassword(
         @Body() {
-            email_or_phone,
+            email,
             password,
             confirm_password
-        }: { email_or_phone: string; password: string; confirm_password: string }
+        }: { email: string; password: string; confirm_password: string }
     ) {
-        return await this.adminService.setPassword(email_or_phone, password, confirm_password);
+        return await this.adminService.setPassword(email, password, confirm_password);
     }
 
     @ApiCreatedResponse({description: 'Verification code sent'})
@@ -89,9 +89,9 @@ export class AdminController {
     @Public()
     @Post('password/forgot')
     async forgotPassword(
-        @Body() {email_or_phone_or_username}: { email_or_phone_or_username: string }
+        @Body() {email_or_username}: { email_or_username: string }
     ) {
-        return await this.adminService.forgotPassword(email_or_phone_or_username);
+        return await this.adminService.forgotPassword(email_or_username);
     }
 
     @ApiCreatedResponse({description: 'Code verified'})
@@ -100,11 +100,11 @@ export class AdminController {
     @Post('password/verify-code')
     async verifyForgotPasswordCode(
         @Body() {
-            email_or_phone_or_username,
+            email_or_username,
             verification_code
-        }: { email_or_phone_or_username: string; verification_code: string }
+        }: { email_or_username: string; verification_code: string }
     ) {
-        return await this.adminService.verifyForgotPasswordCode(email_or_phone_or_username, verification_code);
+        return await this.adminService.verifyForgotPasswordCode(email_or_username, verification_code);
     }
 
     @ApiCreatedResponse({description: 'Password reset successfully'})
@@ -112,9 +112,9 @@ export class AdminController {
     @Public()
     @Post('password/reset')
     async resetPassword(
-        @Body() {password, confirm_password, email_or_phone_or_username}: { password: string; confirm_password: string; email_or_phone_or_username: string }
+        @Body() {password, confirm_password, email_or_username}: { password: string; confirm_password: string; email_or_username: string }
     ) {
-        return await this.adminService.resetPassword(password, confirm_password, email_or_phone_or_username);
+        return await this.adminService.resetPassword(password, confirm_password, email_or_username);
     }
 
     @ApiCreatedResponse({description: 'Check User Authentication'})

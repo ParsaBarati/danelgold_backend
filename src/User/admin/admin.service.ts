@@ -18,22 +18,19 @@ export class AdminService{
     ){}
 
     async login(
-        email_or_phone: string,
+        email: string,
         password: string,
         firebaseToken: string,
     ): Promise<any> {
 
-        const isPhone = /^[0-9]+$/.test(email_or_phone);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
+        const isEmail = /\S+@\S+\.\S+/.test(email);
 
-        console.log(email_or_phone)
+        console.log(email)
         let user;
-        if (isPhone) {
-            user = await this.adminRepository.findOne({where: {phone: email_or_phone}});
-        } else if (isEmail) {
-            user = await this.adminRepository.findOne({where: {email: email_or_phone}});
+        if (isEmail) {
+            user = await this.adminRepository.findOne({where: {email: email}});
         } else {
-            throw new BadRequestException('Invalid email or phone number');
+            throw new BadRequestException('Invalid email ');
         }
 
         if (!user) {
@@ -56,7 +53,6 @@ export class AdminService{
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone,
                 username: user.username,
             },
         };
@@ -79,32 +75,27 @@ export class AdminService{
         };
     }
 
-    async checkUserExists(phone: string, email: string): Promise<void> {
+    async checkUserExists(email: string): Promise<void> {
         const existingUser = await this.adminRepository.findOne({
-            where: [{phone}, {email}],
+            where: [ {email}],
         });
         if (existingUser) {
             throw new BadRequestException('User already exists');
         }
     }
 
-    async sendOTPToPhoneOrEmail(email_or_phone: string): Promise<any> {
-        const isPhone = /^[0-9]+$/.test(email_or_phone);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
+    async sendOTPToEmail(email: string): Promise<any> {
+        const isEmail = /\S+@\S+\.\S+/.test(email);
 
-        if (isPhone) {
-            await this.checkUserExists(email_or_phone, '');
-        } else if (isEmail) {
-            await this.checkUserExists('', email_or_phone);
+        if (isEmail) {
+            await this.checkUserExists(email);
         } else {
-            throw new BadRequestException('Invalid phone number or email');
+            throw new BadRequestException('Invalid email');
         }
 
         let otp;
-        if (isPhone) {
-            otp = await this.otpService.sendOTP(email_or_phone);
-        } else if (isEmail) {
-            otp = await this.otpService.sendOTPToEmail(email_or_phone);
+        if (isEmail) {
+            otp = await this.otpService.sendOTPToEmail(email);
         }
 
         return {
@@ -115,38 +106,30 @@ export class AdminService{
     }
 
     async verifyCode(
-        email_or_phone: string,
+        email: string,
         username: string,
         password: string,
         verification_code: string
     ): Promise<any> {
-        const isPhone = /^[0-9]+$/.test(email_or_phone);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
+        const isEmail = /\S+@\S+\.\S+/.test(email);
 
         const codeAsString = verification_code.toString();
         let user;
 
-        if (isPhone) {
-            const isValidOTP = await this.otpService.verifyOTP(email_or_phone, codeAsString);
+        if (isEmail) {
+            const isValidOTP = await this.otpService.verifyOTP(email, codeAsString);
             if (!isValidOTP) {
                 throw new BadRequestException('Invalid verification code');
             }
-            user = await this.adminRepository.findOneBy({phone: email_or_phone});
-        } else if (isEmail) {
-            const isValidOTP = await this.otpService.verifyOTP(email_or_phone, codeAsString);
-            if (!isValidOTP) {
-                throw new BadRequestException('Invalid verification code');
-            }
-            user = await this.adminRepository.findOneBy({email: email_or_phone});
+            user = await this.adminRepository.findOneBy({email: email});
         } else {
-            throw new BadRequestException('Invalid phone number or email');
+            throw new BadRequestException('Invalid email');
         }
 
         if (!user) {
             const hashedPassword = await bcrypt.hash(password, 10);
             user = this.adminRepository.create({
-                phone: isPhone ? email_or_phone : null,
-                email: isEmail ? email_or_phone : null,
+                email: isEmail ? email : null,
                 username: username,
                 password: hashedPassword,
                 isVerified: true,
@@ -164,7 +147,7 @@ export class AdminService{
     }
 
     async setPassword(
-        email_or_phone: string,
+        email: string,
         password: string,
         confirmPassword: string
     ): Promise<any> {
@@ -173,16 +156,13 @@ export class AdminService{
             throw new BadRequestException('Passwords do not match');
         }
 
-        const isPhone = /^[0-9]+$/.test(email_or_phone);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone);
+        const isEmail = /\S+@\S+\.\S+/.test(email);
 
         let user;
-        if (isPhone) {
-            user = await this.adminRepository.findOneBy({phone: email_or_phone});
-        } else if (isEmail) {
-            user = await this.adminRepository.findOneBy({email: email_or_phone});
+        if (isEmail) {
+            user = await this.adminRepository.findOneBy({email: email});
         } else {
-            throw new BadRequestException('Invalid phone number or email');
+            throw new BadRequestException('Invalid email');
         }
 
         if (!user) {
@@ -200,66 +180,57 @@ export class AdminService{
         };
     }
 
-    async forgotPassword(email_or_phone_or_username: string): Promise<any> {
-        const isPhone = /^[0-9]+$/.test(email_or_phone_or_username);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone_or_username);
-        const isUsername = /^[a-zA-Z0-9_]+$/.test(email_or_phone_or_username);
+    async forgotPassword(email_or_username: string): Promise<any> {
+        const isEmail = /\S+@\S+\.\S+/.test(email_or_username);
+        const isUsername = /^[a-zA-Z0-9_]+$/.test(email_or_username);
 
         let user;
 
-        if (isPhone) {
-            user = await this.adminRepository.findOne({where: {phone: email_or_phone_or_username}});
-        } else if (isEmail) {
-            user = await this.adminRepository.findOne({where: {email: email_or_phone_or_username}});
+        if (isEmail) {
+            user = await this.adminRepository.findOne({where: {email: email_or_username}});
         } else if (isUsername) {
-            user = await this.adminRepository.findOne({where: {username: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {username: email_or_username}});
         } else {
-            throw new BadRequestException('Invalid email, phone number, or username');
+            throw new BadRequestException('Invalid email or username');
         }
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        const identifier = user.phone || user.email;
+        const identifier = user.email;
 
-        const isPhone2 = /^[0-9]+$/.test(identifier);
         const isEmail2 = /\S+@\S+\.\S+/.test(identifier);
-        // Send OTP to user email or phone
+        // Send OTP to user email
         let otp;
-        if (isPhone2) {
-            otp = await this.otpService.sendOTP(identifier);
-        } else if (isEmail2) {
+        if (isEmail2) {
             otp = await this.otpService.sendOTPToEmail(identifier);
         }
         return {status: 'success', message: 'Verification code sent', otp,};
     }
 
     async verifyForgotPasswordCode(
-        email_or_phone_or_username: string,
+        email_or_username: string,
         verification_code: string
     ): Promise<any> {
-        const isPhone = /^[0-9]+$/.test(email_or_phone_or_username);
-        const isEmail = /\S+@\S+\.\S+/.test(email_or_phone_or_username);
-        const isUsername = /^[a-zA-Z0-9_]+$/.test(email_or_phone_or_username);
+        const isEmail = /\S+@\S+\.\S+/.test(email_or_username);
+        const isUsername = /^[a-zA-Z0-9_]+$/.test(email_or_username);
 
         let user;
 
-        if (isPhone) {
-            user = await this.adminRepository.findOne({where: {phone: email_or_phone_or_username}});
-        } else if (isEmail) {
-            user = await this.adminRepository.findOne({where: {email: email_or_phone_or_username}});
+        if (isEmail) {
+            user = await this.adminRepository.findOne({where: {email: email_or_username}});
         } else if (isUsername) {
-            user = await this.adminRepository.findOne({where: {username: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {username: email_or_username}});
         } else {
-            throw new BadRequestException('Invalid email, phone number, or username');
+            throw new BadRequestException('Invalid email or username');
         }
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        const isValidOTP = await this.otpService.verifyOTP(email_or_phone_or_username, verification_code);
+        const isValidOTP = await this.otpService.verifyOTP(email_or_username, verification_code);
 
         if (!isValidOTP) {
             throw new BadRequestException('Invalid verification code');
@@ -271,7 +242,7 @@ export class AdminService{
     async resetPassword(
         password: string,
         confirm_password: string,
-        email_or_phone_or_username: string
+        email_or_username: string
     ): Promise<void> {
         if (password !== confirm_password) {
             throw new BadRequestException('Passwords do not match');
@@ -280,9 +251,8 @@ export class AdminService{
         // جستجوی کاربر با یکی از فیلدهای ایمیل، شماره تلفن یا نام کاربری
         const user = await this.adminRepository.findOne({
             where: [
-                { email: email_or_phone_or_username },
-                { phone: email_or_phone_or_username },
-                { username: email_or_phone_or_username }
+                { email: email_or_username },
+                { username: email_or_username }
             ]
         });
 

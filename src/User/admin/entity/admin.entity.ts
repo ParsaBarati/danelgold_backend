@@ -44,9 +44,6 @@ export class Admin {
     @Column({type: 'varchar', nullable: true})
     name: string;
 
-    @Column({type: 'varchar', unique: true, length: 11, nullable: true})
-    phone: string | null;
-
     @Column({type: 'text', nullable: true})
     email: string | null;
 

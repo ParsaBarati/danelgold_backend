@@ -105,7 +105,7 @@ const multerConfigFactory = (configService)=>({
                         yield _fsextra.ensureDir(uploadDir);
                         cb(null, uploadDir);
                     } catch (error) {
-                        cb(new Error(String(error)), '');
+                        cb(new _common.BadRequestException(String(error)), '');
                     }
                 });
                 return function(req, file, cb) {
@@ -123,14 +123,16 @@ const multerConfigFactory = (configService)=>({
                         let finalFilename = `${baseName}${extension}`;
                         let filePath = _path.resolve(uploadDir, finalFilename);
                         let counter = 1;
+                        console.log('filename');
                         while(yield _fsextra.pathExists(filePath)){
                             finalFilename = `${baseName}-${counter}${extension}`;
                             filePath = _path.resolve(uploadDir, finalFilename);
                             counter++;
                         }
                         cb(null, finalFilename);
+                        console.log('final file name');
                     } catch (error) {
-                        cb(new Error(String(error)), '');
+                        cb(new _common.BadRequestException(String(error)), '');
                     }
                 });
                 return function(req, file, cb) {
@@ -139,6 +141,7 @@ const multerConfigFactory = (configService)=>({
             }()
         }),
         fileFilter: (req, file, cb)=>{
+            console.log('filter');
             const ext = _path.extname(file.originalname).toLowerCase();
             if (allowedExtensions.includes(ext)) {
                 cb(null, true);

@@ -152,6 +152,33 @@ let UploadService = class UploadService {
             };
         })();
     }
+    getMemTypeByExtension(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        switch(extension){
+            case 'jpg':
+            case 'jpeg':
+            case 'heic':
+            case 'png':
+            case 'gif':
+                return 'image';
+            case 'mp4':
+            case 'mkv':
+            case 'avi':
+            case 'mov':
+                return 'video';
+            case 'mp3':
+            case 'wav':
+            case 'aac':
+                return 'audio';
+            case 'pdf':
+            case 'doc':
+            case 'docx':
+            case 'txt':
+                return 'document';
+            default:
+                return 'unknown';
+        }
+    }
     createUpload(file) {
         var _this = this;
         return _async_to_generator(function*() {
@@ -161,7 +188,7 @@ let UploadService = class UploadService {
             const sizeFile = file.size;
             const uploadFileName = file.filename;
             const uploadDestination = file.destination;
-            const uploadMemType = file.mimetype;
+            const uploadMemType = _this.getMemTypeByExtension(uploadFileName);
             const newUpload = _this.uploadRepository.create({
                 name: uploadFileName,
                 size: sizeFile,
@@ -169,10 +196,12 @@ let UploadService = class UploadService {
                 destination: uploadDestination
             });
             const savedUpload = yield _this.uploadRepository.save(newUpload);
+            savedUpload.memType = uploadMemType;
             // Generate the file link
             const baseUrl = process.env.BASE_URL_UPLOAD;
             const encodedFileName = `${savedUpload.destination.replace(/\\/g, '/')}/${encodeURIComponent(savedUpload.name)}`;
             const link = baseUrl + encodedFileName;
+            console.log(savedUpload);
             // Return an object with the Upload entity and the generated link
             return {
                 upload: savedUpload,
@@ -186,6 +215,7 @@ let UploadService = class UploadService {
             const { link } = yield _this.createUpload(file);
             const reel = _this.postRepository.create({
                 mediaUrl: link,
+                media: link,
                 caption,
                 isReel: true,
                 user

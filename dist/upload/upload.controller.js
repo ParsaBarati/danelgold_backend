@@ -73,6 +73,7 @@ let UploadController = class UploadController {
     createUpload(file) {
         var _this = this;
         return _async_to_generator(function*() {
+            console.log('Here!!!!!');
             return yield _this.uploadService.createUpload(file);
         })();
     }
@@ -159,11 +160,7 @@ _ts_decorate([
     }),
     (0, _common.Post)(),
     (0, _common.UseInterceptors)((0, _platformexpress.FileInterceptor)('file')),
-    _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().addMaxSizeValidator({
-        maxSize: 5 * 1024 * 1024
-    }).build({
-        errorHttpStatusCode: _common.HttpStatus.UNPROCESSABLE_ENTITY
-    }))),
+    _ts_param(0, (0, _common.UploadedFile)(new _common.ParseFilePipeBuilder().build())),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
         typeof Express === "undefined" || typeof Express.Multer === "undefined" || typeof Express.Multer.File === "undefined" ? Object : Express.Multer.File
