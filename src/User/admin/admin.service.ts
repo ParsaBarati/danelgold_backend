@@ -60,6 +60,7 @@ export class AdminService{
                 name: user.name,
                 email: user.email,
                 username: user.username,
+                role: user.role,
             },
         };
     }
@@ -150,32 +151,47 @@ export class AdminService{
         await this.adminRepository.save(user);
     }
 
-    async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string, firebaseToken: string) {
-
-
+    async checkAuthentication(
+        token: string,
+        appName: string,
+        packageName: string,
+        version: string,
+        buildNumber: string,
+        firebaseToken: string
+    ) {
         if (!token) {
             throw new UnauthorizedException('No token provided');
         }
-
+    
         if (!appName || !packageName || !version || !buildNumber) {
             throw new UnauthorizedException('Invalid app details');
         }
-        const user = await this.tokenService.getByToken(token);
-        if (!user) {
+    
+        // Updated to retrieve an Admin entity (with role) instead of a generic User
+        const admin = await this.tokenService.getByToken(token) as Admin;
+
+        if (!admin) {
             throw new UnauthorizedException('User not found');
         }
-        user.firebaseToken = firebaseToken;
-        await this.adminRepository.save(user);
+    
+        await this.adminRepository.save(admin);
+    
         return {
             message: 'Authentication successful',
-            user: user,
+            user: {
+                id: admin.id,
+                name: admin.name,
+                email: admin.email,
+                username: admin.username,
+                role: admin.role,  // Role is now available here
+            },
             appName,
             packageName,
             version,
             buildNumber,
         };
     }
-
+    
     async getAllUsers() {
         const users = await this.userRepository.find({
             select: ['username', 'name', 'id', 'profilePic', 'createdAt'], // Adjust fields as necessary

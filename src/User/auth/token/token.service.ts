@@ -5,6 +5,7 @@ import { Token } from './entity/token.entity';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@/User/user/entity/user.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
+import { Admin } from '@/User/admin/entity/admin.entity';
 
 @Injectable()
 export class TokenService {
@@ -71,24 +72,27 @@ export class TokenService {
     return !!tokenEntity;
   }
 
-  async getByToken(token: string): Promise<User | null> {
+  async getByToken(token: string): Promise<User | Admin | null> {
     const tokenEntity = await this.tokenRepository.findOne({
-      where: { token },
-      relations: ['user'], // Include user relation
+        where: { token },
+        relations: ['user', 'admin'], // Include both relations
     });
 
-    if (!tokenEntity || !tokenEntity.user) {
-      return null;
+    if (!tokenEntity) {
+        return null;
     }
 
-    const user = tokenEntity.user;
-    if (!user) {
-      await this.tokenRepository.delete(tokenEntity);
-      return null;
+    if (tokenEntity.admin) {
+        return tokenEntity.admin; // Return Admin if found
     }
 
-    return user;
-  }
+    if (tokenEntity.user) {
+        return tokenEntity.user; // Return User if found
+    }
+
+    await this.tokenRepository.delete(tokenEntity); // Clean up if neither is found
+    return null;
+}
 
   async getMaxSessionsPerUser(): Promise<number> {
     return this.maxSessionsPerUser;

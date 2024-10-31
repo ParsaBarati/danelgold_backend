@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@/User/user/entity/user.entity';
+import { Admin } from '@/User/admin/entity/admin.entity';
 
 @Entity('tokens')
 export class Token {
@@ -20,7 +21,9 @@ export class Token {
   @Column({ type: 'timestamptz' })
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.tokens)
-  @ApiProperty({ type: () =>  User})
-  user: Relation<User>;
+  @ManyToOne(() => User, { nullable: true })
+  user: User | null;
+
+  @ManyToOne(() => Admin, { nullable: true })
+  admin: Admin | null;
 }

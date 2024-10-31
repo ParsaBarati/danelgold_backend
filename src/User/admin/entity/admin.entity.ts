@@ -75,4 +75,8 @@ export class Admin {
 
     @Column({type: 'timestamptz', nullable: true})
     lastLogin: Date | null;
+
+    @OneToMany(() => Token, (token) => token.admin)
+    @ApiProperty({type: () => [Token]})
+    tokens: Relation<Token[]>;
 }
