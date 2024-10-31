@@ -10,6 +10,7 @@ import {Post} from "@/Social/Post/posts/entity/posts.entity";
 import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
 import {BlockUser} from "@/Social/Block/entity/block.entity";
 import {Story} from "@/Social/Story/stories/entity/stories.entity";
+import {Upload} from "@/upload/entity/uplaod.entity";
 
 
 @Injectable()
@@ -17,6 +18,8 @@ export class MessageService {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
+        @InjectRepository(Upload)
+        private uploadRepository: Repository<Upload>,
         @InjectRepository(Post)
         private postRepository: Repository<Post>,
         @InjectRepository(Story)
@@ -147,10 +150,12 @@ export class MessageService {
             .leftJoinAndSelect('message.receiver', 'receiver')
             .leftJoinAndSelect('message.story', 'story') // Load story data if any
             .leftJoinAndSelect('message.post', 'post') // Load post data if any
+            .leftJoinAndSelect('message.media', 'media') // Load post data if any
             .leftJoinAndSelect('message.replyMessage', 'replyMessage') // Load reply data if any
             .leftJoinAndSelect('message.storyReply', 'storyReply') // Load reply data if any
             .leftJoinAndSelect('replyMessage.post', 'replyMessage.post') // Load post data from the reply message
             .leftJoinAndSelect('replyMessage.story', 'replyMessage.story') // Load story data from the reply message
+            .leftJoinAndSelect('replyMessage.media', 'replyMessage.media') // Load story data from the reply message
             .where('(message.senderId = :senderId AND message.receiverId = :receiverId)', {senderId, receiverId})
             .orWhere('(message.senderId = :receiverId AND message.receiverId = :senderId)', {senderId, receiverId})
             .orderBy('message.createdAt', 'ASC')
@@ -158,6 +163,9 @@ export class MessageService {
 
         // Format messages for response
         const formattedMessages = messages.map(msg => {
+            if (msg.media) {
+                msg.media.destination = this.generatePath(msg.media);
+            }
             // Initial formatted message structure with essential fields
             const formattedMessage: any = {
                 id: msg.id,
@@ -173,6 +181,7 @@ export class MessageService {
                     // Check if the story is available based on the 24-hour timeframe
                     isAvailable: (new Date().getTime() - new Date(msg.story.createdAt).getTime()) <= 24 * 60 * 60 * 1000
                 } : null, // Null if no story is associated with this message
+                media: msg.media,
 
                 // Check if the message has an associated post
                 post: msg.post ? {
@@ -190,9 +199,14 @@ export class MessageService {
 
             // If this message is a reply to another message and not a story reply
             if (msg.replyMessage !== null) {
+                if (msg.replyMessage.media) {
+                    msg.replyMessage.media.destination = this.generatePath(msg.replyMessage.media);
+                }
                 // Populate messageReply with details from the replied message
                 formattedMessage.messageReply = {
                     id: msg.replyMessage.id,
+                    media: {...msg.replyMessage.media,},
+
                     content: msg.replyMessage.content,
                     createdAt: msg.replyMessage.createdAt,
                     senderId: msg.senderId,
@@ -246,10 +260,20 @@ export class MessageService {
     }
 
 
+    generatePath(media: Upload) {
+        if (media) {
+            const baseUrl = process.env.BASE_URL_UPLOAD;
+            const encodedFileName = `${media.destination.replace(/\\/g, '/')}/${encodeURIComponent(media.name)}`;
+            return baseUrl + encodedFileName;
+        }
+        return null;
+    }
+
     async sendMessage(
         user: User,
         receiverId: number,
         content: string,
+        mediaId?: number,
         storyId?: number,
         postId?: number,
         replyId?: number,
@@ -286,6 +310,10 @@ export class MessageService {
         if (postId) {
             message.postId = postId;
         }
+        if (mediaId) {
+            message.mediaId = mediaId;
+        }
+
         if (replyId) {
             if (isStoryReply) {
                 message.storyReplyId = replyId
@@ -294,13 +322,30 @@ export class MessageService {
             }
         }
 
+        const upload = await this.uploadRepository.findOne({
+            where: {id: mediaId}
+        });
+
+        if (!upload) {
+            message.mediaId = null;
+        }
+
         // Save the message in the database
         const sentMessage = await this.messageRepository.save(message);
 
+        if (upload) {
+            sentMessage.media = upload;
+            sentMessage.media.destination = this.generatePath(upload);
+
+        }
         // Fetch associated post and story if available
         const post = postId ? await this.postRepository.findOne({where: {id: postId}}) : null;
         const story = storyId ? await this.storyRepository.findOne({where: {id: storyId}}) : null;
-        const replyMessage = replyId ? await this.messageRepository.findOne({where: {id: replyId}}) : null;
+        const replyMessage = replyId ? await this.messageRepository.findOne({
+            where: {id: replyId},
+            relations: ['media']
+        }) : null;
+
 
         // Format the message details for response and Firebase
         const formattedMessage: any = {
@@ -320,6 +365,8 @@ export class MessageService {
                 profilePic: sender.profilePic,
                 name: sender.name,
             },
+            media: sentMessage.media,
+
             // Check if the message has an associated story
             story: story ? {
                 id: story.id,
@@ -342,11 +389,16 @@ export class MessageService {
 
         // If this message is a reply to another message
         if (replyMessage) {
+            if (replyMessage.media) {
+                replyMessage.media.destination = this.generatePath(replyMessage.media);
+            }
+
             formattedMessage.messageReply = {
                 id: replyMessage.id,
                 content: replyMessage.content,
                 createdAt: replyMessage.createdAt,
                 senderId: replyMessage.senderId,
+                media: replyMessage.media,
                 // Include story information if the replied message has an associated story
                 story: replyMessage.story ? {
                     id: replyMessage.story.id,

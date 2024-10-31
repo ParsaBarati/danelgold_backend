@@ -21,9 +21,10 @@ export const multerConfigFactory = (configService: ConfigService) => ({
         await fs.ensureDir(uploadDir);
         cb(null, uploadDir);
       } catch (error) {
-        cb(new Error(String(error)), '');
+        cb(new BadRequestException(String(error)), '');
       }
     },
+
     filename: async (req, file, cb) => {
       try {
         const extension = path.extname(file.originalname);
@@ -35,6 +36,7 @@ export const multerConfigFactory = (configService: ConfigService) => ({
         let finalFilename = `${baseName}${extension}`;
         let filePath = path.resolve(uploadDir, finalFilename);
         let counter = 1;
+        console.log('filename');
 
         while (await fs.pathExists(filePath)) {
           finalFilename = `${baseName}-${counter}${extension}`;
@@ -43,12 +45,16 @@ export const multerConfigFactory = (configService: ConfigService) => ({
         }
 
         cb(null, finalFilename);
+        console.log('final file name');
+
       } catch (error) {
-        cb(new Error(String(error)), '');
+        cb(new BadRequestException(String(error)), '');
       }
     },
   }),
+
   fileFilter: (req, file, cb) => {
+    console.log('filter');
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedExtensions.includes(ext)) {
       cb(null, true);

@@ -1,4 +1,4 @@
-import { UploadService } from './upload.service';
+import {UploadService} from './upload.service';
 import {
     Body,
     Controller,
@@ -18,18 +18,19 @@ import {
     UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {FileInterceptor, FilesInterceptor} from '@nestjs/platform-express';
 import path from 'path';
-import { Request, Response } from 'express';
-import { Public } from '@/common/decorators/public.decorator';
-import { ApiOperation, ApiQuery, ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import {Request, Response} from 'express';
+import {Public} from '@/common/decorators/public.decorator';
+import {ApiOkResponse, ApiOperation, ApiQuery, ApiTags} from '@nestjs/swagger';
 
 @ApiTags('Uploads')
 @Controller('upload')
 export class UploadController {
-    constructor(private readonly uploadService: UploadService) {}
+    constructor(private readonly uploadService: UploadService) {
+    }
 
-    @ApiOperation({ summary: 'Upload Multiple Files in Bulk' })
+    @ApiOperation({summary: 'Upload Multiple Files in Bulk'})
     @Post('bulk')
     @UseInterceptors(FilesInterceptor('files'))
     async createUploads(
@@ -46,40 +47,36 @@ export class UploadController {
         return await this.uploadService.createUploads(files);
     }
 
-    @ApiOperation({ summary: 'Upload Single File' })
+    @ApiOperation({summary: 'Upload Single File'})
     @Post()
     @UseInterceptors(FileInterceptor('file'))
     async createUpload(
         @UploadedFile(
             new ParseFilePipeBuilder()
-                .addMaxSizeValidator({
-                    maxSize: 5 * 1024 * 1024, // 5MB max file size
-                })
-                .build({
-                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-                }),
+                .build(),
         ) file: Express.Multer.File,
     ) {
+        console.log('Here!!!!!');
         return await this.uploadService.createUpload(file);
     }
 
-    @ApiOperation({ summary: 'Upload Reel' })
+    @ApiOperation({summary: 'Upload Reel'})
     @Post('Reel')
-    @ApiOperation({ summary: 'Upload a new reel' })
+    @ApiOperation({summary: 'Upload a new reel'})
     @UseInterceptors(FileInterceptor('file'))
     async uploadReel(
         @UploadedFile(
             new ParseFilePipeBuilder()
-                .addMaxSizeValidator({ maxSize: 50 * 1024 * 1024 }) // Adjust max file size for videos
-                .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+                .addMaxSizeValidator({maxSize: 50 * 1024 * 1024}) // Adjust max file size for videos
+                .build({errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY}),
         ) file: Express.Multer.File,
         @Body('caption') caption: string,
         @Req() req
-    ){
+    ) {
         return this.uploadService.uploadReel(file, caption, (req.uesr as any));
     }
 
-    @ApiOperation({ summary: 'Upload Profile Picture' })
+    @ApiOperation({summary: 'Upload Profile Picture'})
     @Post('profile-pic')
     @UseInterceptors(FileInterceptor('file'))
     async createProfilePictureUpload(
@@ -97,12 +94,12 @@ export class UploadController {
         return await this.uploadService.createProfilePictureUpload(file, req.user as any);
     }
 
-    @ApiOperation({ summary: 'Get All Uploads with Filtering Options' })
-    @ApiQuery({ name: 'page', required: false, example: 1, description: 'Page number for pagination' })
-    @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Number of items per page' })
-    @ApiQuery({ name: 'search', required: false, description: 'Search term to filter uploads' })
-    @ApiQuery({ name: 'sort', required: false, description: 'Sort by a specific field', example: 'id' })
-    @ApiQuery({ name: 'sortOrder', required: false, description: 'Order of sorting', example: 'DESC' })
+    @ApiOperation({summary: 'Get All Uploads with Filtering Options'})
+    @ApiQuery({name: 'page', required: false, example: 1, description: 'Page number for pagination'})
+    @ApiQuery({name: 'limit', required: false, example: 10, description: 'Number of items per page'})
+    @ApiQuery({name: 'search', required: false, description: 'Search term to filter uploads'})
+    @ApiQuery({name: 'sort', required: false, description: 'Sort by a specific field', example: 'id'})
+    @ApiQuery({name: 'sortOrder', required: false, description: 'Order of sorting', example: 'DESC'})
     @Get('all')
     async getAllUploads(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -111,26 +108,26 @@ export class UploadController {
         @Query('sort', new DefaultValuePipe('id')) sort?: string,
         @Query('sortOrder', new DefaultValuePipe('DESC')) sortOrder?: string,
     ) {
-        const query = { page, limit, search, sort, sortOrder };
+        const query = {page, limit, search, sort, sortOrder};
         return this.uploadService.getAllUploads(query);
     }
 
-    @ApiOperation({ summary: 'Delete an Upload by ID' })
-    @ApiOkResponse({ description: 'Upload deleted successfully' })
+    @ApiOperation({summary: 'Delete an Upload by ID'})
+    @ApiOkResponse({description: 'Upload deleted successfully'})
     @Delete(':id')
     async deleteUpload(@Param('id', ParseIntPipe) id: number) {
         return this.uploadService.deleteUpload(id);
     }
 
-    @ApiOperation({ summary: 'Delete Multiple Uploads' })
-    @ApiQuery({ name: 'delete', description: 'Comma-separated list of IDs to delete' })
+    @ApiOperation({summary: 'Delete Multiple Uploads'})
+    @ApiQuery({name: 'delete', description: 'Comma-separated list of IDs to delete'})
     @Delete()
     async deleteMultipleUploads(@Query('delete') ids: string) {
         const idArray = ids.split(',').map((id) => parseInt(id, 10));
         return this.uploadService.deleteMultipleUploads(idArray);
     }
 
-    @ApiOperation({ summary: 'Get File by Path' })
+    @ApiOperation({summary: 'Get File by Path'})
     @Public()
     @Get('/path/:filePath')
     async getByPath(@Param('filePath') filePath: string, @Res() res: Response) {
@@ -143,7 +140,7 @@ export class UploadController {
         res.sendFile(absolutePath);
     }
 
-    @ApiOperation({ summary: 'Get Upload by ID' })
+    @ApiOperation({summary: 'Get Upload by ID'})
     @Get(':id')
     async getUploadById(
         @Param(
