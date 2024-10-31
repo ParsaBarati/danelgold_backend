@@ -296,29 +296,47 @@ export class AuthService {
         await this.userRepository.save(user);
     }
 
-    async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string, firebaseToken: string) {
-
-
+    async checkAuthentication(
+        token: string,
+        appName: string,
+        packageName: string,
+        version: string,
+        buildNumber: string,
+        firebaseToken: string
+    ) {
         if (!token) {
             throw new UnauthorizedException('No token provided');
         }
-
+    
         if (!appName || !packageName || !version || !buildNumber) {
             throw new UnauthorizedException('Invalid app details');
         }
+    
         const user = await this.tokenService.getByToken(token);
-        if (!user) {
-            throw new UnauthorizedException('User not found');
+        
+        // Type narrowing: Confirm `user` is indeed a `User`
+        if (!user || !('firebaseToken' in user)) {
+            throw new UnauthorizedException('User not found or not a valid User entity');
         }
+    
+        // Now we can safely assign `firebaseToken` to `user`
         user.firebaseToken = firebaseToken;
         await this.userRepository.save(user);
+    
         return {
             message: 'Authentication successful',
-            user: user,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                // Any other fields specific to User
+            },
             appName,
             packageName,
             version,
             buildNumber,
         };
     }
+    
 }

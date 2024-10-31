@@ -9,6 +9,8 @@ import { User } from "../user/entity/user.entity";
 import { ApiResponses, createResponse } from "@/utils/response.util";
 import { AddUserDto } from "./dto/addUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { AddAdminDto } from "./dto/addAdmin.dto";
+import { UpdateAdminDto } from "./dto/updateAdmin.dto";
 
 
 
@@ -193,13 +195,38 @@ export class AdminService{
     }
     
     async getAllUsers() {
+
         const users = await this.userRepository.find({
-            select: ['username', 'name', 'id', 'profilePic', 'createdAt'], // Adjust fields as necessary
+            select: [
+                'username', 
+                'name', 
+                'id', 
+                'profilePic', 
+                'createdAt'
+            ], 
         });
 
         return {
             statusCode: 200,
             result: users,
+        };
+    }
+
+    async getAllAdmins() {
+
+        const admins = await this.adminRepository.find({
+            select: [
+                'username', 
+                'name', 
+                'id', 
+                'profilePic', 
+                'createdAt'
+            ], 
+        });
+
+        return {
+            statusCode: 200,
+            result: admins,
         };
     }
 
@@ -228,6 +255,29 @@ export class AdminService{
         return createResponse(201,savedUser)
     }
 
+    async addAdmin(
+        addAdminDto: AddAdminDto
+    ): Promise<ApiResponses<Admin>> {
+
+        const { 
+            name, 
+            username, 
+            password, 
+            email , 
+        } = addAdminDto
+
+        const newAdmin = {
+            name,
+            username,
+            password,
+            email,
+        }
+
+        const savedadmin = await this.adminRepository.save(newAdmin);
+
+        return createResponse(201,savedadmin)
+    }
+
     async updateUser(
         id: number, 
         updateUserDto: UpdateUserDto
@@ -251,6 +301,59 @@ export class AdminService{
 
           return createResponse(200, updateUser);
     }
+
+    async updateAdmin(
+        id: number, 
+        updateAdminDto: UpdateAdminDto
+    ): Promise<ApiResponses<Admin>> {
+
+        const admin = await this.adminRepository.findOneBy({ id });
+
+        if (!admin) throw new NotFoundException('Admin not found');
+
+        const hashedPassword = updateAdminDto.password
+        ? await bcrypt.hash(updateAdminDto.password, 10)
+        : admin.password;
+
+        Object.assign(admin, {
+            ...updateAdminDto,
+            password: hashedPassword,
+            updatedAt: new Date(),
+          });
+
+          const updateAdmin = await this.userRepository.save(admin);
+
+          return createResponse(200, updateAdmin);
+    }
     
+    async deleteUser(
+        id:number
+    ):Promise<{ message: string}>{
+
+        const user = await this.userRepository.findOneBy({ id });
+
+        if(!user){
+            throw new NotFoundException('User Not Found')
+        }
+
+        await this.userRepository.remove(user)
+        
+        return { message: 'User Deleted Successfully' }
+    }
+
+    async deleteAdmin(
+        id:number
+    ):Promise<{ message: string}>{
+
+        const admin = await this.adminRepository.findOneBy({ id });
+
+        if(!admin){
+            throw new NotFoundException('Admin Not Found')
+        }
+
+        await this.adminRepository.remove(admin)
+        
+        return { message: 'Admin Deleted Successfully' }
+    }
 
 }

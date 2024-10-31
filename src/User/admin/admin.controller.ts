@@ -17,6 +17,8 @@ import { AddUserDto } from './dto/addUser.dto';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { AdminRole } from './entity/admin.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { AddAdminDto } from './dto/addAdmin.dto';
+import { UpdateAdminDto } from './dto/updateAdmin.dto';
 
 
 @ApiTags('Admin')
@@ -93,6 +95,15 @@ export class AdminController {
         return await this.adminService.addUser(addUserDto);
     }
 
+    @ApiCreatedResponse({description: 'Add Admin By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
+    @Post('admin/add')
+    async addAdmin(
+        @Body() addAdminDto: AddAdminDto
+    ){
+        return await this.adminService.addAdmin(addAdminDto);
+    }
+
     @ApiCreatedResponse({description: 'Update User By SuperAdmin'})
     @Roles(AdminRole.SUPERADMIN)
     @Patch('user/:id')
@@ -103,11 +114,30 @@ export class AdminController {
         return await this.adminService.updateUser(id, updateUserDto);
     }
 
-    @ApiExcludeEndpoint()
+    @ApiCreatedResponse({description: 'Update Admin By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
+    @Patch('admin/:id')
+    async updateAdmin(
+        @Param('id') id: number, 
+        @Body() updateAdminDto: UpdateAdminDto
+    ){
+        return await this.adminService.updateAdmin(id, updateAdminDto);
+    }
+
+    @ApiCreatedResponse({description: 'List All Users By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
     @ApiOperation({ summary: 'Get All Users' })
-    @Get('all')
+    @Get('user/all')
     async getAllUsers() {
     return this.adminService.getAllUsers();
+    }
+
+    @ApiCreatedResponse({description: 'List All Admins By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
+    @ApiOperation({ summary: 'Get All Admins' })
+    @Get('admin/all')
+    async getAllAdmins() {
+    return this.adminService.getAllAdmins();
     }
 
 
