@@ -79,8 +79,7 @@ let UploadController = class UploadController {
     uploadReel(file, caption, req) {
         var _this = this;
         return _async_to_generator(function*() {
-            const user = req.user; // Extract user from the request
-            return _this.uploadService.uploadReel(file, caption, user);
+            return _this.uploadService.uploadReel(file, caption, req.uesr);
         })();
     }
     createProfilePictureUpload(file, req) {
@@ -172,7 +171,10 @@ _ts_decorate([
     _ts_metadata("design:returntype", Promise)
 ], UploadController.prototype, "createUpload", null);
 _ts_decorate([
-    (0, _common.Post)('upload'),
+    (0, _swagger.ApiOperation)({
+        summary: 'Upload Reel'
+    }),
+    (0, _common.Post)('Reel'),
     (0, _swagger.ApiOperation)({
         summary: 'Upload a new reel'
     }),

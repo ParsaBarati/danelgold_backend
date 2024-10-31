@@ -58,6 +58,8 @@ import { HttpModule } from '@nestjs/axios';
 import { MessageModule } from './Social/Message/message/message.module';
 import { LikeMessageModule } from './Social/Message/like-message/like-message.module';
 import { BlockUser } from './Social/Block/entity/block.entity';
+import { Admin } from './User/admin/entity/admin.entity';
+import { AdminModule } from './User/admin/admin.module';
 
 
 
@@ -96,6 +98,7 @@ import { BlockUser } from './Social/Block/entity/block.entity';
         }),
         TypeOrmModule.forFeature([
             User,
+            Admin,
             Token,
             Club,
             Story,
@@ -117,6 +120,7 @@ import { BlockUser } from './Social/Block/entity/block.entity';
         ForumModule,
         SupportTicketModule,
         AuthModule,
+        AdminModule,
         UserModule,
         UserDetailModule,
         OtpModule,

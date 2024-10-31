@@ -68,6 +68,8 @@ const _axios = require("@nestjs/axios");
 const _messagemodule = require("./Social/Message/message/message.module");
 const _likemessagemodule = require("./Social/Message/like-message/like-message.module");
 const _blockentity = require("./Social/Block/entity/block.entity");
+const _adminentity = require("./User/admin/entity/admin.entity");
+const _adminmodule = require("./User/admin/admin.module");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -171,6 +173,7 @@ AppModule = _ts_decorate([
             }),
             _typeorm.TypeOrmModule.forFeature([
                 _userentity.User,
+                _adminentity.Admin,
                 _tokenentity.Token,
                 _clubentity.Club,
                 _storiesentity.Story,
@@ -192,6 +195,7 @@ AppModule = _ts_decorate([
             _forummodule.ForumModule,
             _supportticketmodule.SupportTicketModule,
             _authmodule.AuthModule,
+            _adminmodule.AdminModule,
             _usermodule.UserModule,
             _userDetailmodule.UserDetailModule,
             _otpmodule.OtpModule,

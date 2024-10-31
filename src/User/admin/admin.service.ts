@@ -1,21 +1,21 @@
-import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { Repository } from "typeorm";
+import { Admin } from "./entity/admin.entity";
+import { OtpService } from "../auth/otp/otp.service";
+import { TokenService } from "../auth/token/token.service";
 import * as bcrypt from 'bcryptjs';
-import {OtpService} from './otp/otp.service';
-import {TokenService} from './token/token.service';
-import {User} from '@/User/user/entity/user.entity';
+import { InjectRepository } from "@nestjs/typeorm";
+
 
 
 @Injectable()
-export class AuthService {
+export class AdminService{
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        @InjectRepository(Admin)
+        private readonly adminRepository: Repository<Admin>,
         private readonly otpService: OtpService,
         private readonly tokenService: TokenService,
-    ) {
-    }
+    ){}
 
     async login(
         email_or_phone: string,
@@ -29,9 +29,9 @@ export class AuthService {
         console.log(email_or_phone)
         let user;
         if (isPhone) {
-            user = await this.userRepository.findOne({where: {phone: email_or_phone}});
+            user = await this.adminRepository.findOne({where: {phone: email_or_phone}});
         } else if (isEmail) {
-            user = await this.userRepository.findOne({where: {email: email_or_phone}});
+            user = await this.adminRepository.findOne({where: {email: email_or_phone}});
         } else {
             throw new BadRequestException('Invalid email or phone number');
         }
@@ -46,7 +46,7 @@ export class AuthService {
         }
 
         user.firebaseToken = firebaseToken;
-        await this.userRepository.save(user);
+        await this.adminRepository.save(user);
         const token = await this.tokenService.createToken(user);
 
         return {
@@ -64,7 +64,7 @@ export class AuthService {
 
     async checkUserNameAvailability(username: string): Promise<any> {
 
-        const existingUserName = await this.userRepository.findOne(
+        const existingUserName = await this.adminRepository.findOne(
             {
                 where: {username}
             });
@@ -80,7 +80,7 @@ export class AuthService {
     }
 
     async checkUserExists(phone: string, email: string): Promise<void> {
-        const existingUser = await this.userRepository.findOne({
+        const existingUser = await this.adminRepository.findOne({
             where: [{phone}, {email}],
         });
         if (existingUser) {
@@ -131,30 +131,30 @@ export class AuthService {
             if (!isValidOTP) {
                 throw new BadRequestException('Invalid verification code');
             }
-            user = await this.userRepository.findOneBy({phone: email_or_phone});
+            user = await this.adminRepository.findOneBy({phone: email_or_phone});
         } else if (isEmail) {
             const isValidOTP = await this.otpService.verifyOTP(email_or_phone, codeAsString);
             if (!isValidOTP) {
                 throw new BadRequestException('Invalid verification code');
             }
-            user = await this.userRepository.findOneBy({email: email_or_phone});
+            user = await this.adminRepository.findOneBy({email: email_or_phone});
         } else {
             throw new BadRequestException('Invalid phone number or email');
         }
 
         if (!user) {
             const hashedPassword = await bcrypt.hash(password, 10);
-            user = this.userRepository.create({
+            user = this.adminRepository.create({
                 phone: isPhone ? email_or_phone : null,
                 email: isEmail ? email_or_phone : null,
                 username: username,
                 password: hashedPassword,
                 isVerified: true,
             });
-            await this.userRepository.save(user);
+            await this.adminRepository.save(user);
         } else {
             user.isVerified = true;
-            await this.userRepository.save(user);
+            await this.adminRepository.save(user);
         }
 
         return {
@@ -178,9 +178,9 @@ export class AuthService {
 
         let user;
         if (isPhone) {
-            user = await this.userRepository.findOneBy({phone: email_or_phone});
+            user = await this.adminRepository.findOneBy({phone: email_or_phone});
         } else if (isEmail) {
-            user = await this.userRepository.findOneBy({email: email_or_phone});
+            user = await this.adminRepository.findOneBy({email: email_or_phone});
         } else {
             throw new BadRequestException('Invalid phone number or email');
         }
@@ -192,7 +192,7 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
 
-        await this.userRepository.save(user);
+        await this.adminRepository.save(user);
 
         return {
             status: 'success',
@@ -208,11 +208,11 @@ export class AuthService {
         let user;
 
         if (isPhone) {
-            user = await this.userRepository.findOne({where: {phone: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {phone: email_or_phone_or_username}});
         } else if (isEmail) {
-            user = await this.userRepository.findOne({where: {email: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {email: email_or_phone_or_username}});
         } else if (isUsername) {
-            user = await this.userRepository.findOne({where: {username: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {username: email_or_phone_or_username}});
         } else {
             throw new BadRequestException('Invalid email, phone number, or username');
         }
@@ -246,11 +246,11 @@ export class AuthService {
         let user;
 
         if (isPhone) {
-            user = await this.userRepository.findOne({where: {phone: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {phone: email_or_phone_or_username}});
         } else if (isEmail) {
-            user = await this.userRepository.findOne({where: {email: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {email: email_or_phone_or_username}});
         } else if (isUsername) {
-            user = await this.userRepository.findOne({where: {username: email_or_phone_or_username}});
+            user = await this.adminRepository.findOne({where: {username: email_or_phone_or_username}});
         } else {
             throw new BadRequestException('Invalid email, phone number, or username');
         }
@@ -278,7 +278,7 @@ export class AuthService {
         }
 
         // جستجوی کاربر با یکی از فیلدهای ایمیل، شماره تلفن یا نام کاربری
-        const user = await this.userRepository.findOne({
+        const user = await this.adminRepository.findOne({
             where: [
                 { email: email_or_phone_or_username },
                 { phone: email_or_phone_or_username },
@@ -293,7 +293,7 @@ export class AuthService {
         // هش کردن رمز عبور جدید
         user.password = await bcrypt.hash(password, 10);
 
-        await this.userRepository.save(user);
+        await this.adminRepository.save(user);
     }
 
     async checkAuthentication(token: string, appName: string, packageName: string, version: string, buildNumber: string, firebaseToken: string) {
@@ -311,7 +311,7 @@ export class AuthService {
             throw new UnauthorizedException('User not found');
         }
         user.firebaseToken = firebaseToken;
-        await this.userRepository.save(user);
+        await this.adminRepository.save(user);
         return {
             message: 'Authentication successful',
             user: user,
@@ -321,4 +321,6 @@ export class AuthService {
             buildNumber,
         };
     }
+
+
 }
