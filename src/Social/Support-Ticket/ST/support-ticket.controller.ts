@@ -5,7 +5,6 @@ import { Request } from 'express';
 import { CreateSTDto } from './dto/createST.dto';
 import { UpdateSTDto } from './dto/updateST.dto';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { UserRole } from '@/User/user/entity/user.entity';
 
 @ApiExcludeController()
 @Controller('ST')
@@ -44,7 +43,6 @@ export class SupportTicketsController {
     return await this.supportTicketsService.removeST(stId,currentUserIdentifier)
   }
 
-  @Roles(UserRole.ADMIN)
   @Patch('/:stId')
   async closeST(
     @Param('stId',ParseIntPipe) stId:number,

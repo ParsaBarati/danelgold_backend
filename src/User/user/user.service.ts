@@ -450,17 +450,6 @@ export class UserService {
         return finalPosts;
     }
 
-    async getAllUsers() {
-        const users = await this.userRepository.find({
-            select: ['username', 'name', 'id', 'profilePic', 'createdAt'], // Adjust fields as necessary
-        });
-
-        return {
-            statusCode: 200,
-            result: users,
-        };
-    }
-
     async follow(
         userId: number,
         user: User,

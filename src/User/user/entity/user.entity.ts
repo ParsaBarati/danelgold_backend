@@ -3,7 +3,6 @@ import {
     CreateDateColumn,
     Entity,
     ManyToMany,
-    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -37,10 +36,6 @@ import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 import { Message } from '@/Social/Message/message/entity/message.entity';
 import { BlockUser } from '@/Social/Block/entity/block.entity';
 
-export enum UserRole {
-    USER = 'user',
-    ADMIN = 'admin',
-}
 
 @Entity({name: 'user'})
 export class User {

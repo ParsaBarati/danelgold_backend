@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, Query, DefaultValuePipe, Req } from '@nestjs/common';
-import { UserRole } from '@/User/user/entity/user.entity';
 import { AuctionsService } from '@/Market/auction/auction.service';
 import { UpdateAuctionDto } from '@/Market/auction/dto/UpdateAuction.dto';
 import { CreateAuctionDto } from '@/Market/auction/dto/CreateAuction.dto';
@@ -13,7 +12,6 @@ import { Request } from 'express';
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}
 
-  @Roles(UserRole.ADMIN)
   @Post()
   async createAuction(
     @Req() req:Request,
@@ -37,7 +35,6 @@ export class AuctionsController {
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Put('/:id')
   updateAuction(
     @Param('id') id: number, 
@@ -46,7 +43,6 @@ export class AuctionsController {
     return this.auctionsService.updateAuction(id, updateAuctionDto);
   }
 
-  @Roles(UserRole.ADMIN)
   @Delete('/:id')
   remove(
     @Param('id',ParseIntPipe) id: number

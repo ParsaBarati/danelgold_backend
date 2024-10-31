@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Reply } from "./entity/reply.entity";
-import { User, UserRole } from "@/User/user/entity/user.entity";
+import { User } from "@/User/user/entity/user.entity";
 import { Repository } from "typeorm";
 import { CreateReplyDTO } from "./dto/CreateReply.dto";
 import { Comment } from "@/Social/Comment/comment/entity/comment.entity";

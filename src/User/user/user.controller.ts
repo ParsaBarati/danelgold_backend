@@ -90,13 +90,6 @@ export class UserController {
     return Array.from(new Map(combinedUsers.map(user => [user.id, user])).values());
   }
 
-  @ApiExcludeEndpoint()
-  @ApiOperation({ summary: 'Get All Users' })
-  @Get('all')
-  async getAllUsers() {
-    return this.userService.getAllUsers();
-  }
-
   @ApiOperation({ summary: 'Update User Profile' })
   @ApiOkResponse({ description: 'Profile updated successfully', example: { statusCode: 200 } })
   @Post('save')

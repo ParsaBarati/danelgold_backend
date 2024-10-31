@@ -36,6 +36,12 @@ import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
 import { Message } from '@/Social/Message/message/entity/message.entity';
 import { BlockUser } from '@/Social/Block/entity/block.entity';
 
+export enum AdminRole {
+    OPERATOR = 'operator',
+    ADMIN = 'admin',
+    SUPERADMIN = 'superadmin'
+}
+
 @Entity({name: 'admin'})
 export class Admin {
     @PrimaryGeneratedColumn()
@@ -47,9 +53,6 @@ export class Admin {
     @Column({type: 'text', nullable: true})
     email: string | null;
 
-    @Column({type: 'text', nullable: true})
-    bio: string | null;
-
     @Column({type: 'varchar', unique: true})
     username: string;
 
@@ -57,13 +60,12 @@ export class Admin {
     password: string;
 
     @Column({type: 'text', nullable: true})
-    firebaseToken: string;
-
-    @Column({type: 'boolean', default: false})
-    isVerified: boolean; // New field to mark user verification status
-
-    @Column({type: 'text', nullable: true})
     profilePic: string | null;
+
+    @Column( 'enum' , {
+        enum: AdminRole
+    })
+    role: AdminRole;
 
     @CreateDateColumn()
     createdAt: Date;

@@ -1,16 +1,22 @@
-import {Body, Controller, Post, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Req, UseGuards} from '@nestjs/common';
 import {Public} from '@/common/decorators/public.decorator';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
     ApiConflictResponse,
     ApiCreatedResponse,
+    ApiExcludeEndpoint,
+    ApiOperation,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Request} from 'express';
 import { AdminService } from './admin.service';
+import { AddUserDto } from './dto/addUser.dto';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { AdminRole } from './entity/admin.entity';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 
 @ApiTags('Admin')
@@ -32,57 +38,6 @@ export class AdminController {
         return await this.adminService.login(email, password,token);
     }
 
-
-    @ApiCreatedResponse({description: 'Username accepted'})
-    @ApiConflictResponse({description: 'Username already exists'})
-    @Public()
-    @Post('signup/username')
-    async checkUsername(
-        @Body() {username}: { username: string }
-    ) {
-        return await this.adminService.checkUserNameAvailability(username);
-    }
-
-    @ApiCreatedResponse({description: 'Verification code sent'})
-    @ApiConflictResponse({description: 'Invalid email'})
-    @Public()
-    @Post('signup/request-code')
-    async requestVerificationCode(
-        @Body() {email}: { email: string }
-    ) {
-        return await this.adminService.sendOTPToEmail(email)
-    }
-
-    @ApiCreatedResponse({description: 'Code verified successfully'})
-    @ApiConflictResponse({description: 'Invalid verification code'})
-    @Public()
-    @Post('signup/verify-code')
-    async verifyCode(
-        @Body() {
-            email,
-            verification_code,
-            username,
-            password
-        }: { email: string; verification_code: string; username: string; password: string }
-    ) {
-        return await this.adminService.verifyCode(email, username, password,
-            verification_code
-        );
-    }
-
-    @ApiCreatedResponse({description: 'Password set successfully'})
-    @ApiConflictResponse({description: 'Passwords do not match'})
-    @Public()
-    @Post('signup/set-password')
-    async setPassword(
-        @Body() {
-            email,
-            password,
-            confirm_password
-        }: { email: string; password: string; confirm_password: string }
-    ) {
-        return await this.adminService.setPassword(email, password, confirm_password);
-    }
 
     @ApiCreatedResponse({description: 'Verification code sent'})
     @ApiBadRequestResponse({description: 'User not found'})
@@ -128,5 +83,32 @@ export class AdminController {
 
         return await this.adminService.checkAuthentication(headerToken, appName, packageName, version, buildNumber, token);
     }
+
+    @ApiCreatedResponse({description: 'Add User By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
+    @Post('user/add')
+    async addUser(
+        @Body() addUserDto: AddUserDto
+    ){
+        return await this.adminService.addUser(addUserDto);
+    }
+
+    @ApiCreatedResponse({description: 'Update User By SuperAdmin'})
+    @Roles(AdminRole.SUPERADMIN)
+    @Patch('user/:id')
+    async updateUser(
+        @Param('id') id: number, 
+        @Body() updateUserDto: UpdateUserDto
+    ){
+        return await this.adminService.updateUser(id, updateUserDto);
+    }
+
+    @ApiExcludeEndpoint()
+    @ApiOperation({ summary: 'Get All Users' })
+    @Get('all')
+    async getAllUsers() {
+    return this.adminService.getAllUsers();
+    }
+
 
 }

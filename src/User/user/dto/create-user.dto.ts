@@ -9,7 +9,6 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../entity/user.entity';
 
 export class CreateUserByAdminDTO {
   @ApiProperty()

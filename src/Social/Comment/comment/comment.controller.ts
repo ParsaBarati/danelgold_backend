@@ -21,7 +21,6 @@ import {
     ApiOperation,
     ApiQuery
 } from '@nestjs/swagger';
-import {UserRole} from '@/User/user/entity/user.entity';
 import {CommentService} from './comment.service';
 import {UpdateCommentDTO} from './dto/UpdateComment.dto';
 import {CreateCommentDTO} from './dto/CreateComment';
@@ -89,7 +88,6 @@ export class CommentController {
         return await this.commentsService.deleteComment(commentId, currentUserIdentifier);
     }
 
-    @Roles(UserRole.ADMIN)
     @Patch()
     async deleteAdminComments(
         @Body('commentIds') commentIds: number[],
@@ -104,7 +102,6 @@ export class CommentController {
     @ApiQuery({name: 'sortBy', required: false})
     @ApiQuery({name: 'sortOrder', required: false})
     @ApiQuery({name: 'postId', required: false})
-    @Roles(UserRole.ADMIN)
     @Get('all/post')
     async getAllPostComments(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -124,7 +121,6 @@ export class CommentController {
     @ApiQuery({name: 'sortBy', required: false})
     @ApiQuery({name: 'sortOrder', required: false})
     @ApiQuery({name: 'storyId', required: false})
-    @Roles(UserRole.ADMIN)
     @Get('all/story')
     async getAllStoryComments(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

@@ -5,6 +5,10 @@ import { OtpService } from "../auth/otp/otp.service";
 import { TokenService } from "../auth/token/token.service";
 import * as bcrypt from 'bcryptjs';
 import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "../user/entity/user.entity";
+import { ApiResponses, createResponse } from "@/utils/response.util";
+import { AddUserDto } from "./dto/addUser.dto";
+import { UpdateUserDto } from "./dto/updateUser.dto";
 
 
 
@@ -13,6 +17,8 @@ export class AdminService{
     constructor(
         @InjectRepository(Admin)
         private readonly adminRepository: Repository<Admin>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
         private readonly otpService: OtpService,
         private readonly tokenService: TokenService,
     ){}
@@ -55,128 +61,6 @@ export class AdminService{
                 email: user.email,
                 username: user.username,
             },
-        };
-    }
-
-    async checkUserNameAvailability(username: string): Promise<any> {
-
-        const existingUserName = await this.adminRepository.findOne(
-            {
-                where: {username}
-            });
-
-        if (existingUserName !== null) {
-            throw new BadRequestException('Username already exists');
-        }
-
-        return {
-            status: 'success',
-            message: 'Username accepted',
-        };
-    }
-
-    async checkUserExists(email: string): Promise<void> {
-        const existingUser = await this.adminRepository.findOne({
-            where: [ {email}],
-        });
-        if (existingUser) {
-            throw new BadRequestException('User already exists');
-        }
-    }
-
-    async sendOTPToEmail(email: string): Promise<any> {
-        const isEmail = /\S+@\S+\.\S+/.test(email);
-
-        if (isEmail) {
-            await this.checkUserExists(email);
-        } else {
-            throw new BadRequestException('Invalid email');
-        }
-
-        let otp;
-        if (isEmail) {
-            otp = await this.otpService.sendOTPToEmail(email);
-        }
-
-        return {
-            status: 'success',
-            otp: otp,
-            message: 'Verification code sent',
-        };
-    }
-
-    async verifyCode(
-        email: string,
-        username: string,
-        password: string,
-        verification_code: string
-    ): Promise<any> {
-        const isEmail = /\S+@\S+\.\S+/.test(email);
-
-        const codeAsString = verification_code.toString();
-        let user;
-
-        if (isEmail) {
-            const isValidOTP = await this.otpService.verifyOTP(email, codeAsString);
-            if (!isValidOTP) {
-                throw new BadRequestException('Invalid verification code');
-            }
-            user = await this.adminRepository.findOneBy({email: email});
-        } else {
-            throw new BadRequestException('Invalid email');
-        }
-
-        if (!user) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            user = this.adminRepository.create({
-                email: isEmail ? email : null,
-                username: username,
-                password: hashedPassword,
-                isVerified: true,
-            });
-            await this.adminRepository.save(user);
-        } else {
-            user.isVerified = true;
-            await this.adminRepository.save(user);
-        }
-
-        return {
-            status: 'success',
-            message: 'Verification code verified, user created/updated successfully',
-        };
-    }
-
-    async setPassword(
-        email: string,
-        password: string,
-        confirmPassword: string
-    ): Promise<any> {
-
-        if (password !== confirmPassword) {
-            throw new BadRequestException('Passwords do not match');
-        }
-
-        const isEmail = /\S+@\S+\.\S+/.test(email);
-
-        let user;
-        if (isEmail) {
-            user = await this.adminRepository.findOneBy({email: email});
-        } else {
-            throw new BadRequestException('Invalid email');
-        }
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
-
-        await this.adminRepository.save(user);
-
-        return {
-            status: 'success',
-            message: 'Password set successfully',
         };
     }
 
@@ -292,5 +176,65 @@ export class AdminService{
         };
     }
 
+    async getAllUsers() {
+        const users = await this.userRepository.find({
+            select: ['username', 'name', 'id', 'profilePic', 'createdAt'], // Adjust fields as necessary
+        });
+
+        return {
+            statusCode: 200,
+            result: users,
+        };
+    }
+
+    async addUser(
+        addUserDto: AddUserDto
+    ): Promise<ApiResponses<User>> {
+
+        const { 
+            name, 
+            username, 
+            password, 
+            email , 
+            phone 
+        } = addUserDto
+
+        const newUser = {
+            name,
+            username,
+            password,
+            email,
+            phone
+        }
+
+        const savedUser = await this.userRepository.save(newUser);
+
+        return createResponse(201,savedUser)
+    }
+
+    async updateUser(
+        id: number, 
+        updateUserDto: UpdateUserDto
+    ): Promise<ApiResponses<User>> {
+
+        const user = await this.userRepository.findOneBy({ id });
+
+        if (!user) throw new NotFoundException('User not found');
+
+        const hashedPassword = updateUserDto.password
+        ? await bcrypt.hash(updateUserDto.password, 10)
+        : user.password;
+
+        Object.assign(user, {
+            ...updateUserDto,
+            password: hashedPassword,
+            updatedAt: new Date(),
+          });
+
+          const updateUser = await this.userRepository.save(user);
+
+          return createResponse(200, updateUser);
+    }
+    
 
 }
