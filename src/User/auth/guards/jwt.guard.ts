@@ -30,13 +30,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
-    
+
+
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is missing');
     }
 
     const token = authHeader.split(' ')[1];
 
+    console.log(token)
     if (!token) {
       throw new UnauthorizedException('Token is missing');
     }

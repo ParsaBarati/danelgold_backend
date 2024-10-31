@@ -280,9 +280,9 @@ export class AuthService {
         // جستجوی کاربر با یکی از فیلدهای ایمیل، شماره تلفن یا نام کاربری
         const user = await this.userRepository.findOne({
             where: [
-                { email: email_or_phone_or_username },
-                { phone: email_or_phone_or_username },
-                { username: email_or_phone_or_username }
+                {email: email_or_phone_or_username},
+                {phone: email_or_phone_or_username},
+                {username: email_or_phone_or_username}
             ]
         });
 
@@ -307,22 +307,22 @@ export class AuthService {
         if (!token) {
             throw new UnauthorizedException('No token provided');
         }
-    
+
         if (!appName || !packageName || !version || !buildNumber) {
             throw new UnauthorizedException('Invalid app details');
         }
-    
-        const user = await this.tokenService.getByToken(token);
-        
+
+        const user = await this.tokenService.getByToken(token) as User;
+
         // Type narrowing: Confirm `user` is indeed a `User`
         if (!user || !('firebaseToken' in user)) {
             throw new UnauthorizedException('User not found or not a valid User entity');
         }
-    
+
         // Now we can safely assign `firebaseToken` to `user`
         user.firebaseToken = firebaseToken;
         await this.userRepository.save(user);
-    
+
         return {
             message: 'Authentication successful',
             user: {
@@ -338,5 +338,5 @@ export class AuthService {
             buildNumber,
         };
     }
-    
+
 }

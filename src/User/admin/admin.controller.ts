@@ -37,6 +37,7 @@ export class AdminController {
     async login(
         @Body() {email, password, token}: { email: string; password: string; token: string }
     ) {
+        console.log(email,password,token)
         return await this.adminService.login(email, password,token);
     }
 

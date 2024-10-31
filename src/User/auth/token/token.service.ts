@@ -58,6 +58,44 @@ export class TokenService {
 
     return token;
   }
+  async createTokenForAdmin(admin: Admin): Promise<string> {
+    if (admin) {
+      const activeTokenCount = await this.tokenRepository
+        .createQueryBuilder('token')
+        .where('token.admin = :adminId', { adminId: admin.id })
+        .getCount();
+
+      if (activeTokenCount >= this.maxSessionsPerUser) {
+        await this.tokenRepository
+          .createQueryBuilder('token')
+          .delete()
+          .where('admin = :adminId', { adminId: admin.id })
+          .execute();
+      }
+    }
+
+    const payload = {
+      sub: admin.id,
+      email: admin.email,
+      username: admin.username,
+      profilePic: admin.profilePic,
+      createdAt: admin.createdAt,
+      lastLogin: admin.lastLogin,
+    };
+
+    const token = this.jwtService.sign(payload,{
+      secret: process.env.JWT_SECRET,
+    });
+
+    const tokenEntity = new Token();
+    tokenEntity.token = token;
+    tokenEntity.createdAt = new Date();
+    tokenEntity.admin = admin; // Correctly assign user relation
+
+    await this.tokenRepository.save(tokenEntity);
+
+    return token;
+  }
 
   async deleteToken(token: string): Promise<void> {
     await this.tokenRepository.delete({ token });

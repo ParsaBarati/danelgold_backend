@@ -46,7 +46,7 @@ import { BlockUser } from '@/Social/Block/entity/block.entity';
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET'),
+                secret: process.env.JWT_SECRET,
                 signOptions: {expiresIn: '7d'},
             }),
         }),

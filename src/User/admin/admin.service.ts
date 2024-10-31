@@ -52,7 +52,7 @@ export class AdminService{
 
         user.firebaseToken = firebaseToken;
         await this.adminRepository.save(user);
-        const token = await this.tokenService.createToken(user);
+        const token = await this.tokenService.createTokenForAdmin(user);
 
         return {
             status: 'success',
@@ -63,6 +63,7 @@ export class AdminService{
                 email: user.email,
                 username: user.username,
                 role: user.role,
+                profilePic: user.profilePic,
             },
         };
     }
@@ -165,9 +166,9 @@ export class AdminService{
             throw new UnauthorizedException('No token provided');
         }
     
-        if (!appName || !packageName || !version || !buildNumber) {
-            throw new UnauthorizedException('Invalid app details');
-        }
+        // if (!appName || !packageName || !version || !buildNumber) {
+        //     throw new UnauthorizedException('Invalid app details');
+        // }
     
         // Updated to retrieve an Admin entity (with role) instead of a generic User
         const admin = await this.tokenService.getByToken(token) as Admin;
@@ -185,6 +186,7 @@ export class AdminService{
                 name: admin.name,
                 email: admin.email,
                 username: admin.username,
+                profilePic: admin.profilePic,
                 role: admin.role,  // Role is now available here
             },
             appName,

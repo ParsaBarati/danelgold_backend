@@ -60,6 +60,7 @@ import { LikeMessageModule } from './Social/Message/like-message/like-message.mo
 import { BlockUser } from './Social/Block/entity/block.entity';
 import { Admin } from './User/admin/entity/admin.entity';
 import { AdminModule } from './User/admin/admin.module';
+import {DashboardModule} from "./User/dashboard/dashboard.module";
 
 
 
@@ -76,7 +77,7 @@ import { AdminModule } from './User/admin/admin.module';
             serveRoot: '/public',
         }),
         ConfigModule.forRoot({
-            envFilePath: '.develop.env',
+            envFilePath: '.env',
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
@@ -139,6 +140,7 @@ import { AdminModule } from './User/admin/admin.module';
         LikeMessageModule,
         NotificationModule,
         WalletModule,
+        DashboardModule,
         {
             global: true,
             ...HttpModule.register({maxRedirects: 5}),

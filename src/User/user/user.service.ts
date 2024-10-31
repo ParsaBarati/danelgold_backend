@@ -291,7 +291,7 @@ export class UserService {
             .createQueryBuilder('user')
             .leftJoinAndSelect('user.posts', 'post')
             .leftJoinAndSelect('user.stories', 'story')
-            .where('user.id = :userId', { userId })
+            .where('user.id = :userId', {userId})
             .orderBy('post.createdAt', 'DESC')
             .addOrderBy('story.createdAt', 'DESC')
             .getOne();
@@ -510,10 +510,10 @@ export class UserService {
                 blockedId: userId
             });
             let followRelationships = await this.followUserRepository.findBy([
-                { followerId: userId, followingId: user.id },
-                { followerId: user.id, followingId: userId }
+                {followerId: userId, followingId: user.id},
+                {followerId: user.id, followingId: userId}
             ]);
-            
+
             await this.followUserRepository.remove(followRelationships);
             await this.blockUserRepository.save(block);
             return {isBlocked: true};
@@ -539,9 +539,9 @@ export class UserService {
         return user;
     }
 
-    async getFollowers(user: User): Promise<Awaited<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }>[]> {
+    async getFollowers(userId, self: User): Promise<Awaited<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }>[]> {
         const followers = await this.followUserRepository.find({
-            where: {followingId: user.id},
+            where: {followingId: userId},
             relations: ['follower'],
         });
 
@@ -550,7 +550,7 @@ export class UserService {
             followers.map(async (follow) => {
                 const isFollowing = await this.followUserRepository.findOne({
                     where: {
-                        followerId: user.id,
+                        followerId: self.id,
                         followingId: follow.follower.id,
                     },
                 });
@@ -566,22 +566,43 @@ export class UserService {
         );
     }
 
-    async getFollowings(user: User): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
+    async getFollowings(userId, self: User): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
+        // If the userId is the same as self.id, return self's followings
+        if (userId === self.id.toString()) {
+            return this.getFollowingsForUser(self.id);
+        }
+
+        // Check if self is following userId
+        const isFollowing = await this.followUserRepository.findOne({
+            where: {followerId: self.id, followingId: userId},
+        });
+        console.log(isFollowing)
+
+        // If not following, return an empty array
+        if (!isFollowing) {
+            return [];
+        }
+
+        // If following, return the followings for the specified userId
+        return this.getFollowingsForUser(userId);
+    }
+
+// Helper method to get followings for a given userId
+    private async getFollowingsForUser(userId: number): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
         const followings = await this.followUserRepository.find({
-            where: {followerId: user.id},
+            where: {followerId: userId},
             relations: ['following'],
         });
 
-        return followings.map(function (follow) {
-            return {
-                id: follow.following?.id,
-                name: follow.following?.name,
-                username: follow.following?.username,
-                pic: follow.following.profilePic ?? "",
-                isFollowing: true,
-            };
-        });
+        return followings.map(follow => ({
+            id: follow.following?.id,
+            name: follow.following?.name,
+            username: follow.following?.username,
+            pic: follow.following.profilePic ?? "",
+            isFollowing: true,
+        }));
     }
+
 
     async getBlocked(user: User): Promise<{ isBlocked: boolean; name: string; id: number; pic: string; username: string }[]> {
         const blockedUsers = await this.blockUserRepository.find({

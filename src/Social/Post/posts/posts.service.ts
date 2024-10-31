@@ -243,7 +243,7 @@ export class PostService {
         const finalPosts = [];
         for (const post of paginationResult.data) {
             let existingLike = await this.likePostRepository.findOne({
-                where: {post: {id: post.id}, user: {id: post.id}},
+                where: {post: {id: post.id}, user: {id: post.user.id}},
             });
             let existingSave = await this.likePostRepository.findOne({
                 where: {post: {id: post.id}, user: {id: post.user.id}},
@@ -253,7 +253,7 @@ export class PostService {
                 media: post.media,
                 id: post.id,
                 user: {
-                    id: post.id,
+                    id: post.user.id,
                     name: post.user.name,
                     pic: post.user.profilePic,
                     username: post.user.username,

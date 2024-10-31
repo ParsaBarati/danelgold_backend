@@ -62,7 +62,7 @@ export class MessageService {
                 'receiver.name AS receiver_name',
                 'receiver.username AS receiver_username',
             ])
-            .where('message.receiverId = :userId', {userId})
+            .where('message.senderId = :userId OR message.receiverId = :userId', {userId})
             .orderBy('message.createdAt', 'DESC')  // Sort by createdAt to get latest messages first
             .getRawMany();  // Use getRawMany to get raw results
 
@@ -93,10 +93,11 @@ export class MessageService {
 
             // Check if this conversation has already been added to the map
             if (!uniqueChatsMap.has(uniqueKey)) {
+                console.log(otherUser,userId)
                 uniqueChatsMap.set(uniqueKey, {
                     id: otherUser.id,
                     user: otherUser,
-                    isRead: chat.message_isread == true,
+                    isRead: (chat.message_isread == true || chat.sender_id == userId),
                     lastSeen: chat.message_created_at,
                 });
             }
@@ -163,7 +164,7 @@ export class MessageService {
             .orderBy('message.createdAt', 'ASC')
             .getMany();
         // Identify messages sent by the opposite user to the current user
-        const messagesToUpdate = messages.filter(message => message.receiver.id === receiverId);
+        const messagesToUpdate = messages.filter(message => message.receiver.id === senderId);
 
 // Update isRead to true for messages sent to the current user by the opposite user
         if (messagesToUpdate.length > 0) {
