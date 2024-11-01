@@ -31,6 +31,7 @@ import {JwtService} from '@nestjs/jwt';
 import {DashboardService} from "./dashboard.service";
 import {DashboardController} from "./dashboard.controller";
 import {Admin} from "../admin/entity/admin.entity";
+import {Message} from "@/Social/Message/message/entity/message.entity";
 
 @Module({
     imports: [
@@ -47,7 +48,8 @@ import {Admin} from "../admin/entity/admin.entity";
             FollowUser,
             BlockUser,
             likeStory,
-            Notification
+            Notification,
+            Message,
         ]),
         PassportModule,
         UserModule,

@@ -3,22 +3,20 @@ import {Public} from '@/common/decorators/public.decorator';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
-    ApiConflictResponse,
     ApiCreatedResponse,
-    ApiExcludeEndpoint,
     ApiOperation,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Request} from 'express';
-import { AdminService } from './admin.service';
-import { AddUserDto } from './dto/addUser.dto';
-import { Roles } from '@/common/decorators/roles.decorator';
-import { AdminRole } from './entity/admin.entity';
-import { UpdateUserDto } from './dto/updateUser.dto';
-import { AddAdminDto } from './dto/addAdmin.dto';
-import { UpdateAdminDto } from './dto/updateAdmin.dto';
+import {AdminService} from './admin.service';
+import {AddUserDto} from './dto/addUser.dto';
+import {Roles} from '@/common/decorators/roles.decorator';
+import {AdminRole} from './entity/admin.entity';
+import {UpdateUserDto} from './dto/updateUser.dto';
+import {AddAdminDto} from './dto/addAdmin.dto';
+import {UpdateAdminDto} from './dto/updateAdmin.dto';
 
 
 @ApiTags('Admin')
@@ -37,8 +35,8 @@ export class AdminController {
     async login(
         @Body() {email, password, token}: { email: string; password: string; token: string }
     ) {
-        console.log(email,password,token)
-        return await this.adminService.login(email, password,token);
+        console.log(email, password, token)
+        return await this.adminService.login(email, password, token);
     }
 
 
@@ -70,7 +68,11 @@ export class AdminController {
     @Public()
     @Post('password/reset')
     async resetPassword(
-        @Body() {password, confirm_password, email_or_username}: { password: string; confirm_password: string; email_or_username: string }
+        @Body() {
+            password,
+            confirm_password,
+            email_or_username
+        }: { password: string; confirm_password: string; email_or_username: string }
     ) {
         return await this.adminService.resetPassword(password, confirm_password, email_or_username);
     }
@@ -92,7 +94,7 @@ export class AdminController {
     @Post('user/add')
     async addUser(
         @Body() addUserDto: AddUserDto
-    ){
+    ) {
         return await this.adminService.addUser(addUserDto);
     }
 
@@ -101,7 +103,7 @@ export class AdminController {
     @Post('admin/add')
     async addAdmin(
         @Body() addAdminDto: AddAdminDto
-    ){
+    ) {
         return await this.adminService.addAdmin(addAdminDto);
     }
 
@@ -109,9 +111,9 @@ export class AdminController {
     @Roles(AdminRole.SUPERADMIN)
     @Patch('user/:id')
     async updateUser(
-        @Param('id') id: number, 
+        @Param('id') id: number,
         @Body() updateUserDto: UpdateUserDto
-    ){
+    ) {
         return await this.adminService.updateUser(id, updateUserDto);
     }
 
@@ -119,26 +121,26 @@ export class AdminController {
     @Roles(AdminRole.SUPERADMIN)
     @Patch('admin/:id')
     async updateAdmin(
-        @Param('id') id: number, 
+        @Param('id') id: number,
         @Body() updateAdminDto: UpdateAdminDto
-    ){
+    ) {
         return await this.adminService.updateAdmin(id, updateAdminDto);
     }
 
     @ApiCreatedResponse({description: 'List All Users By SuperAdmin'})
     @Roles(AdminRole.SUPERADMIN)
-    @ApiOperation({ summary: 'Get All Users' })
+    @ApiOperation({summary: 'Get All Users'})
     @Get('user/all')
     async getAllUsers() {
-    return this.adminService.getAllUsers();
+        return this.adminService.getAllUsers();
     }
 
     @ApiCreatedResponse({description: 'List All Admins By SuperAdmin'})
     @Roles(AdminRole.SUPERADMIN)
-    @ApiOperation({ summary: 'Get All Admins' })
+    @ApiOperation({summary: 'Get All Admins'})
     @Get('admin/all')
     async getAllAdmins() {
-    return this.adminService.getAllAdmins();
+        return this.adminService.getAllAdmins();
     }
 
 
