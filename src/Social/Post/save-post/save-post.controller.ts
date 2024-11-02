@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { SavePostService } from '@/Social/Post/save-post/save-post.service';
+import { SavePostService } from '@/social/post/save-post/save-post.service';
 
 @ApiBearerAuth()
 @ApiTags('Saves')

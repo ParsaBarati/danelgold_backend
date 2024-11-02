@@ -11,9 +11,9 @@ import {
   Index
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/User/user/entity/user.entity';
-import { CollectionEntity } from '@/Market/collection/entity/collection.entity';
-import { Auction } from '@/Market/auction/entity/auction.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { CollectionEntity } from '@/market/collection/entity/collection.entity';
+import { Auction } from '@/market/auction/entity/auction.entity';
 
 @Entity({ name: 'nfts'})
 export class NFT {

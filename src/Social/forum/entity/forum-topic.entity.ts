@@ -9,8 +9,8 @@ import {
     Relation, 
     JoinColumn
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { ForumPost } from './forum-post.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { ForumPost } from '@/social/forum/entity/forum-post.entity';
 
 @Entity({ name: 'topics' })
 export class ForumTopic {

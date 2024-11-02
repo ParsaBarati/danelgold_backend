@@ -10,31 +10,29 @@ import {
     UpdateDateColumn
 } from 'typeorm';
 import {ApiProperty} from '@nestjs/swagger';
-import {Token} from '@/User/auth/token/entity/token.entity';
-import {UserDetail} from '@/User/user-detail/entity/userDetail.entity';
-import {Subscribe} from '@/User/subscribe/entity/subscribe.entity';
-import {CollectionEntity} from '@/Market/collection/entity/collection.entity';
-import {Auction} from '@/Market/auction/entity/auction.entity';
-import {Bid} from '@/Market/auction/entity/auctionBid.entity';
-import {SupportTicket} from '@/Social/Support-Ticket/ST/entity/support-ticket.entity';
-import {ForumTopic} from '@/Social/forum/entity/forum-topic.entity';
-import {ForumPost} from '@/Social/forum/entity/forum-post.entity';
-import {Story} from '@/Social/Story/stories/entity/stories.entity';
-import {Comment} from '@/Social/Comment/comment/entity/comment.entity';
-import {NFT} from '@/NFT/nft/entity/nft.entity';
-import {likeComment} from '@/Social/Comment/like-comment/entity/like-comment.entity';
-import {Post} from '@/Social/Post/posts/entity/posts.entity';
-import {likePost} from '@/Social/Post/like-post/entity/like-post.entity';
-import {Reply} from '@/Social/Comment/replyComment/entity/reply.entity';
-import {likeStory} from '@/Social/Story/like-story/entity/like-story.entity';
-import {Club} from '@/Social/Club/entity/club.entity';
-import {Notification} from '@/Social/Notification/entity/notification.entity';
-import {Wallet} from '@/NFT/wallet/entity/wallet.entity';
-import {FollowUser} from '@/Social/Follow/entity/follow.entity';
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
-import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
-import { Message } from '@/Social/Message/message/entity/message.entity';
-import { BlockUser } from '@/Social/Block/entity/block.entity';
+import {Token} from '@/user/auth/token/entity/token.entity';
+import {UserDetail} from '@/user/user-detail/entity/userDetail.entity';
+import {Subscribe} from '@/user/subscribe/entity/subscribe.entity';
+import {CollectionEntity} from '@/market/collection/entity/collection.entity';
+import {Auction} from '@/market/auction/entity/auction.entity';
+import {SupportTicket} from '@/social/support-ticket/st/entity/support-ticket.entity';
+import {ForumTopic} from '@/social/forum/entity/forum-topic.entity';
+import {Story} from '@/social/story/stories/entity/stories.entity';
+import {Comment} from '@/social/comment/comment/entity/comment.entity';
+import {NFT} from '@/nft/nft/entity/nft.entity';
+import {likeComment} from '@/social/comment/like-comment/entity/like-comment.entity';
+import {Post} from '@/social/post/posts/entity/posts.entity';
+import {likePost} from '@/social/post/like-post/entity/like-post.entity';
+import {Reply} from '@/social/comment/replyComment/entity/reply.entity';
+import {likeStory} from '@/social/story/like-story/entity/like-story.entity';
+import {Club} from '@/social/club/entity/club.entity';
+import {Notification} from '@/social/notification/entity/notification.entity';
+import {Wallet} from '@/nft/wallet/entity/wallet.entity';
+import {FollowUser} from '@/social/follow/entity/follow.entity';
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import {CryptoBalanceEntity} from "@/nft/crypto/entity/cryptoBalance.entity";
+import { Message } from '@/social/message/message/entity/message.entity';
+import { BlockUser } from '@/social/block/entity/block.entity';
 
 export enum AdminRole {
     OPERATOR = 'operator',

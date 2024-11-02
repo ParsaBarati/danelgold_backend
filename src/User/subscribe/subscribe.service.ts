@@ -6,16 +6,16 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Subscribe } from './entity/subscribe.entity';
+import { Subscribe } from '@/user/subscribe/entity/subscribe.entity';
 import { Repository } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { SubscribeDto } from './dto/Subscription.dto';
+import { User } from '@/user/user/entity/user.entity';
+import { SubscribeDto } from '@/user/subscribe/dto/Subscription.dto';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { SmsService } from '@/services/sms.service';
 import * as webPush from 'web-push';
 import { CronJob } from 'cron';
 import { configDotenv } from 'dotenv';
-import { Auction } from '@/Market/auction/entity/auction.entity';
+import { Auction } from '@/market/auction/entity/auction.entity';
 
 configDotenv();
 

@@ -1,12 +1,12 @@
 import {Between, MoreThan, Repository} from "typeorm";
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Admin} from "../admin/entity/admin.entity";
-import {User} from "../user/entity/user.entity";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import {Message} from "@/Social/Message/message/entity/message.entity";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {Admin} from "@/user/admin/entity/admin.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {Story} from "@/social/story/stories/entity/stories.entity";
+import {Message} from "@/social/message/message/entity/message.entity";
+import {Notification} from "@/social/notification/entity/notification.entity";
 
 @Injectable()
 export class DashboardService {

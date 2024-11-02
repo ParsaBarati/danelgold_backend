@@ -1,6 +1,6 @@
 import { Controller, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LikePostService } from '@/Social/Post/like-post/like-post.service';
+import { LikePostService } from '@/social/post/like-post/like-post.service';
 import { Request } from 'express';
 
 @ApiBearerAuth()

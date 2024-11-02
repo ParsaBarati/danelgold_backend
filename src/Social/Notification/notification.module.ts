@@ -1,10 +1,9 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Notification} from "./entity/notification.entity";
-import {NotificationController} from "./notification.controller";
-import {NotificationService} from "./notification.service";
-import {HttpModule} from "@nestjs/axios";
-import {User} from "@/User/user/entity/user.entity";
+import {User} from "@/user/user/entity/user.entity";
+import { NotificationController } from "./notification.controller";
+import { NotificationService } from "./notification.service";
+import { Notification } from "./entity/notification.entity";
 
 
 @Module({

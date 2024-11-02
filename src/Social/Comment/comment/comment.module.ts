@@ -1,15 +1,14 @@
 import {Module} from '@nestjs/common';
-import {CommentController} from './comment.controller';
-import {CommentService} from './comment.service';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {Comment} from './entity/comment.entity';
-import {User} from '@/User/user/entity/user.entity';
-import {Reply} from '@/Social/Comment/replyComment/entity/reply.entity';
-import {likeComment} from '@/Social/Comment/like-comment/entity/like-comment.entity';
+import {User} from '@/user/user/entity/user.entity';
+import {Reply} from '@/social/comment/replyComment/entity/reply.entity';
+import {likeComment} from '@/social/comment/like-comment/entity/like-comment.entity';
 import {PaginationService} from '@/common/paginate/pagitnate.service';
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
-import {HttpModule} from "@nestjs/axios";
+import {NotificationService} from "@/social/notification/notification.service";
+import {Notification} from "@/social/notification/entity/notification.entity";
+import { CommentController } from './comment.controller';
+import { CommentService } from './comment.service';
+import { Comment } from './entity/comment.entity';
 
 @Module({
     imports: [TypeOrmModule.forFeature([

@@ -11,10 +11,10 @@ import {
     Relation,
     UpdateDateColumn
 } from 'typeorm';
-import {User} from '@/User/user/entity/user.entity';
-import {Comment} from '@/Social/Comment/comment/entity/comment.entity';
+import {User} from '@/user/user/entity/user.entity';
+import {Comment} from '@/social/comment/comment/entity/comment.entity';
 import {ApiProperty} from '@nestjs/swagger';
-import {likeStory} from '../../like-story/entity/like-story.entity';
+import {likeStory} from '@/social/story/like-story/entity/like-story.entity';
 
 @Entity('stories')
 export class Story {

@@ -10,9 +10,9 @@ import {
   OneToMany, 
   JoinColumn 
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { NFT } from '@/NFT/nft/entity/nft.entity';
-import { Bid } from './auctionBid.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { NFT } from '@/nft/nft/entity/nft.entity';
+import { Bid } from '@/market/auction/entity/auctionBid.entity';
 
 export enum AuctionStatus {
   Active = 'active',

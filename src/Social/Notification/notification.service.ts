@@ -1,12 +1,12 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Notification, NotificationAction} from './entity/notification.entity';
+import {Notification, NotificationAction} from '@/social/notification/entity/notification.entity';
 import {lastValueFrom} from "rxjs";
 import {HttpService} from '@nestjs/axios';
 import * as fs from "fs";
 import * as jwt from 'jsonwebtoken';
-import {User} from "@/User/user/entity/user.entity";
+import {User} from "@/user/user/entity/user.entity";
 
 
 @Injectable()

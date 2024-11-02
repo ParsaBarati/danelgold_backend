@@ -1,8 +1,8 @@
 import {Controller, Get, Req, UseGuards} from "@nestjs/common";
-import { WalletService } from "./wallet.service";
 import { Request } from "express";
 import {ApiBearerAuth, ApiExcludeController, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {AuthGuard} from "@nestjs/passport";
+import { WalletService } from "./wallet.service";
 
 @ApiTags('Wallet')
 @ApiBearerAuth()

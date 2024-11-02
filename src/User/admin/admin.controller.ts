@@ -10,13 +10,13 @@ import {
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Request} from 'express';
-import {AdminService} from './admin.service';
-import {AddUserDto} from './dto/addUser.dto';
+import {AdminService} from '@/user/admin/admin.service';
+import {AddUserDto} from '@/user/admin/dto/addUser.dto';
 import {Roles} from '@/common/decorators/roles.decorator';
-import {AdminRole} from './entity/admin.entity';
-import {UpdateUserDto} from './dto/updateUser.dto';
-import {AddAdminDto} from './dto/addAdmin.dto';
-import {UpdateAdminDto} from './dto/updateAdmin.dto';
+import {AdminRole} from '@/user/admin/entity/admin.entity';
+import {UpdateUserDto} from '@/user/admin/dto/updateUser.dto';
+import {AddAdminDto} from '@/user/admin/dto/addAdmin.dto';
+import {UpdateAdminDto} from '@/user/admin/dto/updateAdmin.dto';
 
 
 @ApiTags('Admin')

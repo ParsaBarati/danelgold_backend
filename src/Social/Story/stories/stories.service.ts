@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import {LessThan, MoreThan, Repository} from 'typeorm';
-import { Story } from './entity/stories.entity';
-import { CreateStoryDto } from './entity/dto/createStory.dto';
+import { Story } from '@/social/story/stories/entity/stories.entity';
+import { CreateStoryDto } from '@/social/story/stories/entity/dto/createStory.dto';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { UpdateStoryDto } from './entity/dto/updateStory.dto';
+import { User } from '@/user/user/entity/user.entity';
+import { UpdateStoryDto } from '@/social/story/stories/entity/dto/updateStory.dto';
 import { CronJob } from 'cron';
 
 @Injectable()

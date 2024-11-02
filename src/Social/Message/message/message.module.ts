@@ -1,17 +1,17 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Message} from "./entity/message.entity";
-import {MessageController} from "./message.controller";
-import {MessageService} from "./message.service";
-import {User} from "@/User/user/entity/user.entity";
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import {BlockUser} from "@/Social/Block/entity/block.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {NotificationService} from "@/social/notification/notification.service";
+import {Notification} from "@/social/notification/entity/notification.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {Story} from "@/social/story/stories/entity/stories.entity";
+import {BlockUser} from "@/social/block/entity/block.entity";
 import {Upload} from "@/upload/entity/uplaod.entity";
+import { MessageController } from "./message.controller";
+import { MessageService } from "./message.service";
+import { Message } from "./entity/message.entity";
 
 
 @Module({

@@ -8,12 +8,12 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { CreateReplyDTO } from './dto/CreateReply.dto';
-import { ReplyService } from './reply.service';
-import { UpdateReplyDTO } from './dto/UpdateReply.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiExcludeController, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiExcludeController, ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { ReplyService } from './reply.service';
+import { UpdateReplyDTO } from '@/social/comment/replyComment/dto/UpdateReply.dto';
+import { CreateReplyDTO } from '@/social/comment/replyComment/dto/CreateReply.dto';
 
 @ApiExcludeController()
 @Controller('reply')

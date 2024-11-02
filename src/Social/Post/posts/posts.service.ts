@@ -1,14 +1,14 @@
 import {Injectable, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Post} from "./entity/posts.entity";
 import {Repository} from "typeorm";
-import {CreatePostDto} from "./dto/createPost.dto";
 import {ApiResponses, createResponse} from "@/utils/response.util";
-import {User} from "@/User/user/entity/user.entity";
-import {UpdatePostDto} from "./dto/updatePost.dto";
+import {User} from "@/user/user/entity/user.entity";
 import {PaginationService} from "@/common/paginate/pagitnate.service";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {FollowUser} from "@/Social/Follow/entity/follow.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {FollowUser} from "@/social/follow/entity/follow.entity";
+import { Post } from "@/social/post/posts/entity/posts.entity";
+import { CreatePostDto } from "@/social/post/posts/dto/createPost.dto";
+import { UpdatePostDto } from "@/social/post/posts/dto/updatePost.dto";
 
 
 @Injectable()

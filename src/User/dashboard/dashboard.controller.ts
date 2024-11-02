@@ -1,8 +1,8 @@
 import {Controller, Delete, Get, NotFoundException, Param, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags,} from '@nestjs/swagger';
-import {DashboardService} from "./dashboard.service";
+import {DashboardService} from "@/user/dashboard/dashboard.service";
 import {Roles} from "@/common/decorators/roles.decorator";
-import {AdminRole} from "@/User/admin/entity/admin.entity";
+import {AdminRole} from "@/user/admin/entity/admin.entity";
 
 
 @ApiTags('Dashboard')

@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Token } from './entity/token.entity';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@/User/user/entity/user.entity';
+import { User } from '@/user/user/entity/user.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
-import { Admin } from '@/User/admin/entity/admin.entity';
+import { Admin } from '@/user/admin/entity/admin.entity';
+import { Token } from '@/user/auth/token/entity/token.entity';
 
 @Injectable()
 export class TokenService {

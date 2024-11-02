@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, Req } from '@nestjs/common';
-import { StoriesService } from './stories.service';
 import { Request } from 'express';
-import { CreateStoryDto } from './entity/dto/createStory.dto';
-import { UpdateStoryDto } from './entity/dto/updateStory.dto';
+import { CreateStoryDto } from '@/social/story/stories/entity/dto/createStory.dto';
+import { UpdateStoryDto } from '@/social/story/stories/entity/dto/updateStory.dto';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { StoriesService } from '@/social/story/stories/stories.service';
 
 @ApiTags('Story')
 @ApiBearerAuth()

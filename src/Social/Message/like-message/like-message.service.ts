@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { likeMessage } from "./entity/like-message.entity";
+import { likeMessage } from "@/social/message/like-message/entity/like-message.entity";
 import { Repository } from "typeorm";
-import { User } from "@/User/user/entity/user.entity";
-import { NotificationService } from "@/Social/Notification/notification.service";
-import { Message } from "../message/entity/message.entity";
-import { NotificationAction } from "@/Social/Notification/entity/notification.entity";
+import { User } from "@/user/user/entity/user.entity";
+import { NotificationService } from "@/social/notification/notification.service";
+import { Message } from "@/social/message/message/entity/message.entity";
+import { NotificationAction } from "@/social/notification/entity/notification.entity";
 
 
 

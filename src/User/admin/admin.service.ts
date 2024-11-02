@@ -1,16 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { Repository } from "typeorm";
-import { Admin } from "./entity/admin.entity";
-import { OtpService } from "../auth/otp/otp.service";
-import { TokenService } from "../auth/token/token.service";
+import { Admin } from "@/user/admin/entity/admin.entity";
 import * as bcrypt from 'bcryptjs';
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../user/entity/user.entity";
 import { ApiResponses, createResponse } from "@/utils/response.util";
-import { AddUserDto } from "./dto/addUser.dto";
-import { UpdateUserDto } from "./dto/updateUser.dto";
-import { AddAdminDto } from "./dto/addAdmin.dto";
-import { UpdateAdminDto } from "./dto/updateAdmin.dto";
+import { User } from "@/user/user/entity/user.entity";
+import { OtpService } from "@/user/auth/otp/otp.service";
+import { TokenService } from "@/user/auth/token/token.service";
+import { AddUserDto } from "@/user/admin/dto/addUser.dto";
+import { AddAdminDto } from "@/user/admin/dto/addAdmin.dto";
+import { UpdateUserDto } from "@/user/admin/dto/updateUser.dto";
+import { UpdateAdminDto } from "@/user/admin/dto/updateAdmin.dto";
+
 
 
 

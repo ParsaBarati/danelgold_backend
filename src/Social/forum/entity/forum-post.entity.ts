@@ -8,8 +8,8 @@ import {
     Relation, 
     JoinColumn
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { ForumTopic } from './forum-topic.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { ForumTopic } from '@/social/forum/entity/forum-topic.entity';
 
 @Entity({ name: 'forumPosts' })
 export class ForumPost {

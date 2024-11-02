@@ -1,9 +1,9 @@
 import {Body, Controller, Get, Param, Post, Req, UseGuards} from "@nestjs/common";
-import {NotificationService} from "./notification.service";
 import {ApiBearerAuth, ApiOperation, ApiTags} from "@nestjs/swagger";
 import { Request } from 'express';
 import {AuthGuard} from "@nestjs/passport";
-import { NotificationAction } from "./entity/notification.entity";
+import { NotificationAction } from "@/social/notification/entity/notification.entity";
+import { NotificationService } from "@/social/notification/notification.service";
 
 @ApiTags('Notification')
 @ApiBearerAuth()

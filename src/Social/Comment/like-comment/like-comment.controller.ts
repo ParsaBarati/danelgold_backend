@@ -6,8 +6,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeController, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LikeCommentService } from './like-comment.service';
 import { Request } from 'express';
+import { LikeCommentService } from './like-comment.service';
 
 @ApiExcludeController()
 @Controller('like-comment')

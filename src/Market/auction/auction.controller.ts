@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, Query, DefaultValuePipe, Req } from '@nestjs/common';
-import { AuctionsService } from '@/Market/auction/auction.service';
-import { UpdateAuctionDto } from '@/Market/auction/dto/UpdateAuction.dto';
-import { CreateAuctionDto } from '@/Market/auction/dto/CreateAuction.dto';
-import { ParticipateAuctionDto } from '@/Market/auction/dto/ParticipateAuction.dto';
+import { AuctionsService } from '@/market/auction/auction.service';
+import { UpdateAuctionDto } from '@/market/auction/dto/UpdateAuction.dto';
+import { CreateAuctionDto } from '@/market/auction/dto/CreateAuction.dto';
+import { ParticipateAuctionDto } from '@/market/auction/dto/ParticipateAuction.dto';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';

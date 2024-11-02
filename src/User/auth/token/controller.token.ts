@@ -1,6 +1,6 @@
-import { TokenService } from '@/User/auth/token/token.service';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { TokenService } from '@/user/auth/token/token.service';
 
 @ApiExcludeController()
 @Controller('token')

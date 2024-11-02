@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/User/user/entity/user.entity';
-import { SupportTicket } from '../../ST/entity/support-ticket.entity';
+import { SupportTicket } from '../../st/entity/support-ticket.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -6,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserDetail } from './entity/userDetail.entity';
-import { CreateUserDetailDTO } from './dto/create-userDetail.dto';
-import { UpdateUserDetailDTO } from './dto/update-userDetail.dto';
-import { User } from '@/User/user/entity/user.entity';
+import { UserDetail } from '@/user/user-detail/entity/userDetail.entity';
+import { UpdateUserDetailDTO } from '@/user/user-detail/dto/update-userDetail.dto';
+import { User } from '@/user/user/entity/user.entity';
 import {
   PaginationResult,
   PaginationService,

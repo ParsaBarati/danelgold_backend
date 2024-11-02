@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { Auction, AuctionStatus } from '@/Market/auction/entity/auction.entity';
-import { CreateAuctionDto } from '@/Market/auction/dto/CreateAuction.dto';
-import { UpdateAuctionDto } from '@/Market/auction/dto/UpdateAuction.dto';
-import { ParticipateAuctionDto } from '@/Market/auction/dto/ParticipateAuction.dto';
+import { User } from '@/user/user/entity/user.entity';
+import { Auction, AuctionStatus } from '@/market/auction/entity/auction.entity';
+import { CreateAuctionDto } from '@/market/auction/dto/CreateAuction.dto';
+import { UpdateAuctionDto } from '@/market/auction/dto/UpdateAuction.dto';
+import { ParticipateAuctionDto } from '@/market/auction/dto/ParticipateAuction.dto';
 import { Bid } from './entity/auctionBid.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';

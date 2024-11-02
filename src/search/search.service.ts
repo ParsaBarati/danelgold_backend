@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { CollectionEntity } from '@/Market/collection/entity/collection.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { CollectionEntity } from '@/market/collection/entity/collection.entity';
 import { Like } from 'typeorm';
-import { NFT } from '@/NFT/nft/entity/nft.entity';
-import { Post } from '@/Social/Post/posts/entity/posts.entity';
+import { NFT } from '@/nft/nft/entity/nft.entity';
+import { Post } from '@/social/post/posts/entity/posts.entity';
 
 @Injectable()
 export class SearchService {

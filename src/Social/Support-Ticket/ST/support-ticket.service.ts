@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SupportTicket, TicketStatus } from './entity/support-ticket.entity';
+import { SupportTicket, TicketStatus } from '@/social/support-ticket/st/entity/support-ticket.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
-import { CreateSTDto } from './dto/createST.dto';
-import { User } from '@/User/user/entity/user.entity';
-import { UpdateSTDto } from './dto/updateST.dto';
+import { CreateSTDto } from '@/social/support-ticket/st/dto/createST.dto';
+import { User } from '@/user/user/entity/user.entity';
+import { UpdateSTDto } from '@/social/support-ticket/st/dto/updateST.dto';
 
 @Injectable()
 export class SupportTicketsService {

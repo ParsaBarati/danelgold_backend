@@ -18,58 +18,59 @@ const _datasource = /*#__PURE__*/ _interop_require_default(require("./config/dat
 const _path = require("path");
 const _appcontroller = require("./app.controller");
 const _appservice = require("./app.service");
-const _authmodule = require("./User/auth/auth.module");
-const _otpmodule = require("./User/auth/otp/otp.module");
-const _jwtguard = require("./User/auth/guards/jwt.guard");
-const _rolesguard = require("./User/auth/guards/roles.guard");
-const _jwtstrategy = require("./User/auth/strategy/jwt.strategy");
-const _tokenmodule = require("./User/auth/token/token.module");
-const _usermodule = require("./User/user/user.module");
+const _authmodule = require("./user/auth/auth.module");
+const _usermodule = require("./user/user/user.module");
 const _sessionmodule = require("./session/session.module");
-const _subscribemodule = require("./User/subscribe/subscribe.module");
-const _userDetailmodule = require("./User/user-detail/userDetail.module");
+const _subscribemodule = require("./user/subscribe/subscribe.module");
+const _userDetailmodule = require("./user/user-detail/userDetail.module");
 const _uploadmodule = require("./upload/upload.module");
 const _loggerinterseptor = require("./common/utils/logger.interseptor");
 const _globalerror = require("./common/exeptionFilters/global.error");
 const _useragentmiddleware = require("./common/middleware/user-agent.middleware");
-const _auctionmodule = require("./Market/auction/auction.module");
-const _collectionmodule = require("./Market/collection/collection.module");
-const _nftmodule = require("./NFT/nft/nft.module");
-const _forummodule = require("./Social/forum/forum.module");
-const _supportticketmodule = require("./Social/Support-Ticket/ST/support-ticket.module");
-const _userservice = require("./User/user/user.service");
-const _userentity = require("./User/user/entity/user.entity");
-const _tokenentity = require("./User/auth/token/entity/token.entity");
+const _auctionmodule = require("./market/auction/auction.module");
+const _collectionmodule = require("./market/collection/collection.module");
+const _nftmodule = require("./nft/nft/nft.module");
+const _forummodule = require("./social/forum/forum.module");
+const _supportticketmodule = require("./social/support-ticket/st/support-ticket.module");
+const _userservice = require("./user/user/user.service");
+const _userentity = require("./user/user/entity/user.entity");
 const _smsservice = require("./services/sms.service");
 const _IPFSservice = require("./services/IPFS.service");
-const _pintamodule = require("./NFT/pinta/pinta.module");
-const _storiesmodule = require("./Social/Story/stories/stories.module");
-const _postsmodule = require("./Social/Post/posts/posts.module");
-const _storiesentity = require("./Social/Story/stories/entity/stories.entity");
-const _commententity = require("./Social/Comment/comment/entity/comment.entity");
-const _replyentity = require("./Social/Comment/replyComment/entity/reply.entity");
-const _likecommententity = require("./Social/Comment/like-comment/entity/like-comment.entity");
-const _postsentity = require("./Social/Post/posts/entity/posts.entity");
-const _likepostentity = require("./Social/Post/like-post/entity/like-post.entity");
-const _likestoryentity = require("./Social/Story/like-story/entity/like-story.entity");
-const _RSTmodule = require("./Social/Support-Ticket/RST/RST.module");
-const _clubentity = require("./Social/Club/entity/club.entity");
-const _notificationmodule = require("./Social/Notification/notification.module");
-const _walletmodule = require("./NFT/wallet/wallet.module");
-const _cryptoentity = require("./NFT/Crypto/entity/crypto.entity");
-const _followentity = require("./Social/Follow/entity/follow.entity");
-const _likepostmodule = require("./Social/Post/like-post/like-post.module");
-const _savepostmodule = require("./Social/Post/save-post/save-post.module");
-const _savepostentity = require("./Social/Post/save-post/entity/save-post.entity");
-const _likestorymodule = require("./Social/Story/like-story/like-story.module");
-const _notificationentity = require("./Social/Notification/entity/notification.entity");
-const _notificationservice = require("./Social/Notification/notification.service");
+const _pintamodule = require("./nft/pinta/pinta.module");
+const _storiesmodule = require("./social/story/stories/stories.module");
+const _postsmodule = require("./social/post/posts/posts.module");
+const _storiesentity = require("./social/story/stories/entity/stories.entity");
+const _commententity = require("./social/comment/comment/entity/comment.entity");
+const _replyentity = require("./social/comment/replyComment/entity/reply.entity");
+const _likecommententity = require("./social/comment/like-comment/entity/like-comment.entity");
+const _postsentity = require("./social/post/posts/entity/posts.entity");
+const _likepostentity = require("./social/post/like-post/entity/like-post.entity");
+const _likestoryentity = require("./social/story/like-story/entity/like-story.entity");
+const _clubentity = require("./social/club/entity/club.entity");
+const _notificationmodule = require("./social/notification/notification.module");
+const _walletmodule = require("./nft/wallet/wallet.module");
+const _cryptoentity = require("./nft/crypto/entity/crypto.entity");
+const _followentity = require("./social/follow/entity/follow.entity");
+const _likepostmodule = require("./social/post/like-post/like-post.module");
+const _savepostmodule = require("./social/post/save-post/save-post.module");
+const _savepostentity = require("./social/post/save-post/entity/save-post.entity");
+const _likestorymodule = require("./social/story/like-story/like-story.module");
+const _notificationentity = require("./social/notification/entity/notification.entity");
+const _notificationservice = require("./social/notification/notification.service");
 const _axios = require("@nestjs/axios");
-const _messagemodule = require("./Social/Message/message/message.module");
-const _likemessagemodule = require("./Social/Message/like-message/like-message.module");
-const _blockentity = require("./Social/Block/entity/block.entity");
-const _adminentity = require("./User/admin/entity/admin.entity");
-const _adminmodule = require("./User/admin/admin.module");
+const _messagemodule = require("./social/message/message/message.module");
+const _likemessagemodule = require("./social/message/like-message/like-message.module");
+const _blockentity = require("./social/block/entity/block.entity");
+const _adminentity = require("./user/admin/entity/admin.entity");
+const _adminmodule = require("./user/admin/admin.module");
+const _dashboardmodule = require("./user/dashboard/dashboard.module");
+const _otpmodule = require("./user/auth/otp/otp.module");
+const _tokenmodule = require("./user/auth/token/token.module");
+const _rstmodule = require("./social/support-ticket/rst/rst.module");
+const _jwtstrategy = require("./user/auth/strategy/jwt.strategy");
+const _jwtguard = require("./user/auth/guards/jwt.guard");
+const _rolesguard = require("./user/auth/guards/roles.guard");
+const _tokenentity = require("./user/auth/token/entity/token.entity");
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -152,7 +153,7 @@ AppModule = _ts_decorate([
                 serveRoot: '/public'
             }),
             _config.ConfigModule.forRoot({
-                envFilePath: '.develop.env'
+                envFilePath: '.env'
             }),
             _typeorm.TypeOrmModule.forRootAsync({
                 imports: [
@@ -209,11 +210,12 @@ AppModule = _ts_decorate([
             _likepostmodule.LikePostModule,
             _likestorymodule.LikeStoryModule,
             _savepostmodule.SavePostModule,
-            _RSTmodule.RSTModule,
+            _rstmodule.RSTModule,
             _messagemodule.MessageModule,
             _likemessagemodule.LikeMessageModule,
             _notificationmodule.NotificationModule,
             _walletmodule.WalletModule,
+            _dashboardmodule.DashboardModule,
             _object_spread({
                 global: true
             }, _axios.HttpModule.register({

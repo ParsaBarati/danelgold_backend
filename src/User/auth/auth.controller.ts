@@ -1,5 +1,4 @@
 import {Body, Controller, Post, Req, UseGuards} from '@nestjs/common';
-import {AuthService} from './auth.service';
 import {Public} from '@/common/decorators/public.decorator';
 import {
     ApiBadRequestResponse,
@@ -11,6 +10,7 @@ import {
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Request} from 'express';
+import { AuthService } from '@/user/auth/auth.service';
 
 
 @ApiTags('Auth')

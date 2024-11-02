@@ -2,9 +2,9 @@ import {BadRequestException, Injectable, NotFoundException, UnauthorizedExceptio
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import {OtpService} from './otp/otp.service';
-import {TokenService} from './token/token.service';
-import {User} from '@/User/user/entity/user.entity';
+import {User} from '@/user/user/entity/user.entity';
+import { OtpService } from './otp/otp.service';
+import { TokenService } from './token/token.service';
 
 
 @Injectable()

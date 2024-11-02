@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
+import { User } from '@/user/user/entity/user.entity';
 
 @Entity('user-detail')
 export class UserDetail {

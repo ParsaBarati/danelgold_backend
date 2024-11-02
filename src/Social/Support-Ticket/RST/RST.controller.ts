@@ -1,6 +1,6 @@
 import { Body, Controller, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { RSTService } from "./RST.service";
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from "@nestjs/swagger";
+import { RSTService } from "@/social/support-ticket/rst/rst.service";
 
 @ApiExcludeController()
 @Controller('RST')

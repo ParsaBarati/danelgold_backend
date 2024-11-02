@@ -1,13 +1,13 @@
 import {Module} from '@nestjs/common';
-import {LikePostController} from './like-post.controller';
-import {LikePostService} from './like-post.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {User} from "@/User/user/entity/user.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {NotificationService} from "@/social/notification/notification.service";
+import {Notification} from "@/social/notification/entity/notification.entity";
 import {HttpModule} from "@nestjs/axios";
+import { LikePostController } from './like-post.controller';
+import { LikePostService } from './like-post.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Post, User, likePost, Notification]),HttpModule],

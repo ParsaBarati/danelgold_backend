@@ -1,8 +1,8 @@
 import {Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards} from '@nestjs/common';
-import {UserService} from './user.service';
+import {UserService} from '@/user/user/user.service';
 import {ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
-import {UpdateUserDTO} from '@/User/user/dto/update-user.dto';
+import {UpdateUserDTO} from '@/user/user/dto/update-user.dto';
 import {AuthGuard} from '@nestjs/passport';
 
 @ApiTags('User')

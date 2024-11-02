@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { OTP } from './entity/otp.entity';
+import { OTP } from '@/user/auth/otp/entity/otp.entity';
 import { sendOTPSMS } from '@/common/utils/auth.utils'; // SMS utility
 import * as nodemailer from 'nodemailer';
 

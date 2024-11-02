@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "@/User/user/entity/user.entity";
-import { NFT } from "@/NFT/nft/entity/nft.entity";
-import { CollectionsController } from "@/Market/collection/collection.controller";
-import { CollectionsService } from "@/Market/collection/collection.service";
-import { CollectionEntity } from "./entity/collection.entity";
+import { User } from "@/user/user/entity/user.entity";
+import { NFT } from "@/nft/nft/entity/nft.entity";
+import { CollectionsController } from "@/market/collection/collection.controller";
+import { CollectionsService } from "@/market/collection/collection.service";
 import { PaginationService } from "@/common/paginate/pagitnate.service";
+import { CollectionEntity } from "./entity/collection.entity";
 
 
 @Module({

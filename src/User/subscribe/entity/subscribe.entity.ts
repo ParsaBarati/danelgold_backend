@@ -7,7 +7,7 @@ import {
   JoinColumn,
   Relation,
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
+import { User } from '@/user/user/entity/user.entity';
 
 @Entity('subscribe')
 export class Subscribe {

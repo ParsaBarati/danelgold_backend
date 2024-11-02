@@ -17,11 +17,11 @@ const _config = require("@nestjs/config");
 const _uplaodentity = require("./entity/uplaod.entity");
 const _multerutils = require("../common/utils/multer.utils");
 const _pagitnateservice = require("../common/paginate/pagitnate.service");
-const _userentity = require("../User/user/entity/user.entity");
-const _postsentity = require("../Social/Post/posts/entity/posts.entity");
-const _tokenservice = require("../User/auth/token/token.service");
-const _tokenentity = require("../User/auth/token/entity/token.entity");
+const _userentity = require("../user/user/entity/user.entity");
+const _postsentity = require("../social/post/posts/entity/posts.entity");
 const _jwt = require("@nestjs/jwt");
+const _tokenentity = require("../user/auth/token/entity/token.entity");
+const _tokenservice = require("../user/auth/token/token.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

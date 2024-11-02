@@ -4,8 +4,8 @@ import {
   NotAcceptableException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { TokenService } from '@/User/auth/token/token.service';
-import { User } from '@/User/user/entity/user.entity';
+import { TokenService } from '@/user/auth/token/token.service';
+import { User } from '@/user/user/entity/user.entity';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

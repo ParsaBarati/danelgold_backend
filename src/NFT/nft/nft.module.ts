@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "@/User/user/entity/user.entity";
-import { NFT } from "@/NFT/nft/entity/nft.entity";
-import { NFTsController } from "@/NFT/nft/nft.controller";
-import { NFTsService } from "@/NFT/nft/nft.service";
+import { User } from "@/user/user/entity/user.entity";
+import { NFT } from "@/nft/nft/entity/nft.entity";
+import { NFTsController } from "@/nft/nft/nft.controller";
+import { NFTsService } from "@/nft/nft/nft.service";
 import { IPFSService } from "@/services/IPFS.service";
 
 

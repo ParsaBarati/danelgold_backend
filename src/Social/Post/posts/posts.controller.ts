@@ -12,14 +12,13 @@ import {
     Req,
     UseGuards
 } from '@nestjs/common';
-import { PostService } from './posts.service';
 import { Request } from 'express';
-import { CreatePostDto } from './dto/createPost.dto';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { UpdatePostDto } from './dto/updatePost.dto';
-import { CommentService } from "@/Social/Comment/comment/comment.service";
-import { CreateCommentDTO } from "@/Social/Comment/comment/dto/CreateComment";
-import { JwtAuthGuard } from '@/User/auth/guards/jwt.guard';
+import { CommentService } from "@/social/comment/comment/comment.service";
+import { CreateCommentDTO } from "@/social/comment/comment/dto/CreateComment";
+import { PostService } from '@/social/post/posts/posts.service';
+import { CreatePostDto } from '@/social/post/posts/dto/createPost.dto';
+import { UpdatePostDto } from '@/social/post/posts/dto/updatePost.dto';
 
 @ApiTags('Post')
 @ApiBearerAuth()

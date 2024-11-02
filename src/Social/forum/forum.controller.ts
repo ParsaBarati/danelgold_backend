@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Body, Param, Req, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
-import { ForumService } from './forum.service';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { CreateTopicDto } from './dto/createTopic.dto';
-import { UpdateTopicDto } from './dto/updateTopic.dto';
+import { ForumService } from '@/social/forum/forum.service';
+import { CreateTopicDto } from '@/social/forum/dto/createTopic.dto';
+import { UpdateTopicDto } from '@/social/forum/dto/updateTopic.dto';
 
 @ApiExcludeController()
 @Controller('forum')

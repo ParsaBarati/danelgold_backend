@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ForumTopic } from './entity/forum-topic.entity';
-import { ForumPost } from './entity/forum-post.entity';
-import { CreateTopicDto } from './dto/createTopic.dto';
+import { ForumPost } from '@/social/forum/entity/forum-post.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
-import { User } from '@/User/user/entity/user.entity';
-import { UpdateTopicDto } from './dto/updateTopic.dto';
+import { User } from '@/user/user/entity/user.entity';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
+import { ForumTopic } from '@/social/forum/entity/forum-topic.entity';
+import { CreateTopicDto } from '@/social/forum/dto/createTopic.dto';
+import { UpdateTopicDto } from '@/social/forum/dto/updateTopic.dto';
 
 @Injectable()
 export class ForumService {

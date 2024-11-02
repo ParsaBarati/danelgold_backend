@@ -7,11 +7,11 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { SubscribeService } from './subscribe.service';
-import { SubscribeDto } from './dto/Subscription.dto';
+import { SubscribeService } from '@/user/subscribe/subscribe.service';
+import { SubscribeDto } from '@/user/subscribe/dto/Subscription.dto';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
-import { CreateNotificationDto } from './dto/create-notication.dto';
+import { CreateNotificationDto } from '@/user/subscribe/dto/create-notication.dto';
 
 @ApiExcludeController()
 @Controller('subscribe')

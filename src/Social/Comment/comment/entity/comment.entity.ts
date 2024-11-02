@@ -10,11 +10,11 @@ import {
   Relation,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/User/user/entity/user.entity';
-import { Reply } from '@/Social/Comment/replyComment/entity/reply.entity';
-import { Story } from '@/Social/Story/stories/entity/stories.entity';
-import { Post } from '@/Social/Post/posts/entity/posts.entity';
-import { likeComment } from '@/Social/Comment/like-comment/entity/like-comment.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { Reply } from '@/social/comment/replyComment/entity/reply.entity';
+import { Story } from '@/social/story/stories/entity/stories.entity';
+import { Post } from '@/social/post/posts/entity/posts.entity';
+import { likeComment } from '@/social/comment/like-comment/entity/like-comment.entity';
 
 @Entity({ name: 'comments' })
 export class Comment {

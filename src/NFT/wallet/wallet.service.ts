@@ -1,11 +1,11 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Wallet} from './entity/wallet.entity';
-import {NFT} from '@/NFT/nft/entity/nft.entity';
-import {CryptoEntity} from '../Crypto/entity/crypto.entity';
-import {User} from "@/User/user/entity/user.entity";
-import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
+import {NFT} from '@/nft/nft/entity/nft.entity';
+import {User} from "@/user/user/entity/user.entity";
+import {CryptoBalanceEntity} from "@/nft/crypto/entity/cryptoBalance.entity";
+import { Wallet } from '@/nft/wallet/entity/wallet.entity';
+import { CryptoEntity } from '@/nft/crypto/entity/crypto.entity';
 
 @Injectable()
 export class WalletService {

@@ -9,10 +9,10 @@ import {
     Relation
 } from 'typeorm';
 import {ApiProperty} from '@nestjs/swagger';
-import {User} from '@/User/user/entity/user.entity';
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import {likeMessage} from '../../like-message/entity/like-message.entity';
+import {User} from '@/user/user/entity/user.entity';
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {Story} from "@/social/story/stories/entity/stories.entity";
+import {likeMessage} from '@/social/message/like-message/entity/like-message.entity';
 import {Upload} from "@/upload/entity/uplaod.entity";
 
 @Entity('messages')

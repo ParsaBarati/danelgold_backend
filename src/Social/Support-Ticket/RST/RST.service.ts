@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { RST } from "./entity/RST.entity";
 import { Repository } from "typeorm";
-import { SupportTicket, TicketStatus } from "../ST/entity/support-ticket.entity";
 import { ApiResponses, createResponse } from "@/utils/response.util";
+import { RST } from "@/social/support-ticket/rst/entity/rst.entity";
+import { SupportTicket, TicketStatus } from "@/social/support-ticket/st/entity/support-ticket.entity";
 
 
 @Injectable()

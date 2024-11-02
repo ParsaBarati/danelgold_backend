@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { RST } from "./entity/RST.entity";
-import { SupportTicket } from "../ST/entity/support-ticket.entity";
-import { RSTController } from "./RST.controller";
-import { RSTService } from "./RST.service";
+import { RST } from "@/social/support-ticket/rst/entity/rst.entity";
+import { SupportTicket } from "../st/entity/support-ticket.entity";
+import { RSTController } from "./rst.controller";
+import { RSTService } from "./rst.service";
 
 
 @Module({

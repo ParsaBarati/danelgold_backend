@@ -8,8 +8,8 @@ import {
     Relation,
   } from 'typeorm';
   import { ApiProperty } from '@nestjs/swagger';
-  import { User } from '@/User/user/entity/user.entity';
-  import { Post } from '@/Social/Post/posts/entity/posts.entity';
+  import { User } from '@/user/user/entity/user.entity';
+  import { Post } from '@/social/post/posts/entity/posts.entity';
   
   @Entity({ name: 'postLikes' })
   export class likePost {

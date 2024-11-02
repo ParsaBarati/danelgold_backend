@@ -9,8 +9,8 @@ import {
   ManyToOne, 
   JoinColumn 
 } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { NFT } from '@/NFT/nft/entity/nft.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { NFT } from '@/nft/nft/entity/nft.entity';
 
 @Entity({ name: 'collections' })
 export class CollectionEntity {

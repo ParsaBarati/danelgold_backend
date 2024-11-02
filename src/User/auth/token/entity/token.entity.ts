@@ -7,8 +7,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@/User/user/entity/user.entity';
-import { Admin } from '@/User/admin/entity/admin.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { Admin } from '@/user/admin/entity/admin.entity';
 
 @Entity('tokens')
 export class Token {

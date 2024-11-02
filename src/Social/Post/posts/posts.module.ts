@@ -1,24 +1,23 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {Post} from './entity/posts.entity';
-import {User} from '@/User/user/entity/user.entity';
-import {PostsController} from './posts.controller';
-import {PostService} from './posts.service';
+import {User} from '@/user/user/entity/user.entity';
 import {PaginationService} from '@/common/paginate/pagitnate.service';
-import {Comment} from "@/Social/Comment/comment/entity/comment.entity";
-import {CommentService} from "@/Social/Comment/comment/comment.service";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import {Reply} from "@/Social/Comment/replyComment/entity/reply.entity";
-import {likeComment} from "@/Social/Comment/like-comment/entity/like-comment.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
+import {Comment} from "@/social/comment/comment/entity/comment.entity";
+import {CommentService} from "@/social/comment/comment/comment.service";
+import {Story} from "@/social/story/stories/entity/stories.entity";
+import {Reply} from "@/social/comment/replyComment/entity/reply.entity";
+import {likeComment} from "@/social/comment/like-comment/entity/like-comment.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
 import {SearchController} from "@/search/search.controller";
-import {NFT} from "@/NFT/nft/entity/nft.entity";
-import {CollectionEntity} from "@/Market/collection/entity/collection.entity";
+import {NFT} from "@/nft/nft/entity/nft.entity";
+import {CollectionEntity} from "@/market/collection/entity/collection.entity";
 import {SearchService} from "@/search/search.service";
-import {FollowUser} from '@/Social/Follow/entity/follow.entity';
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
-import {HttpModule} from "@nestjs/axios";
+import {FollowUser} from '@/social/follow/entity/follow.entity';
+import {NotificationService} from "@/social/notification/notification.service";
+import {Notification} from "@/social/notification/entity/notification.entity";
+import { PostsController } from './posts.controller';
+import { PostService } from './posts.service';
+import { Post } from './entity/posts.entity';
 
 @Module({
     imports: [TypeOrmModule.forFeature([

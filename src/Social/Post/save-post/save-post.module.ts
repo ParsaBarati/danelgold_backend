@@ -1,11 +1,11 @@
 import {Module} from '@nestjs/common';
-import {SavePostController} from './save-post.controller';
-import {SavePostService} from './save-post.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {User} from "@/User/user/entity/user.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import { SavePostController } from './save-post.controller';
+import { SavePostService } from './save-post.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Post, User, likePost, savePost,])],

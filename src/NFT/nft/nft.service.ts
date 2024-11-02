@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { NFT } from './entity/nft.entity';
+import { User } from '@/user/user/entity/user.entity';
 import { IPFSService } from '@/services/IPFS.service';
 import { ApiResponses, createResponse } from '@/utils/response.util';
+import { NFT } from './entity/nft.entity';
 
 @Injectable()
 export class NFTsService {

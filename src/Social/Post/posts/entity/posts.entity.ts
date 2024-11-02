@@ -8,11 +8,11 @@ import {
     Relation,
     UpdateDateColumn,
 } from 'typeorm';
-import {User} from '@/User/user/entity/user.entity';
-import {Comment} from '@/Social/Comment/comment/entity/comment.entity';
+import {User} from '@/user/user/entity/user.entity';
+import {Comment} from '@/social/comment/comment/entity/comment.entity';
 import {ApiProperty} from '@nestjs/swagger';
-import {likePost} from '@/Social/Post/like-post/entity/like-post.entity';
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
+import {likePost} from '@/social/post/like-post/entity/like-post.entity';
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
 
 @Entity('posts')
 export class Post {

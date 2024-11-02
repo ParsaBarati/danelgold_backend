@@ -1,11 +1,11 @@
 import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Wallet} from "./entity/wallet.entity";
-import {WalletController} from "./wallet.controller";
-import {WalletService} from "./wallet.service";
-import {NFT} from "../nft/entity/nft.entity";
-import {CryptoEntity} from "../Crypto/entity/crypto.entity";
-import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
+import {CryptoBalanceEntity} from "@/nft/crypto/entity/cryptoBalance.entity";
+import { NFT } from "../nft/entity/nft.entity";
+import { WalletService } from "./wallet.service";
+import { WalletController } from "./wallet.controller";
+import { Wallet } from "./entity/wallet.entity";
+import { CryptoEntity } from "../crypto/entity/crypto.entity";
 
 
 @Module({

@@ -1,10 +1,9 @@
 import { Controller, Post, Body, Req, Put, Param, ParseIntPipe, Delete, Patch } from '@nestjs/common';
-import { SupportTicketsService } from './support-ticket.service';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { CreateSTDto } from './dto/createST.dto';
-import { UpdateSTDto } from './dto/updateST.dto';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { CreateSTDto } from '@/social/support-ticket/st/dto/createST.dto';
+import { UpdateSTDto } from '@/social/support-ticket/st/dto/updateST.dto';
+import { SupportTicketsService } from '@/social/support-ticket/st/support-ticket.service';
 
 @ApiExcludeController()
 @Controller('ST')

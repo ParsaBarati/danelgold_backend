@@ -1,6 +1,6 @@
-import { User } from '@/User/user/entity/user.entity';
+import { User } from '@/user/user/entity/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Relation, JoinColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { RST } from '../../RST/entity/RST.entity';
+import { RST } from '@/social/support-ticket/rst/entity/rst.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum TicketStatus {

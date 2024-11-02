@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Comment } from "@/Social/Comment/comment/entity/comment.entity";
+import { Comment } from "@/social/comment/comment/entity/comment.entity";
 import { Repository } from "typeorm";
-import { likeComment } from "./entity/like-comment.entity";
-import { User } from "@/User/user/entity/user.entity";
+import { likeComment } from "@/social/comment/like-comment/entity/like-comment.entity";
+import { User } from "@/user/user/entity/user.entity";
 
 @Injectable()
 export class LikeCommentService{

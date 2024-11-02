@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeController, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { UserDetailService } from '@/User/user-detail/userDetail.service';
+import { UserDetailService } from '@/user/user-detail/userDetail.service';
 
 @ApiExcludeController()
 @Controller('user-detail')

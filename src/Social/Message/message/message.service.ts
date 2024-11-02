@@ -1,15 +1,15 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {In, Repository} from "typeorm";
-import {User} from "@/User/user/entity/user.entity";
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Message} from "./entity/message.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {NotificationAction} from "@/Social/Notification/entity/notification.entity";
-import {BlockUser} from "@/Social/Block/entity/block.entity";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {NotificationService} from "@/social/notification/notification.service";
+import {Message} from "@/social/message/message/entity/message.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {NotificationAction} from "@/social/notification/entity/notification.entity";
+import {BlockUser} from "@/social/block/entity/block.entity";
+import {Story} from "@/social/story/stories/entity/stories.entity";
 import {Upload} from "@/upload/entity/uplaod.entity";
 
 

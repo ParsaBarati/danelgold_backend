@@ -7,11 +7,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Upload } from './entity/uplaod.entity';
 import { multerConfigFactory } from '@/common/utils/multer.utils';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
-import { User } from '@/User/user/entity/user.entity';
-import { Post } from '@/Social/Post/posts/entity/posts.entity';
-import { TokenService } from '@/User/auth/token/token.service';
-import { Token } from '@/User/auth/token/entity/token.entity';
+import { User } from '@/user/user/entity/user.entity';
+import { Post } from '@/social/post/posts/entity/posts.entity';
 import { JwtService } from '@nestjs/jwt';
+import { Token } from '@/user/auth/token/entity/token.entity';
+import { TokenService } from '@/user/auth/token/token.service';
 
 @Module({
   imports: [

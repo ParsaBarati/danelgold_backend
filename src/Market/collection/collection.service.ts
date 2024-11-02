@@ -1,11 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
-import { NFT } from '@/NFT/nft/entity/nft.entity';
-import { CollectionEntity } from '@/Market/collection/entity/collection.entity';
-import { CreateCollectionDto } from '@/Market/collection/dto/CreateCollection.dto';
-import { UpdateCollectionDto } from '@/Market/collection/dto/UpdateCollection.dto';
+import { User } from '@/user/user/entity/user.entity';
+import { NFT } from '@/nft/nft/entity/nft.entity';
+import { CollectionEntity } from '@/market/collection/entity/collection.entity';
+import { CreateCollectionDto } from '@/market/collection/dto/CreateCollection.dto';
+import { UpdateCollectionDto } from '@/market/collection/dto/UpdateCollection.dto';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 

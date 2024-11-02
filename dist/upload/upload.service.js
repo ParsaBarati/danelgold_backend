@@ -16,8 +16,8 @@ const _typeorm1 = require("typeorm");
 const _path = require("path");
 const _fsextra = /*#__PURE__*/ _interop_require_default(require("fs-extra"));
 const _responseutil = require("../utils/response.util");
-const _userentity = require("../User/user/entity/user.entity");
-const _postsentity = require("../Social/Post/posts/entity/posts.entity");
+const _userentity = require("../user/user/entity/user.entity");
+const _postsentity = require("../social/post/posts/entity/posts.entity");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);

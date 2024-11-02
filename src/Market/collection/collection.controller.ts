@@ -11,9 +11,9 @@ import {
   DefaultValuePipe 
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
-import { CollectionsService } from '@/Market/collection/collection.service';
-import { CreateCollectionDto } from '@/Market/collection/dto/CreateCollection.dto';
-import { UpdateCollectionDto } from '@/Market/collection/dto/UpdateCollection.dto';
+import { CollectionsService } from '@/market/collection/collection.service';
+import { CreateCollectionDto } from '@/market/collection/dto/CreateCollection.dto';
+import { UpdateCollectionDto } from '@/market/collection/dto/UpdateCollection.dto';
 import { Request } from 'express';
 
 @ApiExcludeController()

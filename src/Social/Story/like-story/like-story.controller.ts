@@ -1,7 +1,7 @@
 import { Controller, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LikeStoryService } from './like-story.service';
+import { LikeStoryService } from '@/social/story/like-story/like-story.service';
 
 @ApiBearerAuth()
 @ApiTags('Likes')

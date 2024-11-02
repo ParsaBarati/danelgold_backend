@@ -1,7 +1,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Relation, OneToMany} from 'typeorm';
-import { User } from '@/User/user/entity/user.entity';
+import { User } from '@/user/user/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import {CryptoBalanceEntity} from "@/NFT/Crypto/entity/cryptoBalance.entity";
+import {CryptoBalanceEntity} from "@/nft/crypto/entity/cryptoBalance.entity";
 
 @Entity('cryptos')
 export class CryptoEntity {

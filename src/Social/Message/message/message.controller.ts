@@ -1,7 +1,7 @@
 import {Body, Controller, Get, Param, ParseIntPipe, Post, Req} from "@nestjs/common";
-import {MessageService} from "./message.service";
 import {Request} from "express";
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiTags} from "@nestjs/swagger";
+import { MessageService } from "@/social/message/message/message.service";
 
 @ApiTags('Messages')
 @ApiBearerAuth()

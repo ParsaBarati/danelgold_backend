@@ -1,5 +1,5 @@
 import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation} from 'typeorm';
-import {User} from '@/User/user/entity/user.entity';
+import {User} from '@/user/user/entity/user.entity';
 import {ApiProperty} from '@nestjs/swagger';
 
 export enum NotificationAction {

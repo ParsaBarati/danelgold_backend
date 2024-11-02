@@ -1,21 +1,21 @@
 import {Module} from "@nestjs/common";
-import {User} from "./entity/user.entity";
-import {UserController} from "./user.controller";
-import {UserService} from "./user.service";
-import {Token} from "@/User/auth/token/entity/token.entity";
+import {User} from "@/user/user/entity/user.entity";
+import {UserController} from "@/user/user/user.controller";
+import {UserService} from "@/user/user/user.service";
+import {Token} from "@/user/auth/token/entity/token.entity";
 import {SmsService} from "@/services/sms.service";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {Post} from "@/Social/Post/posts/entity/posts.entity";
-import {Story} from "@/Social/Story/stories/entity/stories.entity";
-import {Club} from "@/Social/Club/entity/club.entity";
-import {FollowUser} from "@/Social/Follow/entity/follow.entity";
-import {likePost} from "@/Social/Post/like-post/entity/like-post.entity";
-import {savePost} from "@/Social/Post/save-post/entity/save-post.entity";
-import {likeStory} from "@/Social/Story/like-story/entity/like-story.entity";
-import {NotificationService} from "@/Social/Notification/notification.service";
-import {Notification} from "@/Social/Notification/entity/notification.entity";
+import {Post} from "@/social/post/posts/entity/posts.entity";
+import {Story} from "@/social/story/stories/entity/stories.entity";
+import {Club} from "@/social/club/entity/club.entity";
+import {FollowUser} from "@/social/follow/entity/follow.entity";
+import {likePost} from "@/social/post/like-post/entity/like-post.entity";
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import {likeStory} from "@/social/story/like-story/entity/like-story.entity";
+import {NotificationService} from "@/social/notification/notification.service";
+import {Notification} from "@/social/notification/entity/notification.entity";
 import {HttpModule} from "@nestjs/axios";
-import { BlockUser } from "@/Social/Block/entity/block.entity";
+import { BlockUser } from "@/social/block/entity/block.entity";
 
 
 @Module({

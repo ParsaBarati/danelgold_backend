@@ -21,12 +21,11 @@ import {
     ApiOperation,
     ApiQuery
 } from '@nestjs/swagger';
-import {CommentService} from './comment.service';
-import {UpdateCommentDTO} from './dto/UpdateComment.dto';
-import {CreateCommentDTO} from './dto/CreateComment';
-import {Roles} from '@/common/decorators/roles.decorator';
 import {Request} from 'express';
-import {NotificationService} from "@/Social/Notification/notification.service";
+import {NotificationService} from "@/social/notification/notification.service";
+import { CommentService } from './comment.service';
+import { CreateCommentDTO } from './dto/CreateComment';
+import { UpdateCommentDTO } from './dto/UpdateComment.dto';
 
 @ApiExcludeController()
 @Controller('comment')
