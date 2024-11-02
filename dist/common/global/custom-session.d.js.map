@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../../src/common/global/custom-session.d.ts"],"sourcesContent":["import 'express-session';\n\ndeclare module 'express-session' {\n  interface SessionData {\n    tokens: string[];\n    phone: string;\n  }\n}\n"],"names":[],"mappings":";;;;QAAO"}
