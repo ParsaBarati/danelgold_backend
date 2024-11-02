@@ -18,7 +18,7 @@ export class TokenService {
     private readonly tokenRepository: Repository<Token>,
     private readonly jwtService: JwtService,
   ) {
-    this.maxSessionsPerUser = 1;
+    this.maxSessionsPerUser = 2;
   }
 
   async createToken(user: User): Promise<string> {
