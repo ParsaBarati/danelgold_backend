@@ -14,6 +14,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@/user/user/entity/user.entity';
 import { CollectionEntity } from '@/market/collection/entity/collection.entity';
 import { Auction } from '@/market/auction/entity/auction.entity';
+import { PriceEntity } from '@/market/price/entity/price.entity';
+import { MarketplaceEntity } from '@/market/market-place/entity/market-place.entity';
 
 @Entity({ name: 'nfts'})
 export class NFT {
@@ -36,9 +38,6 @@ export class NFT {
   @Column({ type: 'varchar' })
   ownerIdentifier: string;
 
-  @Column({ type: 'varchar' })
-  artist: string;
-
   @Column()
   collectionId: number;
 
@@ -51,18 +50,26 @@ export class NFT {
   @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
-  @OneToMany(() => Auction, (auctions) => auctions.nft)
+  @OneToMany(() => Auction, (auctions) => auctions.items)
   @ApiProperty({ type: () => [Auction] })
   auctions: Relation<Auction[]>;
+
+  @OneToMany(() => PriceEntity, (prices) => prices.nft)
+  @ApiProperty({ type: () => [PriceEntity] })
+  prices: Relation<PriceEntity[]>;
 
   @ManyToOne(() => CollectionEntity, (collectionEntity) => collectionEntity.nfts)
   @JoinColumn({ name: 'collectionId', referencedColumnName: 'id' })
   @ApiProperty({ type: () => CollectionEntity })
   collectionEntity: Relation<CollectionEntity>;
 
-  @ManyToOne(() => User, (creator) => creator.createdNfts)
-  @ApiProperty({ type: () => User })
-  creator: Relation<User>;
+  @ManyToOne(() => User, (artist) => artist.createdNfts) // Assuming the artist is a User
+  @ApiProperty({ type: () => User }) // Specify the API property
+  artist: Relation<User>; // Ensure artist is linked correctly
+
+  @ManyToOne(() => MarketplaceEntity, (marketplace) => marketplace.nfts)
+  @ApiProperty({ type: () => MarketplaceEntity })
+  marketplace: Relation<MarketplaceEntity>;
 
   @ManyToOne(() => User, (owner) => owner.ownedNfts)
   @ApiProperty({ type: () => User })

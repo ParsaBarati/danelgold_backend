@@ -61,6 +61,8 @@ import { JwtStrategy } from '@/user/auth/strategy/jwt.strategy';
 import { JwtAuthGuard } from '@/user/auth/guards/jwt.guard';
 import { RolesGuard } from '@/user/auth/guards/roles.guard';
 import { Token } from '@/user/auth/token/entity/token.entity';
+import { PriceModule } from './market/price/price.module';
+import { MarketPlaceModule } from './market/market-place/marketplace.module';
 
 
 
@@ -141,6 +143,8 @@ import { Token } from '@/user/auth/token/entity/token.entity';
         NotificationModule,
         WalletModule,
         DashboardModule,
+        PriceModule,
+        MarketPlaceModule,
         {
             global: true,
             ...HttpModule.register({maxRedirects: 5}),

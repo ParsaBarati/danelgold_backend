@@ -110,7 +110,7 @@ export class User {
     @ApiProperty({type: () => [CollectionEntity]})
     collectionEntities: Relation<CollectionEntity[]>;
 
-    @OneToMany(() => NFT, (nfts) => nfts.creator)
+    @OneToMany(() => NFT, (nfts) => nfts.artist)
     @ApiProperty({type: () => [NFT]})
     createdNfts: Relation<NFT[]>;
 

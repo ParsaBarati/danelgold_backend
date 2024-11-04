@@ -6,10 +6,11 @@ import { CollectionsController } from "@/market/collection/collection.controller
 import { CollectionsService } from "@/market/collection/collection.service";
 import { PaginationService } from "@/common/paginate/pagitnate.service";
 import { CollectionEntity } from "./entity/collection.entity";
+import { PriceEntity } from "../price/entity/price.entity";
 
 
 @Module({
-    imports:[TypeOrmModule.forFeature([CollectionEntity,User,NFT])],
+    imports:[TypeOrmModule.forFeature([CollectionEntity,User,NFT,PriceEntity])],
     controllers:[CollectionsController],
     providers:[CollectionsService,PaginationService]
 })

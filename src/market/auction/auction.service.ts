@@ -10,6 +10,7 @@ import { Bid } from './entity/auctionBid.entity';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
 import { CronJob } from 'cron';
+import { AuctionsResponseDto, CurrentAuctionDto, UpcomingAuctionDto } from './dto/filter-auction.dto';
 
 @Injectable()
 export class AuctionsService {
@@ -142,50 +143,59 @@ export class AuctionsService {
     return{ message : 'مزایده با موفقیت حذف گردید'}
   }
 
-  async getAllAuctions(
-    query: any
-  ): Promise<ApiResponses<PaginationResult<any>>> {
+  async getAuctions(): Promise<AuctionsResponseDto> {
+    // Fetch the current auction
+    const currentAuction = await this.auctionsRepository
+        .createQueryBuilder('auction')
+        .leftJoinAndSelect('auction.items', 'item')
+        .where('auction.isActive = true') // Assuming you have an 'isActive' flag
+        .getOne();
 
-    const {
-      page = 1,
-      limit = 10,
-      search,
-      sort = 'id',
-      sortOrder = 'DESC',
-    } = query;
+    // Fetch upcoming auctions
+    const upcomingAuctions = await this.auctionsRepository
+        .createQueryBuilder('auction')
+        .leftJoinAndSelect('auction.items', 'item')
+        .where('auction.startDate > NOW()') // Assuming you want auctions that start in the future
+        .orderBy('auction.startDate', 'ASC')
+        .getMany();
 
-    const queryBuilder = this.auctionsRepository
-      .createQueryBuilder('auctions')
-      .select([
-        'auctions.id',
-        'auctions.title',
-        'auctions.startTime',
-        'auctions.endTime',
-        'auctions.startingBid',
-        'auctions.currentBid',
-        'auctions.auctionStatus',
-        'auctions.createdAt',
-        'auctions.updatedAt'
-      ])
-      .orderBy(`auctions.${sort}`, sortOrder)
-      .skip((page - 1) * limit)
-      .take(limit);
+    // Map results to the response DTO structure
+    const currentAuctionDto: CurrentAuctionDto = currentAuction
+        ? {
+            id: currentAuction.id,
+            title: currentAuction.title,
+            startDate: currentAuction.startTime,
+            endDate: currentAuction.endTime,
+            items: currentAuction.items.map(item => ({
+                id: item.id,
+                name: item.name,
+                artist: {
+                    id: item.artist.id, // Adjust if artist relation is different
+                    name: item.artist.name,
+                },
+            })),
+        }
+        : null;
 
-      const paginationResult = await this.paginationService.paginate(
-        queryBuilder,
-        page,
-        limit,
-      );
+    const upcomingAuctionsDto: UpcomingAuctionDto[] = upcomingAuctions.map(auction => ({
+        id: auction.id,
+        title: auction.title,
+        startDate: auction.startTime,
+        items: auction.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            artist: {
+                id: item.artist.id, // Adjust if artist relation is different
+                name: item.artist.name,
+            },
+        })),
+    }));
 
-      if(search){
-        queryBuilder.andWhere('(auctions.title ILIKE :search)', 
-          {search: `%${search}%`} 
-        )
-      }
-
-      return createResponse(200,paginationResult);
-      
-  }
+    return {
+        currentAuction: currentAuctionDto,
+        upcomingAuctions: upcomingAuctionsDto,
+    };
+}
 
   async getAuctionById(
     auctionId: number

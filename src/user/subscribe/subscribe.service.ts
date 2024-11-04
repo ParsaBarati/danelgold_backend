@@ -162,7 +162,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
 
     const currentAuction = await this.auctionRepository
       .createQueryBuilder('auctions')
-      .leftJoinAndSelect('auctions.nft', 'nft')
+      .leftJoinAndSelect('auctions.items', 'nft') // Change 'nft' to 'items'
       .addSelect(['nft.name', 'nft.image'])
       .where('auctions.startTime >= :windowStart', { windowStart })
       .andWhere('auctions.startTime <= :windowEnd', { windowEnd })
@@ -180,10 +180,17 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
+    // Assuming you want to notify about the first item in the auction
+    const nft = currentAuction.items[0];
+    if (!nft) {
+      console.log('No NFT found in the current auction');
+      return;
+    }
+
     const payload = {
       title: currentAuction.title,
-      body: `${currentAuction.nft.name} در حال برگزاری است`,
-      icon: currentAuction.nft.image,
+      body: `${nft.name} در حال برگزاری است`, // Adjusted to use nft
+      icon: nft.image,
       badge: ``,
     };
 
@@ -200,7 +207,8 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       );
     }
     console.log('Notification sent successfully');
-  }
+}
+
 
   async sendSMSCron(): Promise<void> {
     await this.sendNotif();

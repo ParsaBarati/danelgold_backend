@@ -8,12 +8,16 @@ import { CreateCollectionDto } from '@/market/collection/dto/CreateCollection.dt
 import { UpdateCollectionDto } from '@/market/collection/dto/UpdateCollection.dto';
 import { PaginationResult, PaginationService } from '@/common/paginate/pagitnate.service';
 import { ApiResponses, createResponse } from '@/utils/response.util';
+import { PriceEntity } from '../price/entity/price.entity';
+import { WatchlistResponseDto } from './dto/collectio-response.dto';
 
 @Injectable()
 export class CollectionsService {
   constructor(
     @InjectRepository(CollectionEntity)
     private collectionsRepository: Repository<CollectionEntity>,
+    @InjectRepository(PriceEntity)
+    private priceRepository: Repository<PriceEntity>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(NFT)
@@ -133,6 +137,76 @@ export class CollectionsService {
       }
 
       return createResponse(200,paginationResult);
+  }
+
+  async getCollections(query: any): Promise<WatchlistResponseDto> {
+    const { 
+        blockchainId, 
+        priceMin, 
+        priceMax, 
+        currency, 
+        typeId, 
+        days, 
+        searchQuery,
+        page = 1,
+        limit = 10,
+        sort = 'id',
+        sortOrder = 'DESC',
+    } = query;
+
+    // Calculate the offset for pagination
+    const offset = (page - 1) * limit;
+
+    // Query to fetch collections with pagination
+    const [collections, total] = await this.collectionsRepository
+        .createQueryBuilder('collection')
+        .leftJoinAndSelect('collection.priceChanges', 'price') // Join prices
+        .select([
+            'collection.id',
+            'collection.name',
+            'collection.icon',
+            'price.floorPrice',
+            'price.floorChange',
+            'price.volume',
+            'price.volumeChange',
+            'price.items',
+            'price.owners',
+            'price.currency',
+        ])
+        .where('collection.blockchainId = :blockchainId', { blockchainId })
+        .andWhere('price.floorPrice BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
+        .andWhere('price.currency = :currency', { currency })
+        .andWhere('collection.typeId = :typeId', { typeId })
+        .andWhere('collection.days <= :days', { days })
+        .andWhere('(collection.name ILIKE :searchQuery OR collection.description ILIKE :searchQuery)', {
+            searchQuery: `%${searchQuery}%`,
+        })
+        .orderBy(`collection.${sort}`, sortOrder)
+        .take(limit) // Set the limit for pagination
+        .skip(offset) // Set the offset for pagination
+        .getManyAndCount(); // Get both results and count
+
+    return {
+        collections: collections.map(collection => {
+            // Assume the latest price is the last in the array
+            const latestPrice = collection.priceChanges[collection.priceChanges.length - 1];
+
+            return {
+                id: collection.id,
+                name: collection.name,
+                icon: collection.cover,
+                floorPrice: latestPrice ? latestPrice.floorPrice : null,
+                floorChange: latestPrice ? latestPrice.floorChange : null,
+                volume: latestPrice ? latestPrice.volume : null,
+                volumeChange: latestPrice ? latestPrice.volumeChange : null,
+                items: latestPrice ? latestPrice.items : null,
+                owners: latestPrice ? latestPrice.owners : null,
+                currency: latestPrice ? latestPrice.currency : null,
+            };
+        }),
+        page,
+        limit, 
+    };
   }
 
   async getAuctionById(

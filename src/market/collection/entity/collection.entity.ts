@@ -11,6 +11,8 @@ import {
 } from 'typeorm';
 import { User } from '@/user/user/entity/user.entity';
 import { NFT } from '@/nft/nft/entity/nft.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { PriceEntity } from '@/market/price/entity/price.entity';
 
 @Entity({ name: 'collections' })
 export class CollectionEntity {
@@ -36,8 +38,14 @@ export class CollectionEntity {
   updatedAt: Date;
 
   @OneToMany(() => NFT, (nfts) => nfts.collectionEntity)
+  @ApiProperty({ type: () => NFT })
   nfts: Relation<NFT[]>;
 
+  @OneToMany(() => PriceEntity, (priceChanges) => priceChanges.collection, { cascade: true})
+  @ApiProperty({ type: () => [PriceEntity] })
+  priceChanges: Relation<PriceEntity[]>;
+
   @ManyToOne(() => User, (creator) => creator.collectionEntities)
+  @ApiProperty({ type: () => User })
   creator: Relation<User>;
 }

@@ -5,6 +5,7 @@ import { User } from '@/user/user/entity/user.entity';
 import { IPFSService } from '@/services/IPFS.service';
 import { ApiResponses, createResponse } from '@/utils/response.util';
 import { NFT } from './entity/nft.entity';
+import { FilterNFTsDto } from './dto/filterNFT.dto';
 
 @Injectable()
 export class NFTsService {
@@ -31,7 +32,7 @@ export class NFTsService {
     const metadata = { name, image: image, price };
     const metadataUrl = await this.ipfsService.uploadMetadataToIPFS(metadata);
   
-    const nft = this.nftsRepository.create({
+    const nft = {
       name,
       image,
       metadataUrl,
@@ -39,7 +40,7 @@ export class NFTsService {
       createdAt: new Date(),
       creator,
       owner: creator,
-    });
+    };
   
     const newNFT = await this.nftsRepository.save(nft);
     return createResponse(201, newNFT);
@@ -103,5 +104,64 @@ export class NFTsService {
       .getOne();
       
     return createResponse(200, existingNFT);
+  }
+
+  async filterNFTs(dto: FilterNFTsDto): Promise<any> {
+    const {
+        blockchainId,
+        priceMin,
+        priceMax,
+        currency,
+        typeId,
+        days,
+        searchQuery,
+    } = dto;
+
+    const queryBuilder = this.nftsRepository
+        .createQueryBuilder('nft')
+        .leftJoinAndSelect('nft.collectionEntity', 'collection')
+        .leftJoinAndSelect('nft.creator', 'artist')
+        .select([
+            'nft.id AS id',
+            'nft.name AS name',
+            'nft.image AS icon', // Assuming you use image as the icon
+            'artist.id AS artistId',
+            'artist.name AS artistName',
+            'collection.id AS collectionId',
+            'collection.name AS collectionName',
+            'collection.icon AS collectionIcon',
+        ])
+        .where('nft.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
+        .andWhere('nft.blockchainId = :blockchainId', { blockchainId })
+        .andWhere('nft.typeId = :typeId', { typeId })
+        .andWhere('nft.currency = :currency', { currency })
+        .andWhere('nft.createdAt >= NOW() - INTERVAL :days DAY', { days })
+        .orderBy('nft.createdAt', 'DESC');
+
+    // Add search filter if searchQuery is provided
+    if (searchQuery) {
+        queryBuilder.andWhere('nft.name ILIKE :searchQuery', {
+            searchQuery: `%${searchQuery}%`,
+        });
+    }
+
+    const nfts = await queryBuilder.getRawMany(); // Use getRawMany to get raw results
+
+    return {
+        nfts: nfts.map((nft) => ({
+            id: nft.id,
+            name: nft.name,
+            icon: nft.icon,
+            artist: {
+                id: nft.artistId,
+                name: nft.artistName,
+            },
+            collection: {
+                id: nft.collectionId,
+                name: nft.collectionName,
+                icon: nft.collectionIcon,
+            },
+        })),
+    };
   }
 }

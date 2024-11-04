@@ -58,9 +58,9 @@ export class Auction {
   @ApiProperty({ type: () => [Bid] })
   bids: Relation<Bid[]>;
 
-  @ManyToOne(() => NFT, (nft) => nft.auctions)
-  @ApiProperty({ type: () => NFT })
-  nft: Relation<NFT>;
+  @OneToMany(() => NFT, (nft) => nft.auctions, { cascade: true }) // Change to OneToMany
+  @ApiProperty({ type: () => [NFT] })
+  items: Relation<NFT[]>;
 
   @ManyToOne(() => User, (creator) => creator.auctions)
   @ApiProperty({ type: () => User })

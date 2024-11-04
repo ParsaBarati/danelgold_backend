@@ -1,9 +1,10 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards} from '@nestjs/common';
 import {UserService} from '@/user/user/user.service';
-import {ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
 import {UpdateUserDTO} from '@/user/user/dto/update-user.dto';
 import {AuthGuard} from '@nestjs/passport';
+import { FilterUsersDto } from './dto/filter-user.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -24,6 +25,18 @@ export class UserController {
         return await this.userService.getReels(req.user as any);
     }
 
+    @ApiOperation({ summary: 'Account base on api' })
+    @ApiQuery({ name: 'page', required: true, type: Number })
+    @ApiQuery({ name: 'limit', required: true, type: Number })
+    @Get(':id/details')
+    async getUserDetails(
+        @Param('id') id: number,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+    ) {
+        return this.userService.getUserDetails(id, page, limit);
+    }
+
     @ApiOperation({summary: 'Get Profile By ID'})
     @Get('profile/:id')
     @UseGuards(AuthGuard('jwt'))
@@ -36,6 +49,12 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'))
     async getPostsByUserId(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
         return await this.userService.getPostsForUser(id, req.user as any);
+    }
+
+    @ApiOperation({ summary: 'filter Users base on Api' })
+    @Post('filter')
+    async filterUsers(@Body() dto: FilterUsersDto) {
+        return this.userService.filterUsers(dto);
     }
 
     @ApiOperation({summary: 'Follow User'})

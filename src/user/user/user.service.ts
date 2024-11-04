@@ -15,6 +15,8 @@ import {likeStory} from "@/social/story/like-story/entity/like-story.entity";
 import {NotificationService} from "@/social/notification/notification.service";
 import {NotificationAction} from "@/social/notification/entity/notification.entity";
 import {BlockUser} from '@/social/block/entity/block.entity';
+import { FilterUsersDto } from './dto/filter-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -215,6 +217,78 @@ export class UserService {
             posts: finalPosts,
             stories: finalStories,
         };
+    }
+    
+    async getUserDetails(userId: number, page: number = 1, limit: number = 10): Promise<any> {
+        // Find the user by ID
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['collectionEntities', 'createdNfts'] });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Get collections with price information
+        const collections = await this.userRepository.createQueryBuilder('user')
+            .relation(User, 'collectionEntities')
+            .of(user.id)
+            .loadMany();
+
+        // Fetch associated price entities for the collections
+        const collectionPrices = await Promise.all(
+            collections.map(async (collection) => {
+                const prices = await this.userRepository.createQueryBuilder('price')
+                    .where('price.collectionId = :collectionId', { collectionId: collection.id })
+                    .getMany();
+                return {
+                    ...collection,
+                    prices,
+                };
+            })
+        );
+
+        // Get created NFTs
+        const createdNfts = user.createdNfts;
+
+        // Create pagination result for collections
+        const totalCollections = collectionPrices.length;
+        const paginatedCollections = collectionPrices.slice((page - 1) * limit, page * limit);
+
+        // Create the response object
+        const response = {
+            user: {
+                id: user.id,
+                name: user.name,
+                username: user.username,
+                profilePic: user.profilePic,
+                bio: user.bio,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                // Add more user fields as necessary
+            },
+            collections: paginatedCollections.map(collection => ({
+                id: collection.id,
+                name: collection.name,
+                prices: collection.prices.map(price => ({
+                    floorPrice: price.floorPrice,
+                    currency: price.currency,
+                    items: price.items,
+                    owners: price.owners,
+                    createdAt: price.createdAt,
+                })),
+            })),
+            createdNfts: createdNfts.map(nft => ({
+                id: nft.id,
+                name: nft.name,
+                // Add more NFT fields as necessary
+            })),
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCollections / limit),
+                pageSize: limit,
+                totalItems: totalCollections,
+            },
+        };
+
+        return response;
     }
 
     async getReels(user: User): Promise<any> {
@@ -587,7 +661,6 @@ export class UserService {
         return this.getFollowingsForUser(userId);
     }
 
-// Helper method to get followings for a given userId
     private async getFollowingsForUser(userId: number): Promise<{ isFollowing: boolean; name: string; id: number; pic: string; username: string }[]> {
         const followings = await this.followUserRepository.find({
             where: {followerId: userId},
@@ -603,7 +676,6 @@ export class UserService {
         }));
     }
 
-
     async getBlocked(user: User): Promise<{ isBlocked: boolean; name: string; id: number; pic: string; username: string }[]> {
         const blockedUsers = await this.blockUserRepository.find({
             where: {blockerId: user.id},
@@ -617,6 +689,54 @@ export class UserService {
             pic: block.blocked?.profilePic ?? "",
             isBlocked: true,
         }));
+    }
+
+    async filterUsers(dto: FilterUsersDto): Promise<any> {
+        const {
+            blockchainId,
+            priceMin,
+            priceMax,
+            currency,
+            typeId,
+            days,
+            searchQuery,
+        } = dto;
+
+        const queryBuilder = this.userRepository
+            .createQueryBuilder('user')
+            .select([
+                'user.id AS id',
+                'user.name AS name',
+                'user.username AS username',
+                'user.profilePic AS profilePic',
+                'user.followers AS followers',
+                'user.cover AS cover',
+            ])
+            .where('user.blockchainId = :blockchainId', { blockchainId })
+            .andWhere('user.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
+            .andWhere('user.currency = :currency', { currency })
+            .andWhere('user.typeId = :typeId', { typeId })
+            .andWhere('user.createdAt >= NOW() - INTERVAL :days DAY', { days });
+
+        // Add search filter if searchQuery is provided
+        if (searchQuery) {
+            queryBuilder.andWhere('user.username ILIKE :searchQuery', {
+                searchQuery: `%${searchQuery}%`,
+            });
+        }
+
+        const users = await queryBuilder.getRawMany(); // Get raw results
+
+        return {
+            users: users.map((user) => ({
+                id: user.id,
+                name: user.name,
+                username: user.username,
+                profilePic: user.profilePic,
+                followers: user.followers,
+                cover: user.cover,
+            })),
+        };
     }
 
 

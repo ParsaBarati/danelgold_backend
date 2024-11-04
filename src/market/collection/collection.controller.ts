@@ -10,17 +10,19 @@ import {
   Query, 
   DefaultValuePipe 
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CollectionsService } from '@/market/collection/collection.service';
 import { CreateCollectionDto } from '@/market/collection/dto/CreateCollection.dto';
 import { UpdateCollectionDto } from '@/market/collection/dto/UpdateCollection.dto';
 import { Request } from 'express';
 
-@ApiExcludeController()
+@ApiTags('collection')
+@ApiBearerAuth()
 @Controller('collection')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}
 
+  @ApiExcludeEndpoint()
   @Post()
   async createCollection(
     @Req () req: Request,
@@ -30,6 +32,7 @@ export class CollectionsController {
     return await this.collectionsService.createCollection(createCollectionDto,creatorIdentifier)
   }
 
+  @ApiExcludeEndpoint()
   @Post(':/collectionId/add/nftId')
   async addNftToCollection(
     @Param('collectionId',ParseIntPipe) collectionId:number,
@@ -44,6 +47,7 @@ export class CollectionsController {
     )
   }
 
+  @ApiExcludeEndpoint()
   @Post(':/collectionId/remove/nftId')
   async removeNftFromCollection(
     @Param('nftId',ParseIntPipe) nftId:number,
@@ -56,6 +60,7 @@ export class CollectionsController {
     )
   }
 
+  @ApiExcludeEndpoint()
   @Put('/:id')
   async updateCollection(
     @Param(':collectionId',ParseIntPipe) collectionId: number,
@@ -70,6 +75,16 @@ export class CollectionsController {
     )
   }
 
+  @ApiOperation({ summary: 'Watchlist Base On APi' })
+  @Post('watchlist')
+    async getCollections(
+      @Body() query: any
+    ){
+        return this.collectionsService.getCollections(query);
+    }
+
+    
+  @ApiExcludeEndpoint()
   @Get('all')
   async getAllCollections(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -82,6 +97,7 @@ export class CollectionsController {
     return await this.collectionsService.getAllCollections(query);
   }
 
+  @ApiExcludeEndpoint()
   @Get('/:id')
   async getCollectionById(
     @Param('collectionId',ParseIntPipe) collectionId:number

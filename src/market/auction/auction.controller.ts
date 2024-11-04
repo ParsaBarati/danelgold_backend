@@ -3,15 +3,18 @@ import { AuctionsService } from '@/market/auction/auction.service';
 import { UpdateAuctionDto } from '@/market/auction/dto/UpdateAuction.dto';
 import { CreateAuctionDto } from '@/market/auction/dto/CreateAuction.dto';
 import { ParticipateAuctionDto } from '@/market/auction/dto/ParticipateAuction.dto';
-import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeController, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Request } from 'express';
+import { AuctionsResponseDto } from './dto/filter-auction.dto';
 
-@ApiExcludeController()
+@ApiTags('auction')
+@ApiBearerAuth()
 @Controller('auction')
 export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}
 
+  @ApiExcludeEndpoint()
   @Post()
   async createAuction(
     @Req() req:Request,
@@ -21,6 +24,7 @@ export class AuctionsController {
     return await this.auctionsService.createAuction(creatorPhone,createAuctionDto);
   }
 
+  @ApiExcludeEndpoint()
   @Post('participate/:id')
   async participateAuction(
     @Param('id') auctionId: number,
@@ -35,6 +39,7 @@ export class AuctionsController {
     );
   }
 
+  @ApiExcludeEndpoint()
   @Put('/:id')
   updateAuction(
     @Param('id') id: number, 
@@ -43,6 +48,7 @@ export class AuctionsController {
     return this.auctionsService.updateAuction(id, updateAuctionDto);
   }
 
+  @ApiExcludeEndpoint()
   @Delete('/:id')
   remove(
     @Param('id',ParseIntPipe) id: number
@@ -50,18 +56,13 @@ export class AuctionsController {
     return this.auctionsService.deleteAuction(id);
   }
 
-  @Get('all')
-  getAllAuctions(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('search') search?: string,
-    @Query('sortBy') sort?: string,
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
-  ){
-    const query = { page, limit, search, sort, sortOrder };
-    return this.auctionsService.getAllAuctions(query);
+  @ApiOperation({ summary: 'Get Drops Base On Api' })
+  @Get('drops')
+  async getAuctions(): Promise<AuctionsResponseDto> {
+      return this.auctionsService.getAuctions();
   }
 
+  @ApiExcludeEndpoint()
   @Get('/:id')
   getAuctionById(
     @Param('id',ParseIntPipe) id: number
