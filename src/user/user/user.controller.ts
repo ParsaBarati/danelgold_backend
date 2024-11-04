@@ -36,6 +36,7 @@ export class UserController {
     ) {
         return this.userService.getUserDetails(id, page, limit);
     }
+    
 
     @ApiOperation({summary: 'Get Profile By ID'})
     @Get('profile/:id')
