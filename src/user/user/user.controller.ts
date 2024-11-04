@@ -28,7 +28,7 @@ export class UserController {
     @ApiOperation({ summary: 'Account base on api' })
     @ApiQuery({ name: 'page', required: true, type: Number })
     @ApiQuery({ name: 'limit', required: true, type: Number })
-    @Get(':id/details')
+    @Get('account/:id/details')
     async getUserDetails(
         @Param('id') id: number,
         @Query('page') page: number = 1,
