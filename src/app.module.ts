@@ -63,6 +63,8 @@ import { RolesGuard } from '@/user/auth/guards/roles.guard';
 import { Token } from '@/user/auth/token/entity/token.entity';
 import { PriceModule } from './market/price/price.module';
 import { MarketPlaceModule } from './market/market-place/marketplace.module';
+import { BlogPostModule } from './social/blog/blog-post/blog-post.module';
+import { BlogCategory } from './social/blog/blog-catagory/entity/blog-catagory.entity';
 
 
 
@@ -116,6 +118,7 @@ import { MarketPlaceModule } from './market/market-place/marketplace.module';
             BlockUser,
             savePost,
             Notification,
+            BlogCategory
         ]),
         AuctionModule,
         CollectionEntityModule,
@@ -145,6 +148,7 @@ import { MarketPlaceModule } from './market/market-place/marketplace.module';
         DashboardModule,
         PriceModule,
         MarketPlaceModule,
+        BlogPostModule,
         {
             global: true,
             ...HttpModule.register({maxRedirects: 5}),

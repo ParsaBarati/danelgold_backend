@@ -159,43 +159,45 @@ export class AuctionsService {
         .orderBy('auction.startDate', 'ASC')
         .getMany();
 
-    // Map results to the response DTO structure
-    const currentAuctionDto: CurrentAuctionDto = currentAuction
+       // Map results to the response DTO structure
+        const currentAuctionDto: CurrentAuctionDto = currentAuction
         ? {
-            id: currentAuction.id,
-            title: currentAuction.title,
-            startDate: currentAuction.startTime,
-            endDate: currentAuction.endTime,
-            items: currentAuction.items.map(item => ({
-                id: item.id,
-                name: item.name,
-                artist: {
-                    id: item.artist.id, // Adjust if artist relation is different
-                    name: item.artist.name,
-                },
-            })),
-        }
-        : null;
+        id: currentAuction.id,
+        title: currentAuction.title,
+        startDate: currentAuction.startTime,
+        endDate: currentAuction.endTime,
+        items: {
+            id: currentAuction.items.id,  // Access the related NFT directly
+            name: currentAuction.items.name,
+            artist: {
+                id: currentAuction.items.artist.id,
+                name: currentAuction.items.artist.name,
+            },
+        },
+      }
+      : null;
 
-    const upcomingAuctionsDto: UpcomingAuctionDto[] = upcomingAuctions.map(auction => ({
+
+      const upcomingAuctionsDto: UpcomingAuctionDto[] = upcomingAuctions.map(auction => ({
         id: auction.id,
         title: auction.title,
         startDate: auction.startTime,
-        items: auction.items.map(item => ({
-            id: item.id,
-            name: item.name,
+        item: {
+            id: auction.items.id,
+            name: auction.items.name,
             artist: {
-                id: item.artist.id, // Adjust if artist relation is different
-                name: item.artist.name,
+                id: auction.items.artist.id,
+                name: auction.items.artist.name,
             },
-        })),
+            startingBid: auction.startingBid, // Optional starting bid
+        },
     }));
 
     return {
         currentAuction: currentAuctionDto,
         upcomingAuctions: upcomingAuctionsDto,
     };
-}
+  }
 
   async getAuctionById(
     auctionId: number

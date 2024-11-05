@@ -35,8 +35,8 @@ export class CurrentAuctionDto {
     @ApiProperty()
     endDate: Date;
 
-    @ApiProperty({ type: () => [ItemDto] })
-    items: ItemDto[];
+    @ApiProperty({ type: () => ItemDto })
+    items: ItemDto;
 }
 
 export class UpcomingAuctionDto {
@@ -49,8 +49,8 @@ export class UpcomingAuctionDto {
     @ApiProperty()
     startDate: Date;
 
-    @ApiProperty({ type: () => [ItemDto] })
-    items: ItemDto[];
+    @ApiProperty({ type: () => ItemDto })
+    item: ItemDto; // Change from 'items' to 'item'
 }
 
 export class AuctionsResponseDto {

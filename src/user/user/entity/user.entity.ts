@@ -35,6 +35,7 @@ import { Message } from '@/social/message/message/entity/message.entity';
 import { BlockUser } from '@/social/block/entity/block.entity';
 import { Bid } from '@/market/auction/entity/auctionBid.entity';
 import { ForumPost } from '@/social/forum/entity/forum-post.entity';
+import { BlogPost } from '@/social/blog/blog-post/entity/blog-post.entity';
 
 
 @Entity({name: 'user'})
@@ -193,6 +194,10 @@ export class User {
     @OneToMany(() => CryptoBalanceEntity, (cryptos) => cryptos.user)
     @ApiProperty({type: () => [CryptoBalanceEntity]})
     cryptoBalances: Relation<CryptoBalanceEntity[]>;
+
+    @OneToMany(() => BlogPost, (blogPost) => blogPost.author)
+    @ApiProperty({ type: () => [BlogPost] })
+    blogPost: Relation<BlogPost[]>;
 
     @ManyToMany(() => Club, (clubs) => clubs.members)
     @ApiProperty({type: () => Club})

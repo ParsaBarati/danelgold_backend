@@ -122,7 +122,9 @@ export class UploadController {
     @ApiOperation({summary: 'Delete Multiple Uploads'})
     @ApiQuery({name: 'delete', description: 'Comma-separated list of IDs to delete'})
     @Delete()
-    async deleteMultipleUploads(@Query('delete') ids: string) {
+    async deleteMultipleUploads(
+        @Query('delete') ids: string
+    ){
         const idArray = ids.split(',').map((id) => parseInt(id, 10));
         return this.uploadService.deleteMultipleUploads(idArray);
     }

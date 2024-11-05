@@ -1,5 +1,5 @@
 import {Controller, Delete, Get, NotFoundException, Param, Query} from '@nestjs/common';
-import {ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags,} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiQuery, ApiTags,} from '@nestjs/swagger';
 import {DashboardService} from "@/user/dashboard/dashboard.service";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {AdminRole} from "@/user/admin/entity/admin.entity";
@@ -24,6 +24,8 @@ export class DashboardController {
     }
 
     @ApiCreatedResponse({description: 'List All Users By SuperAdmin'})
+    @ApiQuery({ name: 'page', required: true, type: Number })
+    @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
     @ApiOperation({summary: 'Get All Users'})
     @Get('users/all')
@@ -35,6 +37,8 @@ export class DashboardController {
     }
 
     @ApiCreatedResponse({description: 'List All Posts By SuperAdmin'})
+    @ApiQuery({ name: 'page', required: true, type: Number })
+    @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
     @ApiOperation({summary: 'Get All Posts'})
     @Get('posts/all') // Change the endpoint to 'posts/all'
@@ -56,6 +60,8 @@ export class DashboardController {
     }
 
     @ApiCreatedResponse({description: 'List All Stories By SuperAdmin'})
+    @ApiQuery({ name: 'page', required: true, type: Number })
+    @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
     @ApiOperation({summary: 'Get All Stories'})
     @Get('stories/all')
@@ -77,6 +83,8 @@ export class DashboardController {
     }
 
     @ApiCreatedResponse({ description: 'List All Notifications By SuperAdmin' })
+    @ApiQuery({ name: 'page', required: true, type: Number })
+    @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
     @ApiOperation({ summary: 'Get All Notifications' })
     @Get('notifications/all')

@@ -207,8 +207,7 @@ export class SubscribeService implements OnModuleInit, OnModuleDestroy {
       );
     }
     console.log('Notification sent successfully');
-}
-
+  }
 
   async sendSMSCron(): Promise<void> {
     await this.sendNotif();
