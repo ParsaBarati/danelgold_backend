@@ -53,7 +53,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'filter Users base on Api' })
-    @Post('filter')
+    @Post('users/filter')
     async filterUsers(@Body() dto: FilterUsersDto) {
         return this.userService.filterUsers(dto);
     }

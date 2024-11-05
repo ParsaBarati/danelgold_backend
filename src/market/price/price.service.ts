@@ -77,39 +77,36 @@ export class PricesService {
 
     async filterCollections(dto: FilterCollectionsDto): Promise<any> {
         const {
-            blockchainId,
-            priceMin,
-            priceMax,
-            currency,
-            typeId,
-            days,
-            searchQuery,
+            blockchainId = 0,
+            priceMin = 0,
+            priceMax = 0,
+            currency = 'USD',
+            typeId = 1,
+            days = 7,
+            searchQuery = '',
             page = 1,
             limit = 10,
             sort = 'id',
             sortOrder = 'DESC',
-        } = dto;
+        } = dto || {}; // fall back to an empty object if dto is null/undefined
 
         const queryBuilder = this.collectionRepository
             .createQueryBuilder('collection')
-            .leftJoinAndSelect('collection.nfts', 'nft')
+            .leftJoinAndSelect('collection.nfts', 'nft') // Using 'nfts' relation on CollectionEntity
             .select([
                 'collection.id',
                 'collection.name',
-                'collection.cover AS icon',
+                'collection.cover',
                 'MIN(nft.price) AS floorPrice',
-                'nft.currency AS currency'
+                'COUNT(nft.id) AS itemCount',
+                'COUNT(DISTINCT nft.ownerIdentifier) AS ownerCount' // Unique count for owners
             ])
-            .where('nft.price BETWEEN :priceMin AND :priceMax', {priceMin, priceMax})
-            .andWhere('nft.blockchainId = :blockchainId', {blockchainId})
-            .andWhere('nft.typeId = :typeId', {typeId})
-            .andWhere('nft.currency = :currency', {currency})
-            .andWhere('collection.createdAt >= NOW() - INTERVAL :days DAY', {days})
-            .orderBy(`collection.${sort}`, sortOrder)
-            .skip((page - 1) * limit)
-            .take(limit)
+            .where('nft.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
+            .andWhere(`collection.createdAt >= NOW() - INTERVAL '${days} days'`) // Syntax for time interval
             .groupBy('collection.id')
-            .addGroupBy('nft.currency');
+            .orderBy(`collection.${sort}`, sortOrder === "ASC" ? "ASC" : "DESC")
+            .skip((page - 1) * limit)
+            .take(limit);
 
         // Add search filter if searchQuery is provided
         if (searchQuery) {

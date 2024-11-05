@@ -69,6 +69,8 @@ export class User {
 
     @Column({type: 'text', nullable: true})
     profilePic: string | null;
+    @Column({type: 'text', nullable: true})
+    cover: string | null;
 
     @CreateDateColumn()
     createdAt: Date;

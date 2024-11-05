@@ -124,17 +124,14 @@ export class NFTsService {
         .select([
             'nft.id AS id',
             'nft.name AS name',
-            'nft.image AS icon', // Assuming you use image as the icon
+            'nft.image AS image', // Assuming you use image as the image
             'artist.id AS artistId',
             'artist.name AS artistName',
             'collection.id AS collectionId',
             'collection.name AS collectionName',
-            'collection.icon AS collectionIcon',
+            'collection.image AS collectionCover',
         ])
         .where('nft.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
-        .andWhere('nft.blockchainId = :blockchainId', { blockchainId })
-        .andWhere('nft.typeId = :typeId', { typeId })
-        .andWhere('nft.currency = :currency', { currency })
         .andWhere('nft.createdAt >= NOW() - INTERVAL :days DAY', { days })
         .orderBy('nft.createdAt', 'DESC');
 
@@ -151,7 +148,7 @@ export class NFTsService {
         nfts: nfts.map((nft) => ({
             id: nft.id,
             name: nft.name,
-            icon: nft.icon,
+            image: nft.image,
             artist: {
                 id: nft.artistId,
                 name: nft.artistName,
@@ -159,7 +156,7 @@ export class NFTsService {
             collection: {
                 id: nft.collectionId,
                 name: nft.collectionName,
-                icon: nft.collectionIcon,
+                cover: nft.collectionCover,
             },
         })),
     };
