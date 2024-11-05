@@ -2,8 +2,8 @@ import { Controller, Delete, Get, NotFoundException, Param, Query, Post, Body } 
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DashboardService } from "./dashboard.service";
 import { Roles } from "@/common/decorators/roles.decorator";
-import { AdminRole } from "@/User/admin/entity/admin.entity";
-import { SendNotificationDto } from "@/User/dashboard/dto/notification.dto";
+import { AdminRole } from "@/user/admin/entity/admin.entity";
+import { SendNotificationDto } from "@/user/dashboard/dto/notification.dto";
 
 @ApiTags('Dashboard')
 @ApiBearerAuth()
