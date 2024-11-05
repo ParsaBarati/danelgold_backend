@@ -16,6 +16,8 @@ import {NotificationService} from "@/social/notification/notification.service";
 import {Notification} from "@/social/notification/entity/notification.entity";
 import {HttpModule} from "@nestjs/axios";
 import { BlockUser } from "@/social/block/entity/block.entity";
+import {BlogPost} from "@/social/blog/blog-post/entity/blog-post.entity";
+import {BlogCategory} from "@/social/blog/blog-catagory/entity/blog-catagory.entity";
 
 
 @Module({
@@ -29,6 +31,8 @@ import { BlockUser } from "@/social/block/entity/block.entity";
         FollowUser,
         BlockUser,
         likePost,
+        BlogPost,
+        BlogCategory,
         likeStory,
         Notification,
     ])],

@@ -15,8 +15,7 @@ import {likeStory} from "@/social/story/like-story/entity/like-story.entity";
 import {NotificationService} from "@/social/notification/notification.service";
 import {NotificationAction} from "@/social/notification/entity/notification.entity";
 import {BlockUser} from '@/social/block/entity/block.entity';
-import { FilterUsersDto } from './dto/filter-user.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import {FilterUsersDto} from './dto/filter-user.dto';
 
 @Injectable()
 export class UserService {
@@ -218,10 +217,13 @@ export class UserService {
             stories: finalStories,
         };
     }
-    
+
     async getUserDetails(userId: number, page: number = 1, limit: number = 10): Promise<any> {
         // Find the user by ID
-        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['collectionEntities', 'createdNfts'] });
+        const user = await this.userRepository.findOne({
+            where: {id: userId},
+            relations: ['collectionEntities', 'createdNfts']
+        });
         if (!user) {
             throw new NotFoundException('User not found');
         }
@@ -236,7 +238,7 @@ export class UserService {
         const collectionPrices = await Promise.all(
             collections.map(async (collection) => {
                 const prices = await this.userRepository.createQueryBuilder('price')
-                    .where('price.collectionId = :collectionId', { collectionId: collection.id })
+                    .where('price.collectionId = :collectionId', {collectionId: collection.id})
                     .getMany();
                 return {
                     ...collection,
@@ -693,48 +695,44 @@ export class UserService {
 
     async filterUsers(dto: FilterUsersDto): Promise<any> {
         const {
-            blockchainId,
-            priceMin,
-            priceMax,
-            currency,
-            typeId,
-            days,
+            days = 30,
             searchQuery,
         } = dto;
 
         const queryBuilder = this.userRepository
             .createQueryBuilder('user')
+            .leftJoin(FollowUser, 'followerRelation', 'followerRelation.followingId = user.id') // Join for followers
             .select([
-                'user.id AS id',
-                'user.name AS name',
-                'user.username AS username',
-                'user.profilePic AS profilePic',
-                'user.followers AS followers',
-                'user.cover AS cover',
+                'user.id',
+                'user.name',
+                'user.username',
+                'user.profilePic',
+                'user.cover',
+                'COUNT(DISTINCT followerRelation.id) AS followersCount' // Counting followers
             ])
-            .where('user.blockchainId = :blockchainId', { blockchainId })
-            .andWhere('user.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
-            .andWhere('user.currency = :currency', { currency })
-            .andWhere('user.typeId = :typeId', { typeId })
-            .andWhere('user.createdAt >= NOW() - INTERVAL :days DAY', { days });
-
+            .where(`user.createdAt >= NOW() - INTERVAL '${days} days'`) // Directly interpolate days into the query
         // Add search filter if searchQuery is provided
         if (searchQuery) {
             queryBuilder.andWhere('user.username ILIKE :searchQuery', {
                 searchQuery: `%${searchQuery}%`,
+            }).orWhere('user.name ILIKE :searchQuery', {
+                searchQuery: `%${searchQuery}%`,
             });
         }
 
-        const users = await queryBuilder.getRawMany(); // Get raw results
-
+        const users = await queryBuilder
+            .groupBy('user.id')
+            .orderBy('user.id')
+            .getRawMany(); // Get raw results
+        console.log(users)
         return {
             users: users.map((user) => ({
-                id: user.id,
-                name: user.name,
-                username: user.username,
-                profilePic: user.profilePic,
-                followers: user.followers,
-                cover: user.cover,
+                id: user.user_id,
+                name: user.user_name,
+                username: user.user_username,
+                profilePic: user.user_profilePic,
+                followers: user.followerscount,
+                cover: user.user_cover,
             })),
         };
     }

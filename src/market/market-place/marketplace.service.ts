@@ -23,7 +23,7 @@ export class MarketplaceService {
       priceMax,
       currency,
       typeId,
-      days,
+      days = 30,
       searchQuery,
       page = 1,
       limit = 10,
@@ -39,15 +39,10 @@ export class MarketplaceService {
         'marketplace.name AS name',
         'marketplace.icon AS icon',
         'MIN(nft.price) AS floorPrice',
-        'nft.currency AS currency'
       ])
       .where('nft.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
-      .andWhere('nft.blockchainId = :blockchainId', { blockchainId })
-      .andWhere('nft.typeId = :typeId', { typeId })
-      .andWhere('nft.currency = :currency', { currency })
-      .andWhere('marketplace.createdAt >= NOW() - INTERVAL :days DAY', { days })
+      .andWhere(`marketplace.createdAt >= NOW() - INTERVAL ${days} DAY`)
       .groupBy('marketplace.id')
-      .addGroupBy('nft.currency')
       .orderBy(`marketplace.${sort}`, sortOrder)
       .skip((page - 1) * limit)
       .take(limit);
