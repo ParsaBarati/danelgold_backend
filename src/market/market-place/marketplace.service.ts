@@ -5,6 +5,7 @@ import { MarketplaceEntity } from './entity/market-place.entity';
 import { PaginationService } from '@/common/paginate/pagitnate.service';
 import { FilterMarketplacesDto } from './dto/filter-marketplace.dto';
 import { createResponse } from '@/utils/response.util';
+import { MarketplaceWithFloorPrice } from './interface/marketplaceWithFloorPrice.interface';
 
 @Injectable()
 export class MarketplaceService {

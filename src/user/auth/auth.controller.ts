@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Post, Req, UseGuards} from '@nestjs/common';
 import {Public} from '@/common/decorators/public.decorator';
 import {
     ApiBadRequestResponse,
@@ -127,6 +127,17 @@ export class AuthController {
         const headerToken = req.headers.authorization.split(' ')[1];
 
         return await this.authService.checkAuthentication(headerToken, appName, packageName, version, buildNumber, token);
+    }
+
+    @ApiCreatedResponse({description: 'Check User Authentication'})
+    @Public()
+    @Get('check')
+    @UseGuards(AuthGuard('jwt'))
+    async checkAuthWeb(@Req() req: Request) {
+
+        const headerToken = req.headers.authorization.split(' ')[1];
+
+        return await this.authService.checkAuthenticationWeb(headerToken);
     }
 
 }

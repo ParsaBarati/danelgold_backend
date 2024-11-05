@@ -4,7 +4,6 @@
   "description": "Denel-Gold",
   "main": "index.js",
   "scripts": {
-
     "build": "node node_modules/@nestjs/cli/bin/nest.js build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
@@ -24,6 +23,7 @@
     "swc": "nest start -b swc --type-check -w"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",

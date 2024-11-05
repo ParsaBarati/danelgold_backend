@@ -14,6 +14,7 @@ export enum NotificationAction {
     SHARE = 'share',
     REPOST = 'repost',
     SUGGESTION = 'suggestion',
+    NOTIF = 'notif',
 }
 
 
