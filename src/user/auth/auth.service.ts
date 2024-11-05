@@ -56,6 +56,7 @@ export class AuthService {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                profilePic: user.profilePic,
                 phone: user.phone,
                 username: user.username,
             },
@@ -336,6 +337,35 @@ export class AuthService {
             packageName,
             version,
             buildNumber,
+        };
+    }
+
+    async checkAuthenticationWeb(
+        token: string,
+    ) {
+        if (!token) {
+            throw new UnauthorizedException('No token provided');
+        }
+
+        const user = await this.tokenService.getByToken(token) as User;
+
+        // Type narrowing: Confirm `user` is indeed a `User`
+        if (!user ) {
+            throw new UnauthorizedException('User not found or not a valid User entity');
+        }
+
+
+
+        return {
+            message: 'Authentication successful',
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                profilePic: user.profilePic,
+                // Any other fields specific to User
+            },
         };
     }
 

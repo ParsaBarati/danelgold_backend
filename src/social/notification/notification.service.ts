@@ -7,6 +7,7 @@ import {HttpService} from '@nestjs/axios';
 import * as fs from "fs";
 import * as jwt from 'jsonwebtoken';
 import {User} from "@/user/user/entity/user.entity";
+import * as path from "path";
 
 
 @Injectable()
@@ -57,7 +58,8 @@ export class NotificationService {
     }
 
     async getAccessToken(): Promise<string> {
-        const serviceAccount = JSON.parse(fs.readFileSync("/home/swaggerlexaplus/public_html/hive-e1b7e-18ef2c559b4c.json", 'utf8'));
+        const serviceAccountPath = process.env.GOOGLE_SERVICE_ACCOUNT_PATH;
+        const serviceAccount = JSON.parse(fs.readFileSync(path.resolve(serviceAccountPath), 'utf8'));
 
         const jwtHeader = {
             alg: 'RS256',

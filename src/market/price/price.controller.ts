@@ -1,28 +1,34 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { PricesService } from "./price.service";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { FilterCollectionsDto } from "../collection/dto/FilterCollection.dto";
+import {Body, Controller, Get, Post, Query} from "@nestjs/common";
+import {PricesService} from "./price.service";
+import {ApiOperation, ApiTags} from "@nestjs/swagger";
+import {FilterCollectionsDto} from "../collection/dto/FilterCollection.dto";
+import {Public} from "@/common/decorators/public.decorator";
 
 
 @ApiTags('Price')
-@ApiBearerAuth()
 @Controller('price')
-export class PriceController{
-    constructor( private readonly priceService: PricesService){}
+export class PriceController {
+    constructor(private readonly priceService: PricesService) {
+    }
 
 
-    @ApiOperation({ summary: 'Filter Collections Base on API' })
+    @ApiOperation({summary: 'Filter Collections Base on API'})
     @Post('collections')
     async filterCollections(
         @Body() filterCollectionsDto: FilterCollectionsDto
-    ){
-    return await this.priceService.filterCollections(filterCollectionsDto);
+    ) {
+        return await this.priceService.filterCollections(filterCollectionsDto);
     }
 
-    @ApiOperation({ summary: 'Get Danel Website Homepage' })
+    @ApiOperation({summary: 'Get Danel Website Homepage'})
     @Get('home')
-    async getPrices(){
-       return await this.priceService.getPrices() 
+    @Public()
+    async getPrices(
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+    ) {
+        return await this.priceService.getPrices(page, limit);
     }
+
 
 }

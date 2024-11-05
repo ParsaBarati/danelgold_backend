@@ -1,9 +1,9 @@
-import {Controller, Delete, Get, NotFoundException, Param, Query} from '@nestjs/common';
-import {ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiQuery, ApiTags,} from '@nestjs/swagger';
-import {DashboardService} from "@/user/dashboard/dashboard.service";
-import {Roles} from "@/common/decorators/roles.decorator";
-import {AdminRole} from "@/user/admin/entity/admin.entity";
-
+import { Controller, Delete, Get, NotFoundException, Param, Query, Post, Body } from '@nestjs/common';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { DashboardService } from "./dashboard.service";
+import { Roles } from "@/common/decorators/roles.decorator";
+import { AdminRole } from "@/user/admin/entity/admin.entity";
+import { SendNotificationDto } from "@/user/dashboard/dto/notification.dto";
 
 @ApiTags('Dashboard')
 @ApiBearerAuth()
@@ -11,8 +11,7 @@ import {AdminRole} from "@/user/admin/entity/admin.entity";
 export class DashboardController {
     constructor(
         private readonly dashboardService: DashboardService,
-    ) {
-    }
+    ) {}
 
     @Get('/')
     async dashboardInsights() {
@@ -27,33 +26,35 @@ export class DashboardController {
     @ApiQuery({ name: 'page', required: true, type: Number })
     @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
-    @ApiOperation({summary: 'Get All Users'})
+    @ApiOperation({ summary: 'Get All Users' })
     @Get('users/all')
     async getAllUsers(
-        @Query('page') page: number = 1,  // Default page number
-        @Query('limit') limit: number = 10 // Default limit for users per page
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('sortType') sortType: string = 'asc'
     ) {
-        return this.dashboardService.getAllUsers(page, limit);
+        return this.dashboardService.getAllUsers(page, limit, sortType);
     }
 
     @ApiCreatedResponse({description: 'List All Posts By SuperAdmin'})
     @ApiQuery({ name: 'page', required: true, type: Number })
     @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
-    @ApiOperation({summary: 'Get All Posts'})
-    @Get('posts/all') // Change the endpoint to 'posts/all'
+    @ApiOperation({ summary: 'Get All Posts' })
+    @Get('posts/all')
     async getAllPosts(
-        @Query('page') page: number = 1,  // Default page number
-        @Query('limit') limit: number = 10 // Default limit for posts per page
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('sortType') sortType: string = 'asc'
     ) {
-        return this.dashboardService.getAllPosts(page, limit); // Change to getAllPosts
+        return this.dashboardService.getAllPosts(page, limit, sortType);
     }
 
     @Delete('posts/:id')
     async deletePost(@Param('id') id: string) {
         try {
             await this.dashboardService.deletePost(id);
-            return {message: 'Post deleted successfully'};
+            return { message: 'Post deleted successfully' };
         } catch (error) {
             throw new NotFoundException('Post not found or could not be deleted');
         }
@@ -63,20 +64,21 @@ export class DashboardController {
     @ApiQuery({ name: 'page', required: true, type: Number })
     @ApiQuery({ name: 'limit', required: true, type: Number })
     @Roles(AdminRole.SUPERADMIN)
-    @ApiOperation({summary: 'Get All Stories'})
+    @ApiOperation({ summary: 'Get All Stories' })
     @Get('stories/all')
     async getAllStories(
-        @Query('page') page: number = 1, // Default page number
-        @Query('limit') limit: number = 10 // Default limit for stories per page
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('sortType') sortType: string = 'asc'
     ) {
-        return this.dashboardService.getAllStories(page, limit); // Change to getAllStories
+        return this.dashboardService.getAllStories(page, limit, sortType);
     }
 
-    @Delete('story/:id') // Change to handle story deletion
+    @Delete('story/:id')
     async deleteStory(@Param('id') id: string) {
         try {
-            await this.dashboardService.deleteStory(id); // Change to deleteStory
-            return {message: 'Story deleted successfully'};
+            await this.dashboardService.deleteStory(id);
+            return { message: 'Story deleted successfully' };
         } catch (error) {
             throw new NotFoundException('Story not found or could not be deleted');
         }
@@ -89,9 +91,28 @@ export class DashboardController {
     @ApiOperation({ summary: 'Get All Notifications' })
     @Get('notifications/all')
     async getAllNotifications(
-        @Query('page') page: number = 1, // Default page number
-        @Query('limit') limit: number = 10 // Default limit for notifications per page
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('sortType') sortType: string = 'asc'
     ) {
-        return this.dashboardService.getAllNotifications(page, limit); // Change to getAllNotifications
+        return this.dashboardService.getAllNotifications(page, limit, sortType);
+    }
+
+    @ApiOperation({ summary: 'Get User by ID' })
+    @Roles(AdminRole.SUPERADMIN)
+    @Get('users/:id')
+    async getUserById(@Param('id') id: string) {
+        const user = await this.dashboardService.getUserById(id);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
+    @ApiOperation({ summary: 'Send Notification' })
+    @Roles(AdminRole.SUPERADMIN)
+    @Post('notifications/send')
+    async sendNotification(@Body() sendNotificationDto: SendNotificationDto) {
+        return this.dashboardService.sendNotification(sendNotificationDto);
     }
 }
