@@ -66,6 +66,7 @@ import { MarketPlaceModule } from './market/market-place/marketplace.module';
 import { BlogPostModule } from './social/blog/blog-post/blog-post.module';
 import { BlogCategory } from './social/blog/blog-catagory/entity/blog-catagory.entity';
 import {SeederModule} from "@/database/seeder.module";
+import { SliderModule } from './market/slider/slider.module';
 
 
 
@@ -151,6 +152,7 @@ import {SeederModule} from "@/database/seeder.module";
         PriceModule,
         MarketPlaceModule,
         BlogPostModule,
+        SliderModule,
         {
             global: true,
             ...HttpModule.register({maxRedirects: 5}),
