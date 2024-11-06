@@ -156,8 +156,8 @@ export class DashboardService {
         for (let i = 6; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(today.getDate() - i);
-            const startOfDay = new Date(date).setHours(0, 0, 0, 0);
-            const endOfDay = new Date(date).setHours(23, 59, 59, 999);
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 
             const count = await repository.count({
                 where: { [dateField]: Between(startOfDay, endOfDay) },

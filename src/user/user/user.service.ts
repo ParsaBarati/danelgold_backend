@@ -16,6 +16,7 @@ import {NotificationService} from "@/social/notification/notification.service";
 import {NotificationAction} from "@/social/notification/entity/notification.entity";
 import {BlockUser} from '@/social/block/entity/block.entity';
 import {FilterUsersDto} from './dto/filter-user.dto';
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,8 @@ export class UserService {
         private followUserRepository: Repository<FollowUser>,
         @InjectRepository(BlockUser)
         private blockUserRepository: Repository<BlockUser>,
+        @InjectRepository(NFT)
+        private nftRepository: Repository<NFT>,
         @InjectRepository(likePost)
         private likePostRepository: Repository<likePost>,
         @InjectRepository(likeStory)
@@ -438,10 +441,47 @@ export class UserService {
         const iHaveBlocked = await this.blockUserRepository.findOneBy([
             {blockerId: self.id, blockedId: userId},
         ]);
+        // Fetch user-owned NFTs with artist and collection data
+        const nfts = await this.nftRepository
+            .createQueryBuilder('nft')
+            .leftJoinAndSelect('nft.collectionEntity', 'collection')
+            .leftJoinAndSelect('nft.artist', 'artist')
+            .where('nft.owner.id = :userId', {userId}) // Ensure owner relationship exists in the NFT entity
+            .select([
+                'nft.id',
+                'nft.name',
+                'nft.image',
+                'nft.price',
+                'artist.id',
+                'artist.username',
+                'artist.profilePic',
+                'collection.id',
+                'collection.name',
+                'collection.cover',
+            ])
+            .getRawMany();
+
+        const ownedNfts = nfts.map(nft => ({
+            id: nft.id,
+            name: nft.name,
+            image: nft.image,
+            price: nft.price,
+            artist: {
+                id: nft.id,
+                username: nft.username,
+                profilePic: nft.profilePic,
+            },
+            collection: {
+                id: nft.id,
+                name: nft.name,
+                cover: nft.cover,
+            },
+        }));
 
         return {
             id: user.id,
             username: user.username,
+            cover: user.cover ?? "",
             profilePic: !isBlocked ? user.profilePic : "",
             followers: followersCount,
             following: followingCount,
@@ -452,6 +492,8 @@ export class UserService {
             posts: (!isBlocked ? finalPosts : []),
             isBlocked: !!isBlocked,
             iHaveBlocked: !!iHaveBlocked,
+            ownedNfts: !isBlocked ? ownedNfts : [], // Include owned NFTs in response
+
             // settings: notifications ? notifications : null,
         };
 
@@ -697,6 +739,7 @@ export class UserService {
         const {
             days = 30,
             searchQuery,
+            sortOrder,
         } = dto;
 
         const queryBuilder = this.userRepository
@@ -722,7 +765,7 @@ export class UserService {
 
         const users = await queryBuilder
             .groupBy('user.id')
-            .orderBy('user.id')
+            .orderBy('user.id', sortOrder)
             .getRawMany(); // Get raw results
         console.log(users)
         return {

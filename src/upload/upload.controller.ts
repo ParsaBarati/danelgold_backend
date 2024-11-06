@@ -94,6 +94,24 @@ export class UploadController {
         return await this.uploadService.createProfilePictureUpload(file, req.user as any);
     }
 
+    @ApiOperation({summary: 'Upload Cover Profile Picture'})
+    @Post('cover')
+    @UseInterceptors(FileInterceptor('file'))
+    async createProfileCoverPictureUpload(
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addMaxSizeValidator({
+                    maxSize: 5 * 1024 * 1024, // 5MB max file size
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        ) file: Express.Multer.File,
+        @Req() req: Request,
+    ) {
+        return await this.uploadService.createProfilePictureUpload(file, req.user as any);
+    }
+
     @ApiOperation({summary: 'Get All Uploads with Filtering Options'})
     @ApiQuery({name: 'page', required: false, example: 1, description: 'Page number for pagination'})
     @ApiQuery({name: 'limit', required: false, example: 10, description: 'Number of items per page'})

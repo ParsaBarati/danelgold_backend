@@ -67,6 +67,7 @@ import { BlogPostModule } from './social/blog/blog-post/blog-post.module';
 import { BlogCategory } from './social/blog/blog-catagory/entity/blog-catagory.entity';
 import {SeederModule} from "@/database/seeder.module";
 import { SliderModule } from './market/slider/slider.module';
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 
 
@@ -121,7 +122,8 @@ import { SliderModule } from './market/slider/slider.module';
             BlockUser,
             savePost,
             Notification,
-            BlogCategory
+            BlogCategory,
+            NFT
         ]),
         AuctionModule,
         CollectionEntityModule,

@@ -307,4 +307,45 @@ export class UploadService {
             'Profile picture uploaded successfully!',
         );
     }
+
+    async createCoverPictureUpload(
+        file: any,
+        user: User,
+    ): Promise<ApiResponses<any>> {
+        if (!file) {
+            throw new NotFoundException('File not found');
+        }
+
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const newUpload = this.uploadRepository.create({
+            name: file.filename,
+            size: file.size,
+            memType: file.mimetype,
+            destination: file.destination,
+        });
+
+        const savedUpload = await this.uploadRepository.save(newUpload);
+
+        user.cover =
+            `${process.env.BASE_URL_UPLOAD}` +
+            `${savedUpload.destination.replace(/\\/g, '/')}` +
+            `/${encodeURIComponent(savedUpload.name)}`;
+        await this.userRepository.save(user);
+
+        const uploadWithLink = {
+            ...savedUpload,
+            link: user.cover,
+            cover: user.cover,
+        };
+
+        return createResponse(
+            200,
+            uploadWithLink,
+            'Cover picture uploaded successfully!',
+        );
+    }
 }

@@ -18,36 +18,39 @@ import {FollowUser} from "@/social/follow/entity/follow.entity";
 import {likeStory} from "@/social/story/like-story/entity/like-story.entity";
 import {NotificationService} from "@/social/notification/notification.service";
 import {Notification} from "@/social/notification/entity/notification.entity";
-import { BlockUser } from '@/social/block/entity/block.entity';
-import { Token } from '@/user/auth/token/entity/token.entity';
-import { OtpModule } from '@/user/auth/otp/otp.module';
-import { TokenModule } from '@/user/auth/token/token.module';
-import { AdminController } from '@/user/admin/admin.controller';
-import { AdminService } from '@/user/admin/admin.service';
-import { JwtStrategy } from '@/user/auth/strategy/jwt.strategy';
-import { JwtAuthGuard } from '@/user/auth/guards/jwt.guard';
-import { OtpService } from '@/user/auth/otp/otp.service';
-import { RolesGuard } from '@/user/auth/guards/roles.guard';
-import { Admin } from '@/user/admin/entity/admin.entity';
-import { TokenService } from '@/user/auth/token/token.service';
-import { JwtService } from '@nestjs/jwt';
+import {BlockUser} from '@/social/block/entity/block.entity';
+import {Token} from '@/user/auth/token/entity/token.entity';
+import {OtpModule} from '@/user/auth/otp/otp.module';
+import {TokenModule} from '@/user/auth/token/token.module';
+import {AdminController} from '@/user/admin/admin.controller';
+import {AdminService} from '@/user/admin/admin.service';
+import {JwtStrategy} from '@/user/auth/strategy/jwt.strategy';
+import {JwtAuthGuard} from '@/user/auth/guards/jwt.guard';
+import {OtpService} from '@/user/auth/otp/otp.service';
+import {RolesGuard} from '@/user/auth/guards/roles.guard';
+import {Admin} from '@/user/admin/entity/admin.entity';
+import {TokenService} from '@/user/auth/token/token.service';
+import {JwtService} from '@nestjs/jwt';
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             User,
-            Admin, 
-            UserDetail, 
-            Token, 
-            Post, 
-            Story, 
-            Club, 
-            likePost, 
-            savePost, 
+            Admin,
+            UserDetail,
+            Token,
+            Post,
+            Story,
+            Club,
+            likePost,
+            savePost,
             FollowUser,
-            BlockUser, 
+            BlockUser,
             likeStory,
-            Notification
+            Notification, NFT
+
+
         ]),
         PassportModule,
         UserModule,

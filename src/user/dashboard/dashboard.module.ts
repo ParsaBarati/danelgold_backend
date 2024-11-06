@@ -32,6 +32,7 @@ import {DashboardService} from "@/user/dashboard/dashboard.service";
 import {DashboardController} from "@/user/dashboard/dashboard.controller";
 import {Admin} from "@/user/admin/entity/admin.entity";
 import {Message} from "@/social/message/message/entity/message.entity";
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 @Module({
     imports: [
@@ -50,6 +51,7 @@ import {Message} from "@/social/message/message/entity/message.entity";
             likeStory,
             Notification,
             Message,
+            NFT,
         ]),
         PassportModule,
         UserModule,
