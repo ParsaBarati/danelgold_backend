@@ -101,15 +101,21 @@ export class PricesService {
                 'COUNT(nft.id) AS itemCount',
                 'COUNT(DISTINCT nft.ownerIdentifier) AS ownerCount' // Unique count for owners
             ])
-            .where('nft.price BETWEEN :priceMin AND :priceMax', { priceMin, priceMax })
             .andWhere(`collection.createdAt >= NOW() - INTERVAL '${days} days'`) // Syntax for time interval
             .groupBy('collection.id')
             .orderBy(`collection.${sort}`, sortOrder === "ASC" ? "ASC" : "DESC")
             .skip((page - 1) * limit)
             .take(limit);
-
+        // Calculate the offset for pagination
+        if (priceMin > 0 && priceMax > 0) {
+            queryBuilder.andWhere('nft.price BETWEEN :priceMin AND :priceMax', {priceMin, priceMax});
+        } else if (priceMin > 0) {
+            queryBuilder.andWhere('nft.price >= :priceMin', {priceMin});
+        } else if (priceMax > 0) {
+            queryBuilder.andWhere('nft.price <= :priceMax', {priceMax});
+        }
         // Add search filter if searchQuery is provided
-        if (searchQuery) {
+        if (searchQuery && searchQuery.length > 2) {
             queryBuilder.andWhere('collection.name ILIKE :searchQuery', {
                 searchQuery: `%${searchQuery}%`,
             });

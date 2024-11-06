@@ -30,6 +30,7 @@ import { AuthService } from './auth.service';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { OtpService } from './otp/otp.service';
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 @Module({
     imports: [
@@ -45,7 +46,8 @@ import { OtpService } from './otp/otp.service';
             FollowUser,
             BlockUser, 
             likeStory,
-            Notification
+            Notification,
+            NFT
         ]),
         PassportModule,
         UserModule,

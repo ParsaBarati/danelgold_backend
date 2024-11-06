@@ -18,6 +18,7 @@ import {HttpModule} from "@nestjs/axios";
 import { BlockUser } from "@/social/block/entity/block.entity";
 import {BlogPost} from "@/social/blog/blog-post/entity/blog-post.entity";
 import {BlogCategory} from "@/social/blog/blog-catagory/entity/blog-catagory.entity";
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 
 @Module({
@@ -34,6 +35,7 @@ import {BlogCategory} from "@/social/blog/blog-catagory/entity/blog-catagory.ent
         BlogPost,
         BlogCategory,
         likeStory,
+        NFT,
         Notification,
     ])],
     controllers: [UserController],

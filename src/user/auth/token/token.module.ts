@@ -23,6 +23,7 @@ import { BlockUser } from '@/social/block/entity/block.entity';
 import { Token } from '@/user/auth/token/entity/token.entity';
 import { TokenController } from '@/user/auth/token/controller.token';
 import { JwtStrategy } from '@/user/auth/strategy/jwt.strategy';
+import {NFT} from "@/nft/nft/entity/nft.entity";
 
 @Module({
     imports: [
@@ -38,7 +39,8 @@ import { JwtStrategy } from '@/user/auth/strategy/jwt.strategy';
             FollowUser,
             BlockUser, 
             likeStory, 
-            Notification
+            Notification,
+            NFT,
         ]),
         ConfigModule,
 
