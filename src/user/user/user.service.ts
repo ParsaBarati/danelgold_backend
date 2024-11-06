@@ -370,6 +370,7 @@ export class UserService {
             .createQueryBuilder('user')
             .leftJoinAndSelect('user.posts', 'post')
             .leftJoinAndSelect('user.stories', 'story')
+            .leftJoinAndSelect('user.favorites', 'favorites')
             .where('user.id = :userId', {userId})
             .orderBy('post.createdAt', 'DESC')
             .addOrderBy('story.createdAt', 'DESC')
@@ -402,6 +403,8 @@ export class UserService {
             // console.log(post.content)
             finalPosts.push({
                 id: post.id,
+                caption: post.caption,
+                createdAt: post.createdAt,
                 thumbnail: post.mediaUrl, // Assuming post has a title
                 isStory: false,
                 isReel: post.isReel,
@@ -477,11 +480,49 @@ export class UserService {
                 cover: nft.cover,
             },
         }));
-
+        // Fetch user-owned NFTs with artist and collection data
+        let favoriteNFTs = [];
+        if (user.favorites.length > 0) {
+            const favorites = await this.nftRepository
+                .createQueryBuilder('nft')
+                .leftJoinAndSelect('nft.collectionEntity', 'collection')
+                .leftJoinAndSelect('nft.artist', 'artist')
+                .where('nft.id IN (:...favorites)', {favorites: user.favorites.map((e) => e.nftId)}) // Correct usage with array parameter
+                .select([
+                    'nft.id',
+                    'nft.name',
+                    'nft.image',
+                    'nft.price',
+                    'artist.id',
+                    'artist.username',
+                    'artist.profilePic',
+                    'collection.id',
+                    'collection.name',
+                    'collection.cover',
+                ])
+                .getRawMany();
+            console.log(favorites)
+            favoriteNFTs = favorites.map(nft => ({
+                id: nft.nft_id,
+                name: nft.nft_name,
+                image: nft.nft_image,
+                price: parseFloat(nft.nft_price), // Convert price to a number if needed
+                artist: {
+                    id: nft.artist_id,
+                    username: nft.artist_username,
+                    profilePic: nft.artist_profilePic,
+                },
+                collection: {
+                    id: nft.collection_id,
+                    name: nft.collection_name,
+                    cover: nft.collection_cover,
+                },
+            }));
+        }
         return {
             id: user.id,
             username: user.username,
-            cover: user.cover ?? "",
+            cover: user.cover,
             profilePic: !isBlocked ? user.profilePic : "",
             followers: followersCount,
             following: followingCount,
@@ -492,7 +533,9 @@ export class UserService {
             posts: (!isBlocked ? finalPosts : []),
             isBlocked: !!isBlocked,
             iHaveBlocked: !!iHaveBlocked,
+            createdAt: user.createdAt,
             ownedNfts: !isBlocked ? ownedNfts : [], // Include owned NFTs in response
+            favoriteNFTs: !isBlocked ? favoriteNFTs : [], // Include owned NFTs in response
 
             // settings: notifications ? notifications : null,
         };

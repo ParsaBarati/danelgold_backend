@@ -45,30 +45,31 @@ import {LikePostModule} from "@/social/post/like-post/like-post.module";
 import {SavePostModule} from "@/social/post/save-post/save-post.module";
 import {savePost} from "@/social/post/save-post/entity/save-post.entity";
 import {LikeStoryModule} from "@/social/story/like-story/like-story.module";
-import { Notification } from '@/social/notification/entity/notification.entity';
-import { NotificationService } from '@/social/notification/notification.service';
-import { HttpModule } from '@nestjs/axios';
-import { MessageModule } from '@/social/message/message/message.module';
-import { LikeMessageModule } from '@/social/message/like-message/like-message.module';
-import { BlockUser } from '@/social/block/entity/block.entity';
-import { Admin } from '@/user/admin/entity/admin.entity';
-import { AdminModule } from '@/user/admin/admin.module';
+import {Notification} from '@/social/notification/entity/notification.entity';
+import {NotificationService} from '@/social/notification/notification.service';
+import {HttpModule} from '@nestjs/axios';
+import {MessageModule} from '@/social/message/message/message.module';
+import {LikeMessageModule} from '@/social/message/like-message/like-message.module';
+import {BlockUser} from '@/social/block/entity/block.entity';
+import {Admin} from '@/user/admin/entity/admin.entity';
+import {AdminModule} from '@/user/admin/admin.module';
 import {DashboardModule} from "./user/dashboard/dashboard.module";
-import { OtpModule } from '@/user/auth/otp/otp.module';
-import { TokenModule } from '@/user/auth/token/token.module';
-import { RSTModule } from '@/social/support-ticket/rst/rst.module';
-import { JwtStrategy } from '@/user/auth/strategy/jwt.strategy';
-import { JwtAuthGuard } from '@/user/auth/guards/jwt.guard';
-import { RolesGuard } from '@/user/auth/guards/roles.guard';
-import { Token } from '@/user/auth/token/entity/token.entity';
-import { PriceModule } from './market/price/price.module';
-import { MarketPlaceModule } from './market/market-place/marketplace.module';
-import { BlogPostModule } from './social/blog/blog-post/blog-post.module';
-import { BlogCategory } from './social/blog/blog-catagory/entity/blog-catagory.entity';
+import {OtpModule} from '@/user/auth/otp/otp.module';
+import {TokenModule} from '@/user/auth/token/token.module';
+import {RSTModule} from '@/social/support-ticket/rst/rst.module';
+import {JwtStrategy} from '@/user/auth/strategy/jwt.strategy';
+import {JwtAuthGuard} from '@/user/auth/guards/jwt.guard';
+import {RolesGuard} from '@/user/auth/guards/roles.guard';
+import {Token} from '@/user/auth/token/entity/token.entity';
+import {PriceModule} from './market/price/price.module';
+import {MarketPlaceModule} from './market/market-place/marketplace.module';
+import {BlogPostModule} from './social/blog/blog-post/blog-post.module';
+import {BlogCategory} from './social/blog/blog-catagory/entity/blog-catagory.entity';
 import {SeederModule} from "@/database/seeder.module";
-import { SliderModule } from './market/slider/slider.module';
+import {SliderModule} from './market/slider/slider.module';
 import {NFT} from "@/nft/nft/entity/nft.entity";
-
+import {FavoritesEntity} from "@/nft/favorites/entity/favorites.entity";
+import {FavoritesModule} from "@/nft/favorites/favorites.module";
 
 
 @Module({
@@ -123,7 +124,8 @@ import {NFT} from "@/nft/nft/entity/nft.entity";
             savePost,
             Notification,
             BlogCategory,
-            NFT
+            NFT,
+            FavoritesEntity,
         ]),
         AuctionModule,
         CollectionEntityModule,
@@ -155,6 +157,7 @@ import {NFT} from "@/nft/nft/entity/nft.entity";
         MarketPlaceModule,
         BlogPostModule,
         SliderModule,
+        FavoritesModule,
         {
             global: true,
             ...HttpModule.register({maxRedirects: 5}),

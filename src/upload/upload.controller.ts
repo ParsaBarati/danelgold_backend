@@ -109,7 +109,7 @@ export class UploadController {
         ) file: Express.Multer.File,
         @Req() req: Request,
     ) {
-        return await this.uploadService.createProfilePictureUpload(file, req.user as any);
+        return await this.uploadService.createCoverPictureUpload(file, req.user as any);
     }
 
     @ApiOperation({summary: 'Get All Uploads with Filtering Options'})

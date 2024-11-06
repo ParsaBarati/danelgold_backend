@@ -11,7 +11,7 @@ import {FilterNFTsDto} from './dto/filterNFT.dto';
 export class NFTsService {
     constructor(
         @InjectRepository(NFT)
-        private readonly nftsRepository: Repository<NFT>,
+        private readonly nftRepository: Repository<NFT>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly ipfsService: IPFSService
@@ -43,7 +43,7 @@ export class NFTsService {
             owner: creator,
         };
 
-        const newNFT = await this.nftsRepository.save(nft);
+        const newNFT = await this.nftRepository.save(nft);
         return createResponse(201, newNFT);
     }
 
@@ -52,7 +52,7 @@ export class NFTsService {
         currentOwnerIdentifier: string
     ): Promise<{ message: string }> {
 
-        const nft = await this.nftsRepository.findOne({
+        const nft = await this.nftRepository.findOne({
             where: {id: nftId}, relations: ['owner']
         });
 
@@ -66,26 +66,26 @@ export class NFTsService {
             throw new ForbiddenException('Only the owner can burn this NFT');
         }
 
-        await this.nftsRepository.remove(nft);
+        await this.nftRepository.remove(nft);
         return {message: 'NFT successfully burned'};
     }
 
     async getNFTById(nftId: number): Promise<ApiResponses<any>> {
 
-        const nft = await this.nftsRepository.findOne({
+        const nft = await this.nftRepository.findOne({
             where: {id: nftId},
-            relations: ['creator', 'owner', 'collections']
+            relations: ['artist', 'owner', 'collectionEntity']
         });
 
         if (!nft) {
             throw new NotFoundException('NFT not found');
         }
 
-        const existingNFT = await this.nftsRepository
-            .createQueryBuilder('nfts')
-            .leftJoinAndSelect('nfts.creator', 'creator')
-            .leftJoinAndSelect('nfts.owner', 'owner')
-            .leftJoinAndSelect('nfts.collections', 'collection')
+        const existingNFT = await this.nftRepository
+            .createQueryBuilder('nft')
+            .leftJoinAndSelect('nft.owner', 'owner')
+            .leftJoinAndSelect('nft.collectionEntity', 'collection')
+            .leftJoinAndSelect('nft.artist', 'artist') // Join the artist entity
             .select([
                 'nft.id',
                 'nft.name',
@@ -95,14 +95,20 @@ export class NFTsService {
                 'nft.price',
                 'nft.createdAt',
                 'nft.updatedAt',
-                'creator.username',
+                'nft.views',
+                'nft.favorites',
+                'artist.id',
+                'artist.username',
+                'artist.profilePic',
                 'owner.username',
                 'collection.id',
                 'collection.name',
-                'collection.description',
+                'collection.cover',
             ])
-            .where('nfts.id = :nftId', {nftId})
+            .where('nft.id = :nftId', {nftId})
             .getOne();
+        existingNFT.views += 1;
+        await this.nftRepository.save(existingNFT);
 
         return createResponse(200, existingNFT);
     }
@@ -119,7 +125,7 @@ export class NFTsService {
             sortOrder,
         } = dto;
 
-        const queryBuilder = this.nftsRepository
+        const queryBuilder = this.nftRepository
             .createQueryBuilder('nft')
             .leftJoinAndSelect('nft.collectionEntity', 'collection')
             .leftJoinAndSelect('nft.artist', 'artist')
@@ -153,10 +159,10 @@ export class NFTsService {
             });
         }
 
-        const nfts = await queryBuilder.orderBy('nft.createdAt', sortOrder).getRawMany(); // Use getRawMany to get raw results
+        const nft = await queryBuilder.orderBy('nft.createdAt', sortOrder).getRawMany(); // Use getRawMany to get raw results
 
         return {
-            nfts: nfts.map((nft) => ({
+            nft: nft.map((nft) => ({
                 id: nft.id,
                 name: nft.name,
                 image: nft.image,

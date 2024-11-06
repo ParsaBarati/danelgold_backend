@@ -36,6 +36,7 @@ import { BlockUser } from '@/social/block/entity/block.entity';
 import { Bid } from '@/market/auction/entity/auctionBid.entity';
 import { ForumPost } from '@/social/forum/entity/forum-post.entity';
 import { BlogPost } from '@/social/blog/blog-post/entity/blog-post.entity';
+import {FavoritesEntity} from "@/nft/favorites/entity/favorites.entity";
 
 
 @Entity({name: 'user'})
@@ -168,6 +169,9 @@ export class User {
     @OneToMany(() => savePost, (postSaves) => postSaves.user)
     @ApiProperty({type: () => [savePost]})
     postSaves: Relation<savePost[]>;
+    @OneToMany(() => FavoritesEntity, (favorites) => favorites.user)
+    @ApiProperty({type: () => [FavoritesEntity]})
+    favorites: Relation<FavoritesEntity[]>;
 
     @OneToMany(() => likeStory, (storyLikes) => storyLikes.user)
     @ApiProperty({type: () => [likeStory]})

@@ -16,6 +16,8 @@ import { CollectionEntity } from '@/market/collection/entity/collection.entity';
 import { Auction } from '@/market/auction/entity/auction.entity';
 import { PriceEntity } from '@/market/price/entity/price.entity';
 import { MarketplaceEntity } from '@/market/market-place/entity/market-place.entity';
+import {savePost} from "@/social/post/save-post/entity/save-post.entity";
+import {FavoritesEntity} from "@/nft/favorites/entity/favorites.entity";
 
 @Entity({ name: 'nfts'})
 export class NFT {
@@ -43,6 +45,12 @@ export class NFT {
 
   @Column('decimal', { precision: 18, scale: 8, nullable: false }) 
   price: number;
+
+  @Column({type: 'int', default: 0})
+  favorites: number;
+  @Column({type: 'int', default: 0})
+  views: number;
+
 
   @CreateDateColumn()
   createdAt: Date;
@@ -74,4 +82,8 @@ export class NFT {
   @ManyToOne(() => User, (owner) => owner.ownedNfts)
   @ApiProperty({ type: () => User })
   owner: Relation<User>;
+
+  @OneToMany(() => FavoritesEntity, nftSaves => nftSaves.nft)
+  @ApiProperty({type: () => [FavoritesEntity]})
+  nftFavorites: Relation<FavoritesEntity[]>;
 }
