@@ -481,6 +481,7 @@ export class UserService {
         return {
             id: user.id,
             username: user.username,
+            cover: user.cover ?? "",
             profilePic: !isBlocked ? user.profilePic : "",
             followers: followersCount,
             following: followingCount,

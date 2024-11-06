@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { SliderService } from './slider.service';
 import { CreateSliderDto } from './dto/create-slider.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {Public} from "@/common/decorators/public.decorator";
 
 @ApiTags('Slider')
 @ApiBearerAuth()
@@ -17,6 +18,7 @@ export class SliderController {
 
   @ApiOperation({ summary: 'get slider for homepage' })
   @Get()
+  @Public()
   async getSlider() {
     return this.sliderService.getSlider();
   }
