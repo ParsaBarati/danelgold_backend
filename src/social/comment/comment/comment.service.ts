@@ -276,10 +276,36 @@ export class CommentService {
             .skip((page - 1) * limit)
             .take(limit);
 
-        const rawComments = await queryBuilder.getMany();
+        const comments = await queryBuilder.getMany();
 
-        const processedComments = rawComments.map((comment) => {
+        // Get like information for comments and user like status
+        const commentIds = comments.map(comment => comment.id);
+        const likeCounts = await this.likeCommentRepository
+            .createQueryBuilder('like')
+            .select('like.commentId', 'commentId')
+            .addSelect('COUNT(*)', 'count')
+            .where('like.commentId IN (:...commentIds) AND like.isLike = 1', { commentIds })
+            .groupBy('like.commentId')
+            .getRawMany();
+
+        const userLikes = await this.likeCommentRepository
+            .createQueryBuilder('like')
+            .select('like.commentId', 'commentId')
+            .where('like.commentId IN (:...commentIds) AND like.userId = :userId AND like.isLike = 1', {
+                commentIds,
+                userId: user.id,
+            })
+            .getRawMany();
+
+        // Map likes to comments
+        const likeCountMap = new Map(likeCounts.map(like => [like.commentId, parseInt(like.count, 10)]));
+        const userLikeMap = new Set(userLikes.map(like => like.commentId));
+
+        const processedComments = comments.map((comment) => {
             const isOwner = comment.user.id == user.id;
+            const likeCount = likeCountMap.get(comment.id) || 0;
+            const isLiked = userLikeMap.has(comment.id);
+
             const canUpdateComment = isOwner
 
             const replies = comment.replies.map((reply) => {
@@ -293,6 +319,8 @@ export class CommentService {
 
             return {
                 ...comment,
+                likeCount,
+                isLiked,
                 canUpdate: canUpdateComment,
                 replies,
             };
@@ -310,6 +338,8 @@ export class CommentService {
 
         return createResponse(200, paginationResult);
     }
+
+
 
     async getCommentsByStory(
         storyId: number,

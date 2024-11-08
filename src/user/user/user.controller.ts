@@ -13,10 +13,15 @@ export class UserController {
     constructor(private readonly userService: UserService) {
     }
 
-    @ApiOperation({summary: 'Fetch Homepage Data'})
+    @ApiOperation({ summary: 'Fetch Homepage Data with Pagination' })
     @Get('home')
-    async getHomepageData(@Req() req: Request) {
-        return await this.userService.getHomepageData(req.user as any);
+    async getHomepageData(
+        @Req() req: Request,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+    ) {
+
+        return await this.userService.getHomepageData(req.user as any, page , limit );
     }
 
     @ApiOperation({summary: 'Get All Reels'})

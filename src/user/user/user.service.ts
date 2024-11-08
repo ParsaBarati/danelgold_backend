@@ -66,7 +66,9 @@ export class UserService {
         };
     }
 
-    async getHomepageData(user: User): Promise<any> {
+    async getHomepageData(user: User, page: number = 1, limit: number = 10): Promise<any> {
+        // Pagination calculation
+        const offset = (page - 1) * limit;
 
         const userStory = await this.storyRepository
             .createQueryBuilder('stories')
@@ -81,12 +83,11 @@ export class UserService {
                 'stories.mediaUrl AS story_media',
                 'stories.createdAt AS story_createdAt',
             ])
-            .where('stories.userId = :userId', {userId: user.id})
-            .andWhere('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
-            .andWhere('stories.createdAt > :last24hours', {last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000)}) // Only stories from the last 24 hours
-            .getRawOne(); // Fetch the user's own story, if exists
+            .where('stories.userId = :userId', { userId: user.id })
+            .andWhere('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
+            .andWhere('stories.createdAt > :last24hours', { last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000) })
+            .getRawOne();
 
-        // Fetch followed users' stories within the last 24 hours
         const stories = await this.storyRepository
             .createQueryBuilder('stories')
             .leftJoinAndSelect('stories.user', 'user')
@@ -100,21 +101,18 @@ export class UserService {
                 'user.profilePic AS user_profilepic',
                 'stories.mediaUrl AS story_media',
                 'stories.createdAt AS story_createdAt',
-
             ])
-            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', {now: new Date()})
-            .andWhere('f.followerId = :userId', {userId: user.id}) // Only stories from followed users
-            .andWhere('stories.createdAt > :last24hours', {last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000)}) // Only stories from the last 24 hours
+            .where('(stories.expiresAt IS NULL OR stories.expiresAt > :now)', { now: new Date() })
+            .andWhere('f.followerId = :userId', { userId: user.id })
+            .andWhere('stories.createdAt > :last24hours', { last24hours: new Date(Date.now() - 24 * 60 * 60 * 1000) })
             .orderBy('stories.createdAt', 'DESC')
             .getRawMany();
 
-        // Prepare final stories array
         const finalStories = [];
 
-        // Add the user's own story first, if it exists
         if (userStory) {
             let existingLike = await this.likeStoryRepository.findOne({
-                where: {story: {id: userStory.story_id}, user: {id: user.id}},
+                where: { story: { id: userStory.story_id }, user: { id: user.id } },
             });
             finalStories.push({
                 id: userStory.story_id,
@@ -125,16 +123,15 @@ export class UserService {
                     username: userStory.user_username,
                 },
                 thumb: userStory.story_thumbnail,
-                media: userStory.story_media, // Ensure this is an array of URLs
+                media: userStory.story_media,
                 isLiked: !!existingLike,
                 createdAt: userStory.createdAt,
             });
         }
 
-        // Add followed users' stories
         for (const story of stories) {
             let existingLike = await this.likeStoryRepository.findOne({
-                where: {story: {id: story.story_id}, user: {id: user.id}},
+                where: { story: { id: story.story_id }, user: { id: user.id } },
             });
 
             finalStories.push({
@@ -149,12 +146,12 @@ export class UserService {
                 media: story.story_media,
                 isLiked: !!existingLike,
                 createdAt: story.createdAt,
-
             });
         }
 
-        // Fetch followed users' posts (remains unchanged)
-        const posts = await this.postRepository
+        // Fetch followed users' posts with pagination
+        console.log(offset)
+        let posts = await this.postRepository
             .createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.postLikes', 'postLikes')
@@ -177,23 +174,36 @@ export class UserService {
                 'post.media AS post_media',
                 'post.content AS post_content',
             ])
-            .where('f.followerId = :userId', {userId: user.id}) // Only posts from followed users
+            .where('f.followerId = :userId OR user.id = :userId', { userId: user.id })
             .groupBy('post.id, user.id')
             .orderBy('post.createdAt', 'DESC')
-            .limit(10)
+            .offset(offset)
+            .cache(false) // Disable caching
+            .take(limit)
             .getRawMany();
 
+        // Fetch the total count without pagination
+        const totalPosts = await this.postRepository
+            .createQueryBuilder('post')
+            .leftJoin('follow', 'f', 'f.followingId = post.userId')
+            .where('f.followerId = :userId OR post.userId = :userId', { userId: user.id })
+            .getCount();
+        if (!Array.isArray(posts)){
+            posts = [
+                posts
+            ];
+        }
         const finalPosts = [];
         for (const post of posts) {
             let existingLike = await this.likePostRepository.findOne({
-                where: {post: {id: post.post_id}, user: {id: user.id}},
+                where: { post: { id: post.post_id }, user: { id: user.id } },
             });
             let existingSave = await this.savePostRepository.findOne({
-                where: {post: {id: post.post_id}, user: {id: user.id}},
+                where: { post: { id: post.post_id }, user: { id: user.id } },
             });
             finalPosts.push({
                 content: post.post_content,
-                media: post.media,
+                media: post.post_media,
                 id: post.post_id,
                 user: {
                     id: post.user_id,
@@ -215,12 +225,18 @@ export class UserService {
             });
         }
 
+        const hasMore = totalPosts > offset + posts.length;
+
         return {
             posts: finalPosts,
             stories: finalStories,
+            pagination: {
+                page,
+                limit,
+                hasMore,
+            },
         };
     }
-
     async getUserDetails(userId: number, page: number = 1, limit: number = 10): Promise<any> {
         // Find the user by ID
         const user = await this.userRepository.findOne({
